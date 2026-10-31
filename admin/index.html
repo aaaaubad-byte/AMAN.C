@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101419">
-  <title>أمان | واجهة الإدارة التجريبية</title>
+  <title>أمان | الرئيسية - الإدارة</title>
   <link rel="stylesheet" href="../styles/app.css">
   <script defer src="../shared/storage.js"></script>
   <script defer src="./app.js"></script>
@@ -13,16 +13,19 @@
   <main class="page">
     <header class="page-header">
       <a class="back-link" href="../">الرئيسية</a>
-      <div><p class="eyebrow">AMAN | أمان</p><h1>واجهة الإدارة</h1></div>
+      <div><p class="eyebrow">AMAN | أمان</p><h1>الرئيسية - الإدارة</h1></div>
     </header>
     <section class="panel">
-      <div class="section-heading"><div><h2>سجلات العملاء التجريبية</h2><p class="muted">السجلات المحفوظة على هذا المتصفح والنطاق فقط.</p></div><span id="customer-count" class="count">0</span></div>
-      <div id="customer-list" class="customer-list" aria-live="polite"><p class="empty">جارٍ تحميل السجلات...</p></div>
+      <div class="section-heading">
+        <div><p class="eyebrow">لوحة الإدارة التجريبية</p><h2>الأرقام المضافة</h2><p class="muted">الأرقام التي أُضيفت من واجهة العميل على هذا المتصفح.</p></div>
+        <span id="number-count" class="count">0</span>
+      </div>
+      <div id="number-list" class="customer-list" aria-live="polite"><p class="empty">جارٍ تحميل الأرقام...</p></div>
       <button id="refresh-button" class="button button-secondary button-full" type="button">تحديث القائمة</button>
-      <button id="clear-button" class="text-button" type="button">حذف سجلات الاختبار من هذا المتصفح</button>
+      <button id="clear-button" class="text-button" type="button">حذف جميع أرقام الاختبار</button>
       <p id="admin-message" class="message" role="status" aria-live="polite"></p>
     </section>
-    <p class="footnote">هذه لوحة اختبار فقط، ولا تحتوي على تسجيل دخول أو صلاحيات أو قاعدة بيانات مشتركة.</p>
+    <p class="footnote">هذه لوحة اختبار محلية فقط، ولا تحتوي على قاعدة بيانات أو تسجيل دخول أو صلاحيات حقيقية.</p>
   </main>
 </body>
 </html>
