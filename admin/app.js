@@ -1,7 +1,7 @@
 (() => {
   "use strict";
-  const list = document.getElementById("customer-list");
-  const count = document.getElementById("customer-count");
+  const list = document.getElementById("number-list");
+  const count = document.getElementById("number-count");
   const message = document.getElementById("admin-message");
   const refresh = document.getElementById("refresh-button");
   const clear = document.getElementById("clear-button");
@@ -10,44 +10,47 @@
     return;
   }
   function render() {
-    let customers;
+    let numbers;
     try {
-      customers = window.AmanStorage.getCustomers();
+      numbers = window.AmanStorage.getNumbers();
     } catch (error) {
-      list.textContent = "تعذر قراءة التخزين المحلي.";
+      list.textContent = "تعذرت قراءة التخزين المحلي.";
       return;
     }
-    count.textContent = String(customers.length);
+    count.textContent = String(numbers.length);
     list.replaceChildren();
-    if (!customers.length) {
+    if (!numbers.length) {
       const empty = document.createElement("p");
       empty.className = "empty";
-      empty.textContent = "لا توجد سجلات. أضف عميلًا تجريبيًا من واجهة العميل أولًا.";
+      empty.textContent = "لا توجد أرقام حتى الآن. أضف رقمًا من واجهة العميل أولًا.";
       list.append(empty);
       return;
     }
-    customers.forEach((customer) => {
+    numbers.forEach((number, index) => {
       const item = document.createElement("article");
       item.className = "customer-item";
-      const name = document.createElement("strong");
-      name.textContent = customer.name;
+      const title = document.createElement("strong");
+      title.textContent = "رقم " + (index + 1);
       const phone = document.createElement("span");
-      phone.textContent = "رقم الهاتف: " + customer.phone;
+      phone.textContent = number.phone;
       const date = document.createElement("small");
-      date.textContent = "وقت التسجيل: " + new Date(customer.createdAt).toLocaleString("ar");
-      item.append(name, phone, date);
+      date.textContent = number.createdAt
+        ? "وقت الإضافة: " + new Date(number.createdAt).toLocaleString("ar")
+        : "رقم محفوظ سابقًا";
+      item.append(title, phone, date);
       list.append(item);
     });
   }
   refresh.addEventListener("click", render);
   clear.addEventListener("click", () => {
-    if (!window.confirm("هل تريد حذف جميع سجلات الاختبار المحفوظة في هذا المتصفح؟")) return;
-    window.AmanStorage.clearCustomers();
-    message.textContent = "حُذفت سجلات الاختبار من هذا المتصفح.";
+    if (!window.confirm("هل تريد حذف جميع أرقام الاختبار المحفوظة في هذا المتصفح؟")) return;
+    window.AmanStorage.clearNumbers();
+    message.textContent = "حُذفت جميع أرقام الاختبار.";
     render();
   });
-  window.addEventListener("storage", (event) => {
+  window.addEventListener("storage", event => {
     if (event.key === window.AmanStorage.key) render();
   });
+  window.addEventListener("aman:numbers-changed", render);
   render();
 })();
