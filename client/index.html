@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101419">
-  <title>أمان | واجهة العميل التجريبية</title>
+  <title>أمان | الرئيسية</title>
   <link rel="stylesheet" href="../styles/app.css">
   <script defer src="../shared/storage.js"></script>
   <script defer src="./app.js"></script>
@@ -13,21 +13,20 @@
   <main class="page">
     <header class="page-header">
       <a class="back-link" href="../">الرئيسية</a>
-      <div><p class="eyebrow">AMAN | أمان</p><h1>واجهة العميل</h1></div>
+      <div><p class="eyebrow">AMAN | أمان</p><h1>الرئيسية</h1></div>
     </header>
     <section class="panel">
-      <h2>تسجيل عميل تجريبي</h2>
-      <p class="muted">أدخل اسمًا ورقمًا وهميين لاختبار انتقال السجل إلى لوحة الإدارة.</p>
-      <form id="customer-form" novalidate>
-        <label for="customer-name">الاسم التجريبي</label>
-        <input id="customer-name" name="name" type="text" maxlength="80" autocomplete="off" required>
-        <label for="customer-phone">رقم الهاتف التجريبي</label>
-        <input id="customer-phone" name="phone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" required>
-        <button class="button button-primary" type="submit">حفظ السجل التجريبي</button>
+      <p class="eyebrow">واجهة العميل التجريبية</p>
+      <h2>إضافة رقم إلى أمان</h2>
+      <p class="muted">أدخل رقمًا تجريبيًا، ثم افتح لوحة الإدارة من المتصفح نفسه للتحقق من ظهوره.</p>
+      <form id="number-form" novalidate>
+        <label for="phone-number">رقم الهاتف</label>
+        <input id="phone-number" name="phone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="أدخل الرقم التجريبي" required>
+        <button class="button button-primary" type="submit">إضافة الرقم</button>
       </form>
       <p id="client-message" class="message" role="status" aria-live="polite">جارٍ فحص التخزين...</p>
     </section>
-    <p class="footnote">استخدم واجهتي العميل والإدارة في المتصفح نفسه. لا تدخل بيانات شخصية حقيقية.</p>
+    <p class="footnote">هذه معاينة اختبارية فقط. استخدم أرقامًا وهمية ولا تدخل رقم هاتف حقيقي.</p>
   </main>
 </body>
 </html>
