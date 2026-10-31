@@ -1,31 +1,24 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101419">
-  <title>أمان | الرئيسية - الإدارة</title>
-  <link rel="stylesheet" href="../styles/app.css">
-  <script defer src="../shared/storage.js"></script>
-  <script defer src="./app.js"></script>
-</head>
-<body>
-  <main class="page">
-    <header class="page-header">
-      <a class="back-link" href="../">الرئيسية</a>
-      <div><p class="eyebrow">AMAN | أمان</p><h1>الرئيسية - الإدارة</h1></div>
-    </header>
-    <section class="panel">
-      <div class="section-heading">
-        <div><p class="eyebrow">لوحة الإدارة التجريبية</p><h2>الأرقام المضافة</h2><p class="muted">الأرقام التي أُضيفت من واجهة العميل على هذا المتصفح.</p></div>
-        <span id="number-count" class="count">0</span>
-      </div>
-      <div id="number-list" class="customer-list" aria-live="polite"><p class="empty">جارٍ تحميل الأرقام...</p></div>
-      <button id="refresh-button" class="button button-secondary button-full" type="button">تحديث القائمة</button>
-      <button id="clear-button" class="text-button" type="button">حذف جميع أرقام الاختبار</button>
-      <p id="admin-message" class="message" role="status" aria-live="polite"></p>
-    </section>
-    <p class="footnote">هذه لوحة اختبار محلية فقط، ولا تحتوي على قاعدة بيانات أو تسجيل دخول أو صلاحيات حقيقية.</p>
-  </main>
-</body>
-</html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f4f7f8"><title>أمان | إدارة النظام</title><link rel="stylesheet" href="../styles/app.css"><script defer src="../shared/storage.js"></script><script defer src="./app.js"></script></head>
+<body><main class="app-shell">
+<header class="topbar"><button class="icon-button" type="button" aria-label="الحساب">♙</button><a class="brand" href="../"><span class="brand-mark">أ</span><span><span class="brand-name">أمان</span><span class="brand-tag">لوحة الإدارة</span></span></a></header>
+<h1 class="page-title">الرئيسية</h1><p class="page-subtitle">نظرة عامة على عمليات أمان وإدارة الخدمة.</p>
+<section class="metrics">
+<div class="metric"><span class="metric-icon">▤</span><small>الطلبات قيد المراجعة</small><strong>—</strong></div>
+<div class="metric"><span class="metric-icon">▦</span><small>الأرقام المحمية</small><strong>—</strong></div>
+<div class="metric"><span class="metric-icon">♧</span><small>البلاغات</small><strong>—</strong></div>
+<div class="metric"><span class="metric-icon">◷</span><small>مهام السداد</small><strong>—</strong></div>
+<div class="metric"><span class="metric-icon">♙</span><small>العملاء</small><strong>—</strong></div>
+<div class="metric"><span class="metric-icon">ر</span><small>الإيرادات المعتمدة</small><strong>—</strong></div>
+</section>
+<div class="section-head"><h2>أقسام الإدارة</h2></div>
+<div class="admin-tabs" role="tablist"><button class="active" type="button" data-tab="requests">الطلبات</button><button type="button" data-tab="numbers">الأرقام</button><button type="button" data-tab="customers">العملاء</button></div>
+<section class="card card-white" id="admin-content">
+<div class="section-head" style="margin:0 0 10px"><h2 id="content-title">الطلبات</h2><span class="tag">معاينة</span></div>
+<div id="content-list"><div class="empty">لا توجد طلبات فعلية بعد. ستظهر الطلبات هنا عند ربط النظام بقاعدة البيانات.</div></div>
+</section>
+<div class="notice">تنبيه: هذه واجهة أولية للمعاينة فقط. الأرقام أدناه تأتي من التخزين المحلي التجريبي، أما مؤشرات الطلبات والإيرادات والمهام فلا تعرض بيانات فعلية.</div>
+</main>
+<nav class="bottom-nav" aria-label="تنقل الإدارة"><button class="nav-item active"><span>⌂</span><span>الرئيسية</span></button><button class="nav-item"><span>▤</span><span>الطلبات</span></button><button class="nav-item"><span>▦</span><span>الأرقام</span></button><button class="nav-item"><span>♙</span><span>العملاء</span></button></nav>
+</body></html>
