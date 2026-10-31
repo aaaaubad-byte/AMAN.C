@@ -1,32 +1,37 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101419">
-  <title>أمان | الرئيسية</title>
-  <link rel="stylesheet" href="../styles/app.css">
-  <script defer src="../shared/storage.js"></script>
-  <script defer src="./app.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f7f8"><title>أمان | العميل</title>
+<link rel="stylesheet" href="../styles/app.css">
+<script defer src="../shared/storage.js"></script><script defer src="./app.js"></script>
 </head>
 <body>
-  <main class="page">
-    <header class="page-header">
-      <a class="back-link" href="../">الرئيسية</a>
-      <div><p class="eyebrow">AMAN | أمان</p><h1>الرئيسية</h1></div>
-    </header>
-    <section class="panel">
-      <p class="eyebrow">واجهة العميل التجريبية</p>
-      <h2>إضافة رقم إلى أمان</h2>
-      <p class="muted">أدخل رقمًا تجريبيًا، ثم افتح لوحة الإدارة من المتصفح نفسه للتحقق من ظهوره.</p>
-      <form id="number-form" novalidate>
-        <label for="phone-number">رقم الهاتف</label>
-        <input id="phone-number" name="phone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="أدخل الرقم التجريبي" required>
-        <button class="button button-primary" type="submit">إضافة الرقم</button>
-      </form>
-      <p id="client-message" class="message" role="status" aria-live="polite">جارٍ فحص التخزين...</p>
-    </section>
-    <p class="footnote">هذه معاينة اختبارية فقط. استخدم أرقامًا وهمية ولا تدخل رقم هاتف حقيقي.</p>
-  </main>
-</body>
-</html>
+<main class="app-shell">
+<header class="topbar"><button class="icon-button" type="button" aria-label="القائمة">☰</button><a class="brand" href="../"><span class="brand-mark">أ</span><span><span class="brand-name">أمان</span><span class="brand-tag">حماية وضمان</span></span></a></header>
+<section id="home-view">
+<h1 class="page-title">مرحبًا بك في أمان</h1><p class="page-subtitle">حافظ على رقمك، وتابع حالة الحماية من مكان واحد.</p>
+<section class="card card-white">
+<h2 class="card-title">البحث عن حالة الرقم في أمان</h2><p class="muted">أدخل رقم الهاتف لمعرفة حالته وإمكانية حمايته.</p>
+<form id="search-form" class="search-row"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="مثال: 77XXXXXXX" aria-label="رقم الهاتف"><button class="button" type="submit">بحث</button></form>
+<p id="search-message" class="message" role="status"></p><div id="search-result"></div>
+</section>
+<div class="section-head"><h2>أرقامي</h2><button class="text-link" id="refresh-numbers" type="button">تحديث</button></div>
+<div id="my-numbers"><div class="empty">لا توجد أرقام مرتبطة بحسابك حتى الآن.</div></div>
+<div class="section-head"><h2>الخدمات</h2></div>
+<div class="action-row"><span class="action-icon">◷</span><span class="action-main"><strong>العمليات</strong><small>متابعة طلبات الحماية والتمديد والتنشيط</small></span><span class="arrow">‹</span></div>
+<div class="action-row"><span class="action-icon">♧</span><span class="action-main"><strong>الإشعارات</strong><small>آخر التحديثات والتنبيهات المتعلقة بأرقامك</small></span><span class="arrow">‹</span></div>
+</section>
+<section id="detail-view" hidden>
+<button class="text-link" id="back-home" type="button">‹ العودة للرئيسية</button>
+<div class="detail-head"><div class="detail-symbol">▦</div><h1>تفاصيل الرقم</h1></div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="muted">رقم الهاتف</span><span class="status">مضاف تجريبيًا</span></div>
+<h2 id="detail-phone" style="font-size:22px;margin:10px 0 0;direction:ltr;text-align:right"></h2>
+</div>
+<div class="detail-grid"><div class="detail-cell"><small>حالة الرقم</small><strong>بانتظار ربط الخدمة</strong></div><div class="detail-cell"><small>شركة الاتصالات</small><strong>غير محددة</strong></div></div>
+<div class="card" style="margin-top:14px"><h2 class="card-title">الإجراءات المتاحة</h2><p class="muted">ستظهر خيارات الحماية والتمديد والتنشيط بعد ربط بيانات الرقم بالخدمة الفعلية.</p><button class="button full" type="button" disabled>الإجراء غير متاح في هذه المرحلة</button></div>
+</section>
+</main>
+<nav class="bottom-nav" aria-label="التنقل الرئيسي"><button class="nav-item" type="button"><span>▤</span><span>أرقامي</span></button><button class="nav-item active" type="button"><span>⌂</span><span>الرئيسية</span></button><button class="nav-item" type="button"><span>◷</span><span>العمليات</span></button></nav>
+</body></html>
