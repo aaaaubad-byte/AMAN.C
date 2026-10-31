@@ -7,31 +7,43 @@
     const value = JSON.parse(raw);
     return Array.isArray(value) ? value : [];
   }
+  function normalizePhone(value) {
+    return String(value || "").trim()
+      .replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+      .replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+      .replace(/[\s()-]/g, "");
+  }
   const api = {
     key: KEY,
-    getCustomers() {
-      return read();
+    getNumbers() {
+      return read().filter(item => item && item.phone).map(item => ({
+        id: item.id || String(item.createdAt || item.phone),
+        phone: normalizePhone(item.phone),
+        createdAt: item.createdAt || ""
+      }));
     },
-    addCustomer(input) {
-      const customers = read();
-      const phone = String(input.phone || "").trim();
-      if (customers.some((item) => item.phone === phone)) {
-        throw new Error("هذا الرقم التجريبي مسجل مسبقًا.");
+    addNumber(input) {
+      const numbers = read();
+      const phone = normalizePhone(input.phone);
+      if (phone.replace(/\D/g, "").length < 6) {
+        throw new Error("أدخل رقمًا تجريبيًا صحيحًا لا يقل عن 6 أرقام.");
       }
-      const customer = {
+      if (numbers.some(item => normalizePhone(item.phone) === phone)) {
+        throw new Error("هذا الرقم مضاف مسبقًا.");
+      }
+      const number = {
         id: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : String(Date.now()),
-        name: String(input.name || "").trim(),
         phone,
         createdAt: new Date().toISOString()
       };
-      customers.unshift(customer);
-      window.localStorage.setItem(KEY, JSON.stringify(customers));
-      window.dispatchEvent(new CustomEvent("aman:customers-changed"));
-      return customer;
+      numbers.unshift(number);
+      window.localStorage.setItem(KEY, JSON.stringify(numbers));
+      window.dispatchEvent(new CustomEvent("aman:numbers-changed"));
+      return number;
     },
-    clearCustomers() {
+    clearNumbers() {
       window.localStorage.removeItem(KEY);
-      window.dispatchEvent(new CustomEvent("aman:customers-changed"));
+      window.dispatchEvent(new CustomEvent("aman:numbers-changed"));
     }
   };
   window.AmanStorage = Object.freeze(api);
