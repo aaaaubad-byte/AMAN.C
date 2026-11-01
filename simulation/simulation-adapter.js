@@ -21,6 +21,11 @@
  *  - نافذة الظهور (task_due_window_days) إعداد للشركة: تظهر المهمة «مستحقة» قبل موعدها بهذا العدد من الأيام ليتسع وقت المدير.
  *  - التنشيط يستكمل المخطط. آخر يوم مسموح للتنشيط = تاريخ المصادرة − مهلة التنشيط (reactivation_days؛ 0 = حتى يوم المصادرة نفسه)؛
  *    وبعده يُرفض التنشيط برمز reactivation_window_closed، وبعد تجاوز تاريخ المصادرة يصبح الرقم مصادرًا. مفتاح reactivation_enabled يمنع التنشيط كليًا.
+ *  - لا تُنشأ مهمة خارج نطاق الاشتراك (قرار 2026-11-01): تُخطَّط المهمة التالية (يوم مرجع المخطط + الفاصل) فقط إن كان موعدها ≤ نهاية الاشتراك.
+ *    مرجع المخطط (plan_anchor_at) = يوم بداية الاشتراك الأول ثم يوم آخر مهمة منفذة؛ ولا يغيّره التمديد ولا التنشيط.
+ *    تاريخ المصادرة دون مهمة مخزنة = مرجع المخطط + الفاصل (هو نفسه موعد المهمة التالية لو كانت ضمن الاشتراك).
+ *    التمديد والتنشيط يستكملان المخطط من المرجع نفسه: تُنشأ المهمة الناقصة إن صار موعدها ضمن الاشتراك الجديد.
+ *    الشركة بإعداد «إنشاء أول مهمة = لا» لا مخطط مهام لها: يبقى لها السلوك السابق (نهاية الاشتراك + مهلة التنشيط) وهو قرار مفتوح موثق.
  *  - نافذة الظهور تُدخَل لكل شركة جديدة دون قيمة افتراضية (مطلوبة، عدد صحيح غير سالب).
  *  - التقويم ميلادي وتوقيت Asia/Aden (UTC+3 ثابت، بلا توقيت صيفي).
  */
@@ -100,10 +105,27 @@ function notify(customerId, title, body, extra = {}) {
 /* ---------- المهام وتاريخ المصادرة (D2/D4/D5/D6) ---------- */
 /* المهمة القادمة الوحيدة للرقم: موعدها هو تاريخ المصادرة. */
 function pendingTask(n) { return db.tasks.find(t => t.number_id === n.id && t.status !== "executed") || null; }
-/* آخر لحظة يجوز فيها التنفيذ/التنشيط قبل المصادرة. دون مهمة قادمة (create_first_task=false) نعود إلى مهلة التنشيط في إعدادات الشركة (مفتوح: راجع PROGRESS_LOG). */
+/* مرجع حساب المخطط: يوم بداية الاشتراك الأول ثم يوم آخر مهمة منفذة (لا يغيّره التمديد ولا التنشيط). */
+function planAnchor(n) { return n.plan_anchor_at || n.starts_at || n.created_at || null; }
+/* موعد المهمة التالية المحسوب (مرجع المخطط + الفاصل) سواء أُنشئت المهمة أم لا. null إن لم يكن للشركة مخطط مهام. */
+function nextPlannedDue(n) {
+ const c = companyById(n.company_id), interval = Number(c && c.task_interval_days), anchor = planAnchor(n);
+ if (!c || !c.create_first_task || !anchor || !isInt(interval) || interval < 1) return null;
+ return addDays(dayStart(anchor), interval);
+}
+/* تخطيط المهمة القادمة: لا تُنشأ مهمة موعدها بعد نهاية الاشتراك (قرار 2026-11-01). تُستدعى بعد ضبط نهاية الاشتراك. */
+function planNextTask(n) {
+ if (pendingTask(n)) return;
+ const due = nextPlannedDue(n);
+ if (!due || Date.parse(due) > Date.parse(n.ends_at)) return;
+ db.tasks.push({ id: uid("TSK"), number_id: n.id, phone: n.phone, company_id: n.company_id, customer_id: n.owner_id, status: "planned", due_at: due, created_at: now() });
+}
+/* آخر لحظة يجوز فيها التنفيذ/التنشيط قبل المصادرة: نهاية يوم موعد المهمة القادمة، المخزنة أو المحسوبة من مرجع المخطط. دون مخطط مهام (create_first_task=false) نعود إلى نهاية الاشتراك + مهلة التنشيط (مفتوح: راجع PROGRESS_LOG). */
 function confiscationDeadline(n) {
  const t = pendingTask(n);
  if (t) return endOfDay(t.due_at);
+ const due = nextPlannedDue(n);
+ if (due) return endOfDay(due);
  const c = companyById(n.company_id);
  const grace = c && c.reactivation_enabled ? Number(c.reactivation_days || 0) : 0;
  return addDays(n.ends_at, grace);
@@ -118,13 +140,13 @@ function liveStatus(n) {
  return s;
 }
 /* آخر لحظة يجوز فيها التنشيط = نهاية اليوم (تاريخ المصادرة − مهلة التنشيط) بتوقيت عدن. null إن كان التنشيط غير مسموح للشركة.
- * دون مهمة قادمة لا يوجد تاريخ مصادرة مخطط، فنُبقي السلوك السابق (نهاية الاشتراك + المهلة) — قرار مفتوح موثق في PROGRESS_LOG ولم نخترع بديلًا. */
+ * تاريخ المصادرة هنا هو موعد المهمة المخزنة أو المحسوبة من مرجع المخطط (آخر مهمة منفذة ضمن الاشتراك + الفاصل). دون مخطط مهام نُبقي السلوك السابق (نهاية الاشتراك + المهلة) — قرار مفتوح موثق في PROGRESS_LOG. */
 function reactivationDeadline(n) {
  const c = companyById(n.company_id);
  if (!c || !c.reactivation_enabled) return null;
- const t = pendingTask(n);
- if (t) return endOfDay(addDays(dayStart(t.due_at), -Number(c.reactivation_days || 0)));
- return addDays(n.ends_at, Number(c.reactivation_days || 0));
+ const grace = Number(c.reactivation_days || 0), t = pendingTask(n), due = t ? t.due_at : nextPlannedDue(n);
+ if (due) return endOfDay(addDays(dayStart(due), -grace));
+ return addDays(n.ends_at, grace);
 }
 function remainingLabel(n) {
  const ms = Date.parse(n.ends_at) - Date.now();
@@ -407,17 +429,19 @@ const admin = {
   const a = adminUser(); if (!a) return AUTH();
   const r = db.requests.find(x => x.id === p.request_id); if (!r || r.status !== "pending") return fail("الطلب غير متاح للاعتماد.", "not_pending");
   const blocked = blockReason(r); if (blocked) return fail(blocked, "approval_blocked");
-  const effect = approvalEffect(r), c = companyById(r.company_id);
+  const effect = approvalEffect(r);
   let n = numberFor(r.phone);
   if (r.operation_type === "activation") {
    if (!n) { n = { id: uid("NUM"), phone: r.phone, company_id: r.company_id, created_at: now(), events: [] }; db.numbers.push(n); }
-   /* اشتراك جديد = مخطط جديد: تُسقط أي مهمة قادمة قديمة للرقم. المنفذة تبقى سجلًا. */
+   /* اشتراك جديد = مخطط جديد: تُسقط أي مهمة قادمة قديمة للرقم ويبدأ مرجع المخطط من يوم الاعتماد. المنفذة تبقى سجلًا. */
    db.tasks = db.tasks.filter(t => t.number_id !== n.id || t.status === "executed");
    n.owner_id = r.customer_id;
-   if (c && c.create_first_task) db.tasks.push({ id: uid("TSK"), number_id: n.id, phone: n.phone, company_id: c.id, customer_id: r.customer_id, status: "planned", due_at: addDays(dayStart(effect.starts_at), c.task_interval_days), created_at: now() });
+   n.plan_anchor_at = effect.starts_at;
   }
   if (r.operation_type !== "extension") n.starts_at = effect.starts_at;
   n.status = "protected"; n.ends_at = effect.ends_at; n.package_name = r.package_name; n.duration_days = r.duration_days;
+  /* المهمة القادمة تُنشأ فقط إن كان موعدها ضمن الاشتراك؛ التمديد والتنشيط يستكملان المخطط من مرجعه فتُنشأ المهمة الناقصة إن صار موعدها ضمن الاشتراك الجديد. */
+  planNextTask(n);
   n.events = n.events || []; n.events.unshift({ type: r.operation_type, at: now(), request_id: r.id });
   r.status = "approved"; r.approved_at = now();
   notify(r.customer_id, "تم اعتماد طلبك", "اعتُمد طلب " + OPERATION_LABELS[r.operation_type] + " للرقم " + r.phone + ".");
@@ -497,11 +521,10 @@ const admin = {
   const n = numberFor(t.phone);
   if (!n || liveStatus(n) !== "protected") return fail("لا تُنفَّذ المهمة إلا والرقم محمي (ضمن فترة الاشتراك).", "task_not_executable");
   t.status = "executed"; t.executed_at = now();
-  /* تنفيذ المهمة يعيد حساب التالية (وهو تاريخ المصادرة الجديد): يوم التنفيذ + الفاصل الدوري، سواء كان التنفيذ مبكرًا أو في موعده. */
-  const c = companyById(t.company_id), interval = Number(c && c.task_interval_days);
-  if (isInt(interval) && interval >= 1) {
-   db.tasks.push({ id: uid("TSK"), number_id: t.number_id, phone: t.phone, company_id: t.company_id, customer_id: t.customer_id, status: "planned", due_at: addDays(dayStart(t.executed_at), interval), created_at: now() });
-  }
+  /* تنفيذ المهمة يجعل يوم التنفيذ مرجع المخطط، فتكون التالية = يوم التنفيذ + الفاصل الدوري (وهو تاريخ المصادرة الجديد) سواء كان التنفيذ مبكرًا أو في موعده.
+   * لا تُنشأ المهمة التالية إن كان موعدها بعد نهاية الاشتراك؛ يبقى تاريخ المصادرة محسوبًا من المرجع نفسه وتُنشأ المهمة عند التمديد أو التنشيط. */
+  n.plan_anchor_at = t.executed_at;
+  planNextTask(n);
   audit("task_executed", "task", t.id, "تسجيل تنفيذ مهمة سداد للرقم " + t.phone);
   save(); return ok();
  },
