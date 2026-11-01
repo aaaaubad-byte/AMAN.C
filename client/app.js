@@ -203,7 +203,7 @@ function openProtection(number,type){
 }
 function populateProtectionCatalog(){
  const ps=document.getElementById("protection-package"),ms=document.getElementById("protection-payment");
- const packages=protectionCatalog.packages.filter(p=>p&&p.active!==false&&p.id&&p.name&&Number.isFinite(Number(p.duration_days))&&Number(p.duration_days)>0&&Number.isFinite(Number(p.price_yer))&&String(p.company_id)===String(protectionContext?.company_id)&&p.operation_type===protectionContext?.type);
+ const packages=protectionCatalog.packages.filter(p=>p&&p.active!==false&&p.id&&p.name&&Number.isFinite(Number(p.duration_days))&&Number(p.duration_days)>0&&Number.isFinite(Number(p.price_yer))&&String(p.company_id)===String(protectionContext?.company_id)&&(p.operation_type===protectionContext?.type||(Array.isArray(p.operation_types)&&p.operation_types.some(v=>v===protectionContext?.type||(protectionContext?.type==="activation"&&v==="subscription")))));
  const methods=protectionCatalog.paymentMethods.filter(p=>p&&p.active!==false&&p.id&&p.name);
  ps.innerHTML='<option value="">اختر الباقة المتاحة</option>'+packages.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+' — '+escapeHtml(p.duration_days)+' يوم — '+escapeHtml(Number(p.price_yer).toLocaleString("ar"))+' ر.ي</option>').join("");
  ms.innerHTML='<option value="">اختر وسيلة الدفع</option>'+methods.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join("");
@@ -216,14 +216,14 @@ document.getElementById("protection-package").addEventListener("change",event=>{
 });
 document.getElementById("protection-payment").addEventListener("change",event=>{
  const p=protectionCatalog.paymentMethods.find(x=>String(x.id)===event.target.value);
- document.getElementById("payment-instructions").textContent=p?text(p.instructions,"لا توجد تعليمات إضافية."):"تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
+ document.getElementById("payment-instructions").textContent=p?text(p.instructions,"لا توجد تعليمات إضافية."):"تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";const reference=document.getElementById("payment-reference");reference.required=Boolean(p?.reference_required??true);reference.placeholder=reference.required?"أدخل مرجع عملية الدفع":"مرجع الدفع غير مطلوب لهذه الوسيلة.";
 });
 document.getElementById("protection-form").addEventListener("submit",event=>{
  event.preventDefault();
  const p=protectionCatalog.packages.find(x=>String(x.id)===document.getElementById("protection-package").value);
  const m=protectionCatalog.paymentMethods.find(x=>String(x.id)===document.getElementById("protection-payment").value);
  const ref=document.getElementById("payment-reference").value.trim();
- if(!p||!m||!ref){setMessage(document.getElementById("protection-message"),"أكمل اختيار الباقة ووسيلة الدفع وأدخل مرجع الدفع.");return;}
+ if(!p||!m){setMessage(document.getElementById("protection-message"),"اختر الباقة ووسيلة الدفع.");return;}if((m.reference_required??true)&&!ref){setMessage(document.getElementById("protection-message"),"أدخل مرجع الدفع لهذه الوسيلة.");return;}if(ref&&m.reference_pattern){try{if(!(new RegExp(m.reference_pattern)).test(ref)){setMessage(document.getElementById("protection-message"),"صيغة مرجع الدفع غير مطابقة.");return;}}catch{setMessage(document.getElementById("protection-message"),"تعذر التحقق من صيغة مرجع الدفع؛ راجع إعدادات وسيلة الدفع.");return;}}
  protectionContext={...protectionContext,package:p,paymentMethod:m,paymentReference:ref};
  const rows=[["الرقم",protectionContext.phone],["الشركة",protectionContext.company],["نوع العملية",operationTypeLabels[protectionContext.type]],["الباقة",p.name],["المدة",p.duration_days+" يوم"],["السعر",Number(p.price_yer).toLocaleString("ar")+" ر.ي"],["وسيلة الدفع",m.name],["مرجع الدفع",ref]];
  document.getElementById("review-details").innerHTML=rows.map(([a,b])=>'<div class="review-row"><span>'+escapeHtml(a)+'</span><strong>'+escapeHtml(b)+'</strong></div>').join("");

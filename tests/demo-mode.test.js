@@ -162,3 +162,20 @@ test("A30-A31 show the authenticated admin and require explicit confirmation bef
  assert.match(adminA26A31,/signOutAdmin/);
  assert.match(demo,/signOutAdmin:async/);
 });
+
+const catalogClient=readFileSync("client/app.js","utf8");
+test("Client catalog supports activation packages and legacy multi-operation demo packages",()=>{
+ assert.match(catalogClient,/Array\.isArray\(p\.operation_types\)/);
+ assert.match(catalogClient,/protectionContext\?\.type==="activation"/);
+});
+test("Client payment reference is optional only when the selected method says so and validates known patterns",()=>{
+ assert.match(catalogClient,/reference\.required=Boolean\(p\?\.reference_required\?\?true\)/);
+ assert.match(catalogClient,/new RegExp\(m\.reference_pattern\)/);
+ assert.match(catalogClient,/مرجع الدفع غير مطلوب/);
+});
+test("Demo submission rejects unavailable or mismatched packages and disabled payment methods instead of falling back",()=>{
+ assert.match(demo,/db\.packages\.find\(x=>x\.id===p\.package_id\)/);
+ assert.match(demo,/db\.payments\.find\(x=>x\.id===p\.payment_method_id\)/);
+ assert.match(demo,/pack\.active===false\|\|pay\.active===false/);
+ assert.match(demo,/String\(pack\.company_id\)!==String\(company\.id\)/);
+});
