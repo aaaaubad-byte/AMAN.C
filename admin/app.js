@@ -9,7 +9,8 @@ const definitions={
  numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"▦",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"قسم الأرقام ضمن دفعة لاحقة."},
  customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"♙",emptyTitle:"لا يوجد عملاء",emptyDescription:"قسم العملاء ضمن دفعة لاحقة."},
  tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"◷",emptyTitle:"لا توجد مهام سداد",emptyDescription:"قسم المهام ضمن دفعة لاحقة."},
- reports:{title:"التقارير",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"▥",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"قسم التقارير ضمن دفعة لاحقة."},
+ complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"⚑",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات بعد ربط الخدمة."},
+ reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"▥",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"قسم التقارير ضمن دفعة لاحقة."},
  settings:{title:"الإعدادات",description:"إدارة الشركات والبادئات والباقات ووسائل الدفع وإعدادات الخدمة.",icon:"⚙",emptyTitle:"لم تُضَف بيانات بعد",emptyDescription:"قسم الإعدادات ضمن دفعة لاحقة."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
