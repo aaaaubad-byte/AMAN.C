@@ -51,12 +51,20 @@ async function seed(e) {
   }), "شركة").company;
   must(await e.A.savePackage({ company_id: company.id, operation_type: "activation", name: "سنوي", days: 365, price_yer: 1000, active: true }), "باقة");
   must(await e.A.savePaymentMethod({ name: "وسيلة", account_number: "123", instructions: "تعليمات", reference_required: true, active: true }), "وسيلة دفع");
-  const pkg = (await e.A.listPackages()).items[0], pay = (await e.A.listPaymentMethods()).items[0];
+  const pkg = (await e.A.listPackages({})).items[0], pay = (await e.A.listPaymentMethods({})).items[0];
   return { company, pkg, pay };
 }
 const submit = (e, s, { phone = "711234567", ref = "R-1", op = "activation" } = {}) => e.C.submitProtectionRequest({
   phone, operation_type: op, company_id: s.company.id, package_id: s.pkg.id, payment_method_id: s.pay.id, payment_reference: ref
 });
+/* بيئة جاهزة: شركة وباقة ووسيلة دفع، وعميل مالك سجّل دخوله وأرسل طلب اشتراك لم يُعتمد بعد. */
+async function withPendingRequest() {
+  const e = env();
+  const s = await seed(e);
+  must(await e.C.signUp({ email: "owner@test.local", password: "1234" }), "المالك");
+  const req = must(await submit(e, s), "طلب");
+  return { e, s, req };
+}
 
 test("اكتمال الواجهة: كل عمليات العقد معرَّفة في المحوّل", () => {
   const e = env();
@@ -104,15 +112,15 @@ test("الحسابات: التحقق من البريد وكلمة المرور �
 test("البدء من حالة فارغة: لا شركات ولا باقات ولا وسائل دفع ولا طلبات ولا أرقام ولا مهام ولا عملاء", async () => {
   const e = env();
   must(await e.A.signInAdmin(ADMIN), "دخول المدير");
-  const empty = async (res, key) => { must(res, key); assert.ok(Array.isArray(res[key]), key + " مصفوفة"); assert.equal(res[key].length, 0, key + " فارغة"); };
-  await empty(await e.A.listCompanies({}), "companies");
-  await empty(await e.A.listPackages({}), "items");
-  await empty(await e.A.listPaymentMethods({}), "items");
-  await empty(await e.A.listRequests({}), "requests");
-  await empty(await e.A.listNumbers({}), "numbers");
-  await empty(await e.A.listCustomers({}), "customers");
-  await empty(await e.A.listTasks({}), "tasks");
-  await empty(await e.A.listComplaints({}), "reports");
+  const empty = (res, key) => { must(res, key); assert.ok(Array.isArray(res[key]), key + " مصفوفة"); assert.equal(res[key].length, 0, key + " فارغة"); };
+  empty(await e.A.listCompanies({}), "companies");
+  empty(await e.A.listPackages({}), "items");
+  empty(await e.A.listPaymentMethods({}), "items");
+  empty(await e.A.listRequests({}), "requests");
+  empty(await e.A.listNumbers({}), "numbers");
+  empty(await e.A.listCustomers({}), "customers");
+  empty(await e.A.listTasks({}), "tasks");
+  empty(await e.A.listComplaints({}), "reports");
   const sum = must(await e.A.getDashboardSummary({}), "ملخص").summary;
   assert.equal(sum.pending_requests, 0);
   assert.equal(sum.protected_numbers, 0);
@@ -133,7 +141,7 @@ test("الإدارة: غير الموجود يُرجع not_found، والتحق�
   assert.equal((await e.A.listPackages({})).items.length, 0);
 });
 
-test("الشركات: نافذة الظهور مطلوبة، والبادئة المكررة بين شركتين مرفوضة", async () => {
+test("الشركات: نافذة الظهور مطلوبة، والبادئة المكررة والاسم المكرر مرفوضان", async () => {
   const e = env();
   const s = await seed(e);
   const base = { name: "شركة أخرى", prefixes: ["73"], number_lengths: [9], task_interval_days: 90, is_active: true, create_first_task: true, reactivation_enabled: true, reactivation_days: 5 };
@@ -143,18 +151,17 @@ test("الشركات: نافذة الظهور مطلوبة، والبادئة ا
   must(await e.A.saveCompanySettings({ ...base, task_due_window_days: 3 }), "شركة صالحة");
 });
 
-test("البحث عن رقم: رموز الأخطاء الموثقة", async () => {
+test("البحث عن رقم: رموز الأخطاء الموثقة ورقم غير مشترك", async () => {
+  const bare = env();
+  must(await bare.C.signUp({ email: "n@test.local", password: "1234" }), "عميل");
+  failed(await bare.C.lookupNumber({ phone: "711234567" }), "no_companies", "دون شركات");
   const e = env();
+  await seed(e);
   must(await e.C.signUp({ email: "n@test.local", password: "1234" }), "عميل");
-  failed(await e.C.lookupNumber({ phone: "711234567" }), "no_companies", "دون شركات");
-  const admin = env();
-  await seed(admin);
-  must(await admin.C.signUp({ email: "n@test.local", password: "1234" }), "عميل");
-  failed(await admin.C.lookupNumber({ phone: "abc" }), "invalid_number", "رقم غير صالح");
-  failed(await admin.C.lookupNumber({ phone: "9912345678" }), "unknown_prefix", "بادئة مجهولة");
-  failed(await admin.C.lookupNumber({ phone: "7112345" }), "invalid_length", "طول غير مطابق");
-  const ok = must(await admin.C.lookupNumber({ phone: "711234567" }), "رقم غير مشترك");
-  assert.equal(ok.number.status, "not_subscribed");
+  failed(await e.C.lookupNumber({ phone: "abc" }), "invalid_number", "رقم غير صالح");
+  failed(await e.C.lookupNumber({ phone: "9912345678" }), "unknown_prefix", "بادئة مجهولة");
+  failed(await e.C.lookupNumber({ phone: "7112345" }), "invalid_length", "طول غير مطابق");
+  assert.equal(must(await e.C.lookupNumber({ phone: "711234567" }), "رقم غير مشترك").number.status, "not_subscribed");
 });
 
 test("طلب الحماية: التحقق من الباقة ووسيلة الدفع والمرجع والرقم", async () => {
@@ -164,18 +171,85 @@ test("طلب الحماية: التحقق من الباقة ووسيلة الد�
   failed(await e.C.submitProtectionRequest({ phone: "12", operation_type: "activation" }), "invalid_request", "بيانات ناقصة");
   failed(await e.C.submitProtectionRequest({ phone: "711234567", operation_type: "activation", company_id: s.company.id, package_id: "x", payment_method_id: s.pay.id, payment_reference: "R" }), "unavailable_package", "باقة مجهولة");
   failed(await submit(e, s, { ref: "" }), "reference_required", "مرجع مطلوب");
-  failed(await submit(e, s, { op: "extension" }), "unavailable_package", "نوع عملية لا تطابق الباقة");
+  failed(await submit(e, s, { op: "extension" }), "unavailable_package", "نوع عملية لا يطابق الباقة");
   const catalog = must(await e.C.getProtectionCatalog({ company_id: s.company.id, operation_type: "activation" }), "الكتالوج");
   assert.equal(catalog.packages.length, 1);
   assert.equal(catalog.payment_methods[0].account_number, "123");
   must(await submit(e, s), "طلب صالح");
 });
 
-test("دورة العملية: اعتماد يجعل الرقم محميًا، والخصوصية وأهلية العمليات والتكرار", async () => {
+test("دورة الاعتماد: الرقم يصير محميًا، والاعتماد مرة ثانية مرفوض، وغير المالك لا يرى تفاصيل الحماية ولا يشترك فيه", async () => {
+  const { e, s, req } = await withPendingRequest();
+  assert.equal(must(await e.A.getDashboardSummary({}), "ملخص").summary.pending_requests, 1);
+  must(await e.A.approveRequest({ request_id: req.request_id }), "اعتماد");
+  failed(await e.A.approveRequest({ request_id: req.request_id }), "not_pending", "اعتماد ثانٍ");
+  const mine = must(await e.C.listMyNumbers({}), "أرقامي").items;
+  assert.equal(mine.length, 1);
+  assert.equal(mine[0].status, "protected");
+  failed(await submit(e, s, { ref: "R-2" }), "operation_not_allowed", "اشتراك جديد على رقم محمي لدى المالك نفسه");
+  must(await e.C.signOut({}), "خروج المالك");
+  must(await e.C.signUp({ email: "other@test.local", password: "1234" }), "عميل آخر");
+  const view = must(await e.C.lookupNumber({ phone: "711234567" }), "بحث").number;
+  assert.equal(view.status, "other_protected");
+  for (const key of ["package_name", "starts_at", "ends_at", "duration_days", "owner_id", "customer_id"]) assert.equal(key in view, false, "الخصوصية: " + key);
+  failed(await submit(e, s, { ref: "R-3" }), "operation_not_allowed", "اشتراك في رقم محمي لدى غيره");
+  assert.equal((await e.C.listMyNumbers({})).items.length, 0);
+  const nums = must(await e.A.listNumbers({}), "أرقام الإدارة").numbers;
+  assert.equal(nums.length, 1);
+  assert.ok(must(await e.A.listAuditLog({}), "التدقيق").items.length > 0, "الإجراء الإداري يُسجَّل");
+});
+
+test("الرفض: سبب من القائمة إلزامي، وتوضيح ≤ 300 حرف، والنتيجة تصل إلى العميل، ولا اعتماد بعد الرفض", async () => {
+  const { e, req } = await withPendingRequest();
+  failed(await e.A.rejectRequest({ request_id: req.request_id, reason_code: "ليس_من_القائمة" }), "invalid_reason", "سبب مجهول");
+  failed(await e.A.rejectRequest({ request_id: req.request_id, reason_code: "amount_short", explanation: "س".repeat(301) }), "explanation_too_long", "توضيح طويل");
+  must(await e.A.rejectRequest({ request_id: req.request_id, reason_code: "amount_short", explanation: "المبلغ ناقص" }), "رفض");
+  failed(await e.A.approveRequest({ request_id: req.request_id }), "not_pending", "اعتماد بعد الرفض");
+  failed(await e.A.rejectRequest({ request_id: req.request_id, reason_code: "amount_short" }), "not_pending", "رفض ثانٍ");
+  const op = must(await e.C.listMyOperations({}), "عملياتي").items[0];
+  assert.equal(op.status, "rejected");
+  assert.ok(op.rejection_reason, "سبب الرفض يصل إلى العميل");
+  assert.equal(must(await e.C.getNotifications({}), "إشعارات").items.length, 1, "إشعار آلي بالرفض");
+  assert.equal(must(await e.A.getRejectReasons({}), "الأسباب").items.length, 3);
+});
+
+test("البلاغات: قواعد التقديم، منع التكرار، ثم قرار الإدارة بسبب إلزامي", async () => {
+  const { e, req } = await withPendingRequest();
+  must(await e.A.approveRequest({ request_id: req.request_id }), "اعتماد");
+  failed(await e.C.submitReport({ phone: "711234567", reason_code: "unauthorized" }), "report_not_allowed", "المالك يبلّغ عن رقمه");
+  must(await e.C.signOut({}), "خروج");
+  must(await e.C.signUp({ email: "reporter@test.local", password: "1234" }), "مبلّغ");
+  failed(await e.C.submitReport({ phone: "711234567", reason_code: "ليس_من_القائمة" }), "invalid_reason", "سبب مجهول");
+  failed(await e.C.submitReport({ phone: "711234567", reason_code: "other" }), "reason_text_required", "سبب آخر بلا توضيح");
+  failed(await e.C.submitReport({ phone: "711234599", reason_code: "unauthorized" }), "report_not_allowed", "رقم غير محمي");
+  must(await e.C.submitReport({ phone: "711234567", reason_code: "unauthorized", reason_text: "بلاغ" }), "بلاغ صالح");
+  failed(await e.C.submitReport({ phone: "711234567", reason_code: "mine" }), "duplicate_report", "بلاغ مفتوح مكرر");
+  const list = must(await e.A.listComplaints({}), "البلاغات").reports;
+  assert.equal(list.length, 1);
+  assert.equal(list[0].status, "open");
+  failed(await e.A.decideComplaint({ report_id: list[0].id, decision: "no_action" }), "invalid_request", "قرار بلا سبب");
+  must(await e.A.decideComplaint({ report_id: list[0].id, decision: "no_action", reason: "لا مخالفة" }), "قرار");
+  assert.equal((await e.A.listComplaints({})).reports[0].status, "resolved");
+  failed(await e.A.decideComplaint({ report_id: list[0].id, decision: "no_action", reason: "مرة ثانية" }), "invalid_request", "قرار ثانٍ على بلاغ محسوم");
+});
+
+test("تعطيل العميل: يمنع الدخول، ولا يُكرَّر الإجراء، وإعادة التفعيل تعيد الدخول", async () => {
+  const { e } = await withPendingRequest();
+  const customer = must(await e.A.listCustomers({}), "العملاء").customers.find(c => c.email === "owner@test.local");
+  assert.ok(customer, "العميل ظاهر للإدارة");
+  must(await e.A.updateCustomerStatus({ customer_id: customer.id, status: "disabled", reason: "اختبار" }), "تعطيل");
+  failed(await e.A.updateCustomerStatus({ customer_id: customer.id, status: "disabled" }), "invalid_status_change", "تعطيل مكرر");
+  failed(await e.C.signIn({ email: "owner@test.local", password: "1234" }), "invalid_credentials", "دخول معطَّل");
+  must(await e.A.updateCustomerStatus({ customer_id: customer.id, status: "active" }), "تفعيل");
+  must(await e.C.signIn({ email: "owner@test.local", password: "1234" }), "دخول بعد التفعيل");
+});
+
+test("وسائل الدفع: رقم الحساب يُحفظ ويصل إلى العميل، وفي التعديل بلا رقم يُمسح", async () => {
   const e = env();
   const s = await seed(e);
-  must(await e.C.signUp({ email: "owner@test.local", password: "1234" }), "المالك");
-  const req = must(await submit(e, s), "طلب");
-  assert.equal(must(await e.A.getDashboardSummary({}), "ملخص").summary.pending_requests, 1);
-  failed(await submit(e, s, { ref: "R-2" }), "operation_not_allowed", "تكرار الاشتراك لرقم يملكه العميل قبل الاعتماد يُحسم عند الاعتماد");
+  must(await e.C.signUp({ email: "p@test.local", password: "1234" }), "عميل");
+  assert.equal((await e.C.getProtectionCatalog({})).payment_methods[0].account_number, "123");
+  must(await e.A.savePaymentMethod({ id: s.pay.id, name: s.pay.name, instructions: "تعليمات", reference_required: true, active: true }), "تعديل بلا رقم");
+  assert.equal((await e.A.listPaymentMethods({})).items[0].account_number, "");
+  failed(await e.A.savePaymentMethod({ name: "طويل", account_number: "x".repeat(101), instructions: "ت" }), "validation_failed", "رقم حساب طويل");
 });
