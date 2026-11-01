@@ -31,7 +31,7 @@ jobs:
       - name: Run browser tests
         env:
           AMAN_REQUIRE_BROWSER: "1"
-        run: node --test --test-timeout=60000 tests/browser.test.js tests/browser-admin.test.js
+        run: node --test --test-timeout=60000 tests/browser.test.js tests/browser-admin.test.js tests/browser-client.test.js
 
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
