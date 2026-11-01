@@ -4,9 +4,9 @@
 <body><main class="app admin-app">
 <header class="topbar"><button class="icon-btn" id="admin-account" aria-label="الحساب"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button><a class="brand" href="../"><span class="brand-symbol">أ</span><span class="brand-copy"><strong>أمان</strong><small>إدارة النظام</small></span></a></header>
 
-<section id="admin-login" hidden><div class="auth-wrap"><div class="auth-brand"><div class="brand-symbol">أ</div><h1>إدارة أمان</h1><p>منطقة مخصصة للمخولين فقط</p></div><div class="auth-card"><h2>تسجيل دخول الإدارة</h2><p>أدخل بيانات حساب الإدارة للوصول إلى لوحة التحكم.</p><form id="admin-login-form"><label class="field-label" for="admin-username">البريد الإلكتروني</label><input class="field" id="admin-username" type="email" autocomplete="username" required><div class="field-wrap"><label class="field-label" for="admin-password">كلمة المرور</label><input class="field" id="admin-password" type="password" autocomplete="current-password" required></div><p class="notice-error" id="admin-login-message" aria-live="polite"></p><button class="btn btn-block" type="submit">دخول الإدارة</button></form></div><p class="auth-foot">تسجيل الدخول والصلاحيات لا تُفعّل قبل ربط خادم المصادقة.</p></div></section>
+<section id="admin-login"><div class="auth-wrap"><div class="auth-brand"><div class="brand-symbol">أ</div><h1>إدارة أمان</h1><p>منطقة مخصصة للمخولين فقط</p></div><div class="auth-card"><h2>تسجيل دخول الإدارة</h2><p>أدخل بيانات حساب الإدارة للوصول إلى لوحة التحكم.</p><form id="admin-login-form"><label class="field-label" for="admin-username">البريد الإلكتروني</label><input class="field" id="admin-username" type="email" autocomplete="username" required><div class="field-wrap"><label class="field-label" for="admin-password">كلمة المرور</label><input class="field" id="admin-password" type="password" autocomplete="current-password" required></div><p class="notice-error" id="admin-login-message" aria-live="polite"></p><button class="btn btn-block" type="submit">دخول الإدارة</button></form></div><p class="auth-foot">تسجيل الدخول والصلاحيات لا تُفعّل قبل ربط خادم المصادقة.</p></div></section>
 
-<section id="dashboard-screen"><div class="page-head"><p class="eyebrow">مركز التحكم</p><h1 class="page-title">الرئيسية</h1><p class="page-desc">متابعة عمليات الحماية وإدارة خدمات أمان.</p></div>
+<section id="dashboard-screen" hidden><div class="page-head"><p class="eyebrow">مركز التحكم</p><h1 class="page-title">الرئيسية</h1><p class="page-desc">متابعة عمليات الحماية وإدارة خدمات أمان.</p></div>
 <div class="admin-stats">
 <article class="stat-card"><span class="stat-icon">▤</span><small>طلبات قيد المراجعة</small><strong>—</strong><em>بانتظار ربط البيانات</em></article>
 <article class="stat-card"><span class="stat-icon">▦</span><small>الأرقام المحمية</small><strong>—</strong><em>بانتظار ربط البيانات</em></article>
@@ -19,15 +19,36 @@
 <div class="admin-shortcuts">
 <button class="admin-shortcut" data-section="requests"><span class="quick-icon">▤</span><strong>الطلبات</strong><small>مراجعة طلبات الخدمة</small></button>
 <button class="admin-shortcut" data-section="numbers"><span class="quick-icon">▦</span><strong>الأرقام</strong><small>حالات الحماية والسجلات</small></button>
-<button class="admin-shortcut" data-section="customers"><span class="quick-icon">♙</span><strong>العملاء</strong><small>حسابات العملاء</small></button>
-<button class="admin-shortcut" data-section="tasks"><span class="quick-icon">◷</span><strong>مهام السداد</strong><small>المواعيد والتنفيذ</small></button>
+<button class="admin-shortcut" data-section="customers"><span class="quick-icon">♙</span><strong id="stat-customers">—</strong><small>حسابات العملاء</small></button>
+<button class="admin-shortcut" data-section="tasks"><span class="quick-icon">◷</span><strong id="stat-due-tasks">—</strong><small>المواعيد والتنفيذ</small></button>
 <button class="admin-shortcut" data-section="reports"><span class="quick-icon">▥</span><strong>التقارير</strong><small>ملخصات الأداء والإيرادات</small></button>
 <button class="admin-shortcut" data-section="settings"><span class="quick-icon">⚙</span><strong>الإعدادات</strong><small>الشركات والباقات والدفع</small></button>
 </div>
 <section class="surface" style="margin-top:17px"><div class="section-head" style="margin:0 0 10px"><h2>آخر النشاطات</h2><span class="state state-off">لا توجد بيانات</span></div><div class="empty-state"><strong>لا توجد نشاطات مسجلة</strong><p>سيظهر هنا آخر ما تم على النظام بعد ربط قاعدة البيانات وسجل التدقيق.</p></div></section>
 </section>
 
-<section id="admin-section" hidden><button class="quiet-link" id="admin-back">‹ العودة إلى الرئيسية</button><div class="page-head"><p class="eyebrow">إدارة أمان</p><h1 class="page-title" id="section-title">الطلبات</h1><p class="page-desc" id="section-description"></p></div><div class="surface"><div class="empty-state"><div class="empty-icon" id="section-icon">▤</div><strong id="section-empty-title">لا توجد بيانات لعرضها</strong><p id="section-empty-description">سيظهر المحتوى هنا بعد ربط النظام بقاعدة البيانات والصلاحيات.</p></div></div></section>
+<section id="admin-section" hidden>
+<button class="quiet-link" id="admin-back">‹ العودة إلى الرئيسية</button>
+<div class="page-head"><p class="eyebrow">إدارة أمان</p><h1 class="page-title" id="section-title">الطلبات</h1><p class="page-desc" id="section-description"></p></div>
+<div id="requests-list-view" hidden>
+<div class="surface">
+<div class="admin-filter-grid">
+<div><label class="field-label" for="request-search">بحث</label><input class="field" id="request-search" placeholder="رقم الطلب أو الهاتف أو العميل"></div>
+<div><label class="field-label" for="request-status">حالة الطلب</label><select class="field" id="request-status"><option value="pending">قيد المراجعة</option><option value="all">كل الحالات</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div>
+<div><label class="field-label" for="request-type">نوع العملية</label><select class="field" id="request-type"><option value="all">كل العمليات</option><option value="subscription">اشتراك</option><option value="extension">تمديد الاشتراك</option><option value="reactivation">تنشيط</option></select></div>
+<div><label class="field-label" for="request-company">الشركة</label><select class="field" id="request-company"><option value="all">كل الشركات</option></select></div>
+</div>
+<div class="field-row"><button class="btn btn-outline" id="requests-refresh" type="button">تحديث القائمة</button><button class="btn btn-soft" id="requests-reset" type="button">مسح المرشحات</button></div>
+<p id="requests-message" aria-live="polite"></p>
+</div>
+<div id="requests-list" aria-live="polite"><div class="surface empty-state"><strong>سجّل الدخول لعرض الطلبات</strong></div></div>
+</div>
+<div id="request-detail-view" hidden>
+<div class="field-row detail-toolbar"><button class="btn btn-outline" id="request-detail-back" type="button">العودة إلى الطلبات</button><button class="btn btn-soft" id="request-detail-refresh" type="button">تحديث التفاصيل</button></div>
+<div id="request-detail-content"></div>
+</div>
+<div id="admin-generic-view" class="surface" hidden><div class="empty-state"><div class="empty-icon" id="section-icon">▤</div><strong id="section-empty-title">لا توجد بيانات لعرضها</strong><p id="section-empty-description"></p></div></div>
+</section>
 </main>
-<nav class="bottom-nav" aria-label="تنقل الإدارة"><button class="nav-item active" data-admin-tab="dashboard"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></button><button class="nav-item" data-admin-tab="requests"><svg viewBox="0 0 24 24"><path d="M7 3h10l3 3v15H4V3zM8 10h8M8 14h8M8 18h5"/></svg><span>الطلبات</span></button><button class="nav-item" data-admin-tab="numbers"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h2m3 0h1M9 15h2m3 0h1"/></svg><span>الأرقام</span></button><button class="nav-item" data-admin-tab="customers"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/></svg><span>العملاء</span></button></nav>
+<nav class="bottom-nav" id="admin-bottom-nav" aria-label="تنقل الإدارة" hidden><button class="nav-item active" data-admin-tab="dashboard"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></button><button class="nav-item" data-admin-tab="requests"><svg viewBox="0 0 24 24"><path d="M7 3h10l3 3v15H4V3zM8 10h8M8 14h8M8 18h5"/></svg><span>الطلبات</span></button><button class="nav-item" data-admin-tab="numbers"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h2m3 0h1M9 15h2m3 0h1"/></svg><span>الأرقام</span></button><button class="nav-item" data-admin-tab="customers"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/></svg><span>العملاء</span></button></nav>
 </body></html>
