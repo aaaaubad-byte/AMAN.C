@@ -5,6 +5,7 @@
 //   { client, admin, setNow?, status?, adminCredentials? }
 // حيث client/admin كائنان بعمليات async تُرجع { success, code?, message? } كما في العقود. إن لم يتوفر setNow تُتخطى اختبارات الزمن.
 // ملاحظة صدق: كُتب هذا الملف دون تشغيله (بيئة بلا Node)؛ لا يُعدّ ناجحًا حتى يُشغَّل فعليًا.
+// ملاحظة تقنية: الكائنات القادمة من vm تنتمي لنطاق آخر، فلا تُقارَن مصفوفاتها بـ deepEqual مباشرة (نستخدم JSON أو Array.from).
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -211,7 +212,7 @@ timeTest("lookupNumber: التحقق والحالات الخمس دون كشف �
   await w.as("b@test.local");
   const other = (await w.client.lookupNumber({ phone: "711234567" })).number;
   assert.equal(other.status, "other_protected");
-  assert.deepEqual(Object.keys(other).sort(), ["company", "company_id", "phone", "status"]); // لا مالك ولا باقة ولا تواريخ
+  assert.equal(JSON.stringify(Array.from(Object.keys(other)).sort()), JSON.stringify(["company", "company_id", "phone", "status"])); // لا مالك ولا باقة ولا تواريخ
   assert.equal(await w.myStatus("711000000"), "not_subscribed");
 
   w.setNow("2026-02-15T10:00:00+03:00");
@@ -266,8 +267,8 @@ test("الرفض: السبب من القائمة، التوضيح حتى 300، �
   const w = await world();
   await w.as("a@test.local");
   const r = must(await w.submit("activation", "act365"), "إرسال");
-  const reasons = must(await w.admin.getRejectReasons({}), "الأسباب").items.map(x => x.code);
-  assert.deepEqual(reasons.sort(), ["amount_short", "bad_reference", "not_received"]);
+  const reasons = Array.from(must(await w.admin.getRejectReasons({}), "الأسباب").items, x => x.code).sort();
+  assert.equal(JSON.stringify(reasons), JSON.stringify(["amount_short", "bad_reference", "not_received"]));
   fails(await w.admin.rejectRequest({ request_id: r.request_id, reason_code: "غير-معتمد" }), "invalid_reason", "سبب غير معتمد");
   fails(await w.admin.rejectRequest({ request_id: r.request_id, reason_code: "bad_reference", explanation: "x".repeat(301) }), "explanation_too_long", "توضيح طويل");
   must(await w.admin.rejectRequest({ request_id: r.request_id, reason_code: "bad_reference", explanation: "المرجع غير مطابق" }), "رفض");
@@ -365,7 +366,7 @@ test("سجل التدقيق: الإجراء الإداري الناجح يُسج
   fails(await w.admin.rejectRequest({ request_id: r.request_id, reason_code: "غير-معتمد" }), "invalid_reason", "رفض فاشل");
   assert.equal((await w.admin.listAuditLog({})).items.length, before);
   must(await w.admin.approveRequest({ request_id: r.request_id }), "اعتماد");
-  const actions = (await w.admin.listAuditLog({})).items.map(x => x.action);
+  const actions = Array.from((await w.admin.listAuditLog({})).items, x => x.action);
   assert.ok(actions.includes("request_approved"));
   assert.ok(actions.includes("company_created"));
   const summary = must(await w.admin.getDashboardSummary({}), "ملخص").summary;
@@ -410,15 +411,14 @@ timeTest("قاعدة 8: المصادرة بعد نهاية يوم الموعد �
   assert.equal((await w.tasks()).filter(x => x.status !== "executed").length, 0);
 });
 
-timeTest("قاعدة 7: لا تنفيذ بعد انتهاء الاشتراك ولا إعادة جدولة لرقم غير محمي", {}, async w => {
+timeTest("الرقم المصادَر: لا تنفيذ لمهمته ولا إعادة جدولة لها", {}, async w => {
   await w.as("a@test.local");
   await w.apply("activation", "act365");
-  const t = await w.openTask();
-  w.setNow("2027-01-02T10:00:00+03:00"); // بعد نهاية الاشتراك (365 يومًا) لكن المهمة المخزنة تجاوزت موعدها فالرقم مصادَر
-  // نختبر الحالة غير المصادَرة بإعادة ضبط السيناريو على اشتراك 90 يومًا لا يتوفر في الباقات؛ فنكتفي بالتحقق من أن الرقم المصادَر لا يقبل التنفيذ.
-  const res = await w.admin.executeTask({ task_id: t.id });
-  assert.equal(res.success, false);
-  assert.ok(["task_not_executable", "task_not_available"].includes(res.code), JSON.stringify(res));
+  const t = await w.openTask(); // تُجلب قبل المصادرة لأن قائمة المهام تخفي مهام المصادَر
+  w.setNow("2027-01-02T10:00:00+03:00"); // بعد موعد المهمة (04-01) فالرقم مصادَر
+  assert.equal(await w.myStatus("711234567"), "confiscated");
+  fails(await w.admin.executeTask({ task_id: t.id }), "task_not_executable", "تنفيذ لرقم مصادَر");
+  fails(await w.admin.rescheduleTask({ task_id: t.id, new_due_at: "2027-02-01" }), "task_not_reschedulable", "إعادة جدولة لرقم مصادَر");
 });
 
 timeTest("قاعدة 9: نافذة الظهور تحوّل المهمة إلى due قبل موعدها دون تغيير الموعد", { windowDays: 10 }, async w => {
@@ -434,7 +434,7 @@ timeTest("قاعدة 9: نافذة الظهور تحوّل المهمة إلى d
   assert.equal((await w.admin.getDashboardSummary({})).summary.due_tasks, 1);
 });
 
-timeTest("قاعدة 10: التنشيط بعد آخر يوم يُرفض برمز النافذة، ومفتاح المنع برمزه", {}, async w => {
+timeTest("قاعدة 10: التنشيط يُقبل في آخر يوم ويُرفض بعده برمز النافذة", {}, async w => {
   await w.as("a@test.local");
   await w.apply("activation", "act30");
   w.setNow("2026-03-27T23:59:59+03:00");
@@ -476,5 +476,5 @@ timeTest("قاعدة 12: تغيير الفاصل للشركة يزيح المه�
   assert.equal(prev.affected_tasks, 1);
   const c = (await w.admin.listCompanies({})).companies[0];
   must(await w.admin.saveCompanySettings({ ...c, task_interval_days: 100 }), "حفظ الفاصل");
-  assert.equal((await w.openTask()).due_at, "2026-04-10T21:00:00.000Z"); // 04-01 + 10 يومًا بتوقيت عدن = 04-11
+  assert.equal((await w.openTask()).due_at, "2026-04-10T21:00:00.000Z"); // 04-01 + 10 أيام بتوقيت عدن = 04-11
 });
