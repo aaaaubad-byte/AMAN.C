@@ -42,13 +42,13 @@ function installClient(){
   updateNumberAlertPreferences:async p=>{if(!customer())return fail();let a=db.alerts.find(x=>x.customer_id===customer().id&&x.phone===p.phone);if(!a){a={customer_id:customer().id,phone:p.phone};db.alerts.push(a);}Object.assign(a,p);save();return ok();},
   submitReport:async p=>{const r={id:id("RPT"),customer_id:customer()?.id||null,...p,status:"open",created_at:now()};db.reports.unshift(r);save();return ok({report_id:r.id});}
  };
- window.AMANClientData.setProtectionCatalog(db.packages,db.payments);
+ document.addEventListener("DOMContentLoaded",()=>{if(window.AMANClientData){window.AMANClientData.setProtectionCatalog(db.packages,db.payments);if(customer()){window.AMANClientData.setNumbers(numbersFor(customer().id));window.AMANClientData.setOperations(customerRequests());}}});
  function sync(){const u=customer();if(!u)return;window.AMANClientData.setNumbers(numbersFor(u.id));window.AMANClientData.setOperations(customerRequests());}
  document.addEventListener("submit",e=>{
   if(e.target.id==="auth-form"){e.preventDefault();e.stopImmediatePropagation();const email=document.getElementById("auth-email").value.trim().toLowerCase(),password=document.getElementById("auth-password").value;let u=db.users.find(x=>x.email.toLowerCase()===email&&x.password===password&&!x.is_admin);if(!u&&document.getElementById("auth-title")?.textContent.includes("إنشاء")){if(db.users.some(x=>x.email.toLowerCase()===email)){alert("البريد مستخدم بالفعل.");return;}u={id:id("CUS"),full_name:email.split("@")[0],email,password,status:"active",customer_type:"user"};db.users.push(u);}if(!u){alert("بيانات الدخول غير صحيحة. استخدم customer@aman.demo / 1234");return;}db.session=u.id;save();sync();location.reload();}
   if(e.target.id==="search-form"){e.preventDefault();e.stopImmediatePropagation();const phone=document.getElementById("phone-search").value.replace(/\D/g,"");const n=db.numbers.find(x=>x.phone===phone);const msg=document.getElementById("search-message");if(n&&customer()&&n.customer_id===customer().id){window.AMANClientData.showSearchResult(n);msg.textContent="هذا الرقم مرتبط بحسابك في البيئة التجريبية.";}else{msg.textContent="الرقم غير محمي في بيانات التجربة. يمكنك تقديم طلب حماية بعد تسجيل الدخول وإضافة الرقم من مسار العميل المتاح.";} }
  },true);
- if(customer()){sync();const name=document.getElementById("profile-name");if(name)name.value=customer().full_name;}
+ document.addEventListener("DOMContentLoaded",()=>{if(customer()){sync();const name=document.getElementById("profile-name");if(name)name.value=customer().full_name;}});
 }
 function installAdmin(){
  window.AMANAdminServices={
