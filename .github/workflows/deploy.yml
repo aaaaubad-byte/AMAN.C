@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir -p dist
           cp index.html dist/
-          cp -R client admin styles demo dist/
+          cp -R client admin styles services dist/
           touch dist/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
