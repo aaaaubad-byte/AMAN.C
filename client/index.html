@@ -35,8 +35,18 @@
 <button class="quick-link" type="button" data-navigate="notifications"><span class="quick-icon">♧</span><span class="quick-text"><strong>الإشعارات</strong><small>التحديثات والتنبيهات الخاصة بأرقامك</small></span><span class="chevron">‹</span></button>
 </section>
 
-<section id="numbers-screen" data-screen="numbers" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام المرتبطة بحسابك بعد اعتماد طلبات الاشتراك.</p></div><div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام بعد</strong><p>ستظهر الأرقام المعتمدة في هذا القسم.</p></div></section>
-<section id="operations-screen" data-screen="operations" hidden><div class="page-head"><p class="eyebrow">متابعة الخدمة</p><h1 class="page-title">العمليات</h1><p class="page-desc">طلبات الاشتراك والتمديد والتنشيط وحالات مراجعتها.</p></div><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات لعرضها</strong><p>ستظهر عملياتك هنا بعد تقديم طلبات الخدمة.</p></div></section>
+<section id="numbers-screen" data-screen="numbers" hidden>
+<div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام المرتبطة بحسابك بعد اعتماد طلب الاشتراك فقط.</p></div>
+<section class="surface list-tools"><label class="field-label" for="numbers-search">البحث في أرقامك</label><div class="field-row"><input class="field" id="numbers-search" type="search" placeholder="ابحث برقم الهاتف" autocomplete="off"><button class="btn btn-outline" id="clear-numbers-search" type="button" aria-label="مسح البحث">مسح</button></div>
+<div class="filter-grid"><div><label class="field-label" for="numbers-company-filter">شركة الاتصالات</label><select class="field" id="numbers-company-filter"><option value="">كل الشركات</option></select></div><div><label class="field-label" for="numbers-status-filter">حالة الحماية</label><select class="field" id="numbers-status-filter"><option value="">كل الحالات</option><option value="protected">محمي</option><option value="inactive">غير نشط</option><option value="confiscated">منتهي-مصادر</option></select></div></div></section>
+<div id="numbers-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام بعد</strong><p>تظهر هنا الأرقام بعد اعتماد طلب الاشتراك. البحث عن رقم لا يضيفه إلى قائمتك.</p></div></div>
+</section>
+<section id="operations-screen" data-screen="operations" hidden>
+<div class="page-head"><p class="eyebrow">متابعة الخدمة</p><h1 class="page-title">العمليات</h1><p class="page-desc">تابع طلبات الاشتراك والتمديد والتنشيط وحالة كل طلب.</p></div>
+<section class="surface list-tools"><label class="field-label" for="operations-search">البحث في العمليات</label><input class="field" id="operations-search" type="search" placeholder="رقم الهاتف أو رقم الطلب" autocomplete="off">
+<div class="filter-grid single-filter"><div><label class="field-label" for="operations-status-filter">حالة الطلب</label><select class="field" id="operations-status-filter"><option value="">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div></div></section>
+<div id="operations-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات حتى الآن</strong><p>ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.</p></div></div>
+</section>
 <section id="account-screen" data-screen="account" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">بيانات الحساب وإعدادات الأمان.</p></div><div class="surface"><div class="empty-state"><div class="empty-icon">♙</div><strong>بيانات الحساب</strong><p>ستظهر بيانات حسابك بعد تسجيل الدخول وربط المصادقة.</p></div><button class="btn btn-outline btn-block" id="open-login" type="button">تسجيل الدخول</button></div></section>
 <section id="notifications-screen" data-screen="notifications" hidden><div class="page-head"><p class="eyebrow">ابقَ على اطلاع</p><h1 class="page-title">الإشعارات</h1><p class="page-desc">تنبيهات حالة الحماية ومواعيد التجديد وتحديثات الطلبات.</p></div><div class="soft-surface empty-state"><div class="empty-icon">♧</div><strong>لا توجد إشعارات</strong><p>ستظهر إشعاراتك هنا عند توفرها.</p></div></section>
 </main>
@@ -51,8 +61,15 @@
 <div class="detail-block"><div class="detail-line"><div><div class="detail-label">رقم الهاتف</div><div class="detail-value" id="sheet-phone" dir="ltr">—</div></div><span class="state state-off">غير متحقق</span><span class="detail-icon">♧</span></div></div>
 <div class="detail-block"><div class="detail-line"><div><div class="detail-label">شركة الاتصالات</div><div class="detail-value">تُحدد بعد التحقق</div></div><span class="detail-icon">▦</span></div></div>
 <div class="detail-block"><div class="detail-split"><div><div class="detail-label">تاريخ البداية</div><div class="detail-value">—</div></div><div><div class="detail-label">تاريخ الانتهاء</div><div class="detail-value">—</div></div></div></div>
-<div class="alert-note">سيتم استكمال تفاصيل الرقم وإجراءات حالته في دفعة العميل.</div>
-<button class="btn btn-block" style="margin-top:14px" id="sheet-done">إغلاق</button>
+<div id="sheet-details-extra"></div>
+<div class="alert-note" id="sheet-privacy-note" hidden></div>
+<div class="sheet-actions" id="sheet-actions"></div>
+<button class="btn btn-outline btn-block" style="margin-top:14px" id="sheet-done">إغلاق</button>
+</section></div>
+<div class="overlay" id="operation-sheet" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="operation-sheet-title">
+<div class="sheet-handle"></div><div class="sheet-top"><button class="sheet-close" id="close-operation-sheet" aria-label="إغلاق">×</button><span></span></div>
+<div class="sheet-hero"><div class="sheet-hero-icon">▤</div><h2 id="operation-sheet-title">تفاصيل العملية</h2></div>
+<div id="operation-sheet-content"></div><button class="btn btn-outline btn-block" id="operation-sheet-done" type="button">إغلاق</button>
 </section></div>
 <script type="application/json" id="screen-contract">{"status":"phase-1-navigation-foundation","data_source":"not-connected","mock_data":false}</script>
 </body></html>
