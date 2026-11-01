@@ -18,6 +18,8 @@ const definitions={
  payments:{title:"وسائل الدفع",description:"إدارة وسائل الدفع وتعليماتها واشتراط مرجع الدفع.",icon:"ر",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
  content:{title:"المحتوى الثابت",description:"تحرير الشروط والأحكام والخصوصية والتواصل والمساعدة والدعم.",icon:"▤",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص الثابتة المعتمدة."},
  audit:{title:"سجل التدقيق",description:"مراجعة أحدث إجراءات الإدارة مع مرشحات الإجراء والكيان.",icon:"◷",emptyTitle:"لا توجد سجلات",emptyDescription:"ستظهر الأحداث الإدارية المسجلة هنا."},
+ followup:{title:"نافذة الظهور والمتابعة",description:"المتابعة اليومية للمهام المستحقة ضمن نافذة الظهور قبل مواعيدها: تنفيذها أو إعادة جدولتها.",icon:"◔",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"ستظهر المهام المستحقة هنا ضمن نافذة الظهور."},
+ more:{title:"المزيد",description:"باقي أقسام الإدارة.",icon:"⋯",emptyTitle:"",emptyDescription:""},
  account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"♙",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
@@ -26,7 +28,9 @@ const typeLabel={subscription:"اشتراك",extension:"تمديد الاشتر�
 function message(node,text,kind="info"){node.textContent=text;node.className=kind==="error"?"notice-error":kind==="success"?"notice-success":"notice-info";}
 function text(v,fallback="—"){return v===null||v===undefined||v===""?fallback:String(v);}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function setActive(name){tabs.forEach(t=>t.classList.toggle("active",t.dataset.adminTab===name));}
+const primaryTabs=["dashboard","requests","numbers","customers"];
+function setActive(name){const tab=!name?"":primaryTabs.includes(name)?name:"more";tabs.forEach(t=>t.classList.toggle("active",t.dataset.adminTab===tab));}
+function renderMore(){const h=$("admin-generic-view");h.replaceChildren();const order=["tasks","followup","complaints","reports","notifications","alerts","settings","packages","payments","content","audit","account"];const wrap=document.createElement("div");wrap.className="admin-shortcuts";order.forEach(k=>{const d=definitions[k];if(!d)return;const b=document.createElement("button");b.type="button";b.className="admin-shortcut";b.dataset.moreSection=k;const i=document.createElement("span");i.className="quick-icon";i.textContent=d.icon;const t=document.createElement("strong");t.textContent=d.title;b.append(i,t);b.addEventListener("click",()=>navigate(k));wrap.append(b);});h.append(wrap);}
 function showLogin(){current="login";dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;setActive("");}
 function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;setActive("dashboard");loadDashboard();}
 function navigate(name,{remember=true}={}) {
@@ -40,9 +44,10 @@ function navigate(name,{remember=true}={}) {
  setActive(name);window.scrollTo({top:0,behavior:"smooth"});
  document.dispatchEvent(new CustomEvent("aman:admin-screenchange",{detail:{screen:name}}));
  if(name==="requests")loadRequests();
+ if(name==="more")renderMore();
  return true;
 }
-function back(){if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"){navigate("requests",{remember:false});return;}showDashboard();}
+function back(){if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
 window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
