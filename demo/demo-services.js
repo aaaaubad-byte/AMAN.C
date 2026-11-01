@@ -14,9 +14,9 @@ const seed = () => ({
 });
 function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.users)&&Array.isArray(x.requests)){if(!("customer_session" in x))x.customer_session=x.session&&x.users.some(u=>u.id===x.session&&!u.is_admin)?x.session:null;if(!("admin_session" in x))x.admin_session=x.session&&x.users.some(u=>u.id===x.session&&u.is_admin)?x.session:null;delete x.session;return x;}}catch{}return seed();}
 let db=load();function save(){localStorage.setItem(KEY,JSON.stringify(db));}
-function current(){return db.users.find(x=>x.id===db.session)||null;}
-function customer(){const u=current();return u&&!u.is_admin?u:null;}
-function admin(){const u=current();return u&&u.is_admin?u:null;}
+
+function customer(){return db.users.find(x=>x.id===db.customer_session&&!x.is_admin)||null;}
+function admin(){return db.users.find(x=>x.id===db.admin_session&&x.is_admin===true)||null;}
 function ok(x={}){return {success:true,...x};}
 function fail(message){return {success:false,message};}
 function ownsRequest(r){return !!customer()&&r.customer_id===customer().id;}
