@@ -38,7 +38,7 @@ function setup(startIso = "2026-01-01T09:00:00+03:00", { windowDays = 0, reactiv
   };
   const company = must(admin.saveCompanySettings(companyInput), "إضافة شركة").company;
   const pkgs = {};
-  [["act365", "activation", 365], ["act30", "activation", 30], ["react30", "reactivation", 30]].forEach(([k, op, days]) => {
+  [["act365", "activation", 365], ["act120", "activation", 120], ["act90", "activation", 90], ["act30", "activation", 30], ["ext365", "extension", 365], ["react30", "reactivation", 30]].forEach(([k, op, days]) => {
     admin.savePackage({ company_id: company.id, operation_type: op, name: k, days, price_yer: 1000, active: true });
   });
   admin.listPackages().items.forEach(p => { pkgs[p.name] = p.id; });
@@ -171,18 +171,72 @@ test("لا إعادة جدولة إلى تاريخ سابق لليوم", () => {
   assert.equal(res.code, "invalid_date");
 });
 
-test("D6: التنشيط قبل تاريخ المصادرة يستكمل المخطط نفسه دون مهمة جديدة", () => {
+// ---- قرار 2026-11-01: لا تُنشأ مهمة خارج نطاق الاشتراك؛ والتنشيط/التمديد يستكملان المخطط من آخر مهمة منفذة + الفاصل ----
+
+test("لا مهمة خارج الاشتراك: فاصل (90) أكبر من مدة الاشتراك (30) ← لا مهام، وتاريخ المصادرة = بداية المخطط + الفاصل", () => {
   const s = setup();
-  s.runOp("activation", "act30"); // الحماية حتى 01-31، موعد المهمة 04-01
-  const before = s.pending();
+  s.runOp("activation", "act30"); // الحماية حتى 01-31 والموعد المحسوب 04-01 خارج الاشتراك
+  assert.equal(s.tasks().length, 0);
   s.setNow("2026-02-15T10:00:00+03:00");
   assert.equal(s.numStatus(), "inactive");
-  s.runOp("reactivation", "react30");
+  s.setNow("2026-04-01T23:59:59+03:00");
+  assert.equal(s.numStatus(), "inactive"); // لم يُصادَر بعد: آخر يوم 04-01
+  s.setNow("2026-04-02T00:00:00+03:00");
+  assert.equal(s.numStatus(), "confiscated");
+});
+
+test("D6 (محدَّث): التنشيط بعد انتهاء الاشتراك يستكمل المخطط من المرجع نفسه ولا يُنشئ مهمة تتجاوز الاشتراك الجديد", () => {
+  const s = setup();
+  s.runOp("activation", "act30"); // الحماية حتى 01-31، لا مهام
+  s.setNow("2026-02-15T10:00:00+03:00");
+  assert.equal(s.numStatus(), "inactive");
+  s.runOp("reactivation", "react30"); // الحماية الجديدة حتى 03-17، والموعد المحسوب 04-01 بعدها
   assert.equal(s.numStatus(), "protected");
-  const after = s.tasks();
-  assert.equal(after.length, 1);
-  assert.equal(after[0].id, before.id);
-  assert.equal(after[0].due_at, before.due_at);
+  assert.equal(s.tasks().length, 0);
+  s.setNow("2026-03-18T10:00:00+03:00");
+  assert.equal(s.numStatus(), "inactive"); // لا يزال تاريخ المصادرة 04-01
+  s.setNow("2026-04-02T00:00:00+03:00");
+  assert.equal(s.numStatus(), "confiscated");
+});
+
+test("التنفيذ داخل الاشتراك ثم نهاية الاشتراك قبل موعد التالية: لا مهمة جديدة، وتاريخ المصادرة = يوم آخر مهمة منفذة + الفاصل", () => {
+  const s = setup();
+  s.runOp("activation", "act120"); // الحماية حتى 05-01
+  s.setNow("2026-02-10T10:00:00+03:00");
+  s.must(s.admin.executeTask({ task_id: s.pending().id }), "تنفيذ مبكر"); // التالية المحسوبة 05-11 بعد نهاية الاشتراك
+  assert.equal(s.tasks().filter(t => t.status !== "executed").length, 0);
+  assert.equal(s.tasks().filter(t => t.status === "executed").length, 1);
+  s.setNow("2026-05-02T10:00:00+03:00");
+  assert.equal(s.numStatus(), "inactive");
+  s.setNow("2026-05-11T23:59:59+03:00");
+  assert.equal(s.numStatus(), "inactive");
+  s.setNow("2026-05-12T00:00:00+03:00");
+  assert.equal(s.numStatus(), "confiscated");
+});
+
+test("التنشيط بعد انتهاء الاشتراك يستكمل المخطط: تُنشأ المهمة من آخر مهمة منفذة + الفاصل إن صارت ضمن الاشتراك الجديد", () => {
+  const s = setup();
+  s.runOp("activation", "act120");
+  s.setNow("2026-02-10T10:00:00+03:00");
+  s.must(s.admin.executeTask({ task_id: s.pending().id }), "تنفيذ مبكر");
+  s.setNow("2026-05-02T10:00:00+03:00"); // غير نشط؛ آخر يوم للتنشيط 05-06 (05-11 − 5)
+  assert.equal(s.numStatus(), "inactive");
+  s.runOp("reactivation", "react30"); // الحماية الجديدة حتى 06-01
+  assert.equal(s.numStatus(), "protected");
+  const open = s.tasks().filter(t => t.status !== "executed");
+  assert.equal(open.length, 1);
+  assert.equal(open[0].due_at, "2026-05-10T21:00:00.000Z"); // 05-11 بتوقيت عدن = 02-10 + 90
+});
+
+test("التمديد يستكمل المخطط: تُنشأ المهمة الناقصة حين يصير موعدها ضمن الاشتراك الممدَّد", () => {
+  const s = setup();
+  s.runOp("activation", "act30");
+  assert.equal(s.tasks().length, 0);
+  s.setNow("2026-01-15T10:00:00+03:00");
+  s.runOp("extension", "ext365");
+  const open = s.tasks().filter(t => t.status !== "executed");
+  assert.equal(open.length, 1);
+  assert.equal(open[0].due_at, "2026-03-31T21:00:00.000Z"); // 04-01 بتوقيت عدن = بداية الاشتراك + 90
 });
 
 test("D6: التنشيط بعد تجاوز تاريخ المصادرة مرفوض", () => {
@@ -197,7 +251,7 @@ test("D6: التنشيط بعد تجاوز تاريخ المصادرة مرفو�
 
 test("D5: لا تنفيذ للمهمة بعد انتهاء الاشتراك (الرقم غير نشط)", () => {
   const s = setup();
-  s.runOp("activation", "act30");
+  s.runOp("activation", "act90"); // الحماية حتى 04-01 09:00 والموعد 04-01 (ضمن الاشتراك فتُنشأ المهمة)
   s.setNow("2026-04-01T10:00:00+03:00"); // يوم الموعد، والاشتراك منتهٍ، ولم يُصادَر بعد
   assert.equal(s.numStatus(), "inactive");
   const res = s.admin.executeTask({ task_id: s.pending().id });
@@ -256,14 +310,15 @@ test("مفتاح السماح بالتنشيط: التنشيط مرفوض برم
   assert.equal(res.code, "reactivation_disabled");
 });
 
-test("التنشيط لا يغيّر تاريخ المصادرة ولا موعد المهمة", () => {
+test("التنشيط لا يغيّر تاريخ المصادرة: المهمة تُنشأ بموعدها الأصلي نفسه إن صارت ضمن الاشتراك الجديد", () => {
   const s = setup();
-  s.runOp("activation", "act30");
-  const before = s.pending();
-  s.setNow("2026-03-20T10:00:00+03:00");
-  s.runOp("reactivation", "react30");
-  assert.equal(s.pending().due_at, before.due_at);
-  assert.equal(s.pending().confiscation_date, before.confiscation_date);
+  s.runOp("activation", "act30"); // لا مهام (الموعد 04-01 خارج الاشتراك)
+  s.setNow("2026-03-20T10:00:00+03:00"); // غير نشط وقبل آخر يوم للتنشيط 03-27
+  assert.equal(s.numStatus(), "inactive");
+  s.runOp("reactivation", "react30"); // الحماية الجديدة حتى 04-19 فتشمل الموعد 04-01
+  const t = s.pending();
+  assert.equal(t.due_at, "2026-03-31T21:00:00.000Z"); // الموعد الأصلي نفسه: 04-01 بتوقيت عدن
+  assert.equal(t.confiscation_date, "2026-04-01T20:59:59.999Z");
 });
 
 test("إعادة الجدولة: اليوم نفسه مسموح (التقديم حتى اليوم)", () => {
@@ -288,8 +343,8 @@ test("إعادة الجدولة: المثال المعتمد — موعد 20 ن�
 
 test("إعادة الجدولة للأرقام المحمية فقط: رقم غير نشط مرفوض بـ task_not_reschedulable", () => {
   const s = setup();
-  s.runOp("activation", "act30");
-  s.setNow("2026-02-15T10:00:00+03:00");
+  s.runOp("activation", "act90"); // الموعد 04-01 ضمن الاشتراك فتُنشأ المهمة
+  s.setNow("2026-04-01T10:00:00+03:00"); // الاشتراك منتهٍ ولم يُصادَر بعد
   assert.equal(s.numStatus(), "inactive");
   const res = s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "2026-04-20" });
   assert.equal(res.success, false);
