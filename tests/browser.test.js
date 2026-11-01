@@ -101,6 +101,12 @@ test("إضافة شركة: تحقق ← حفظ عبر الخدمة ← ظهور 
   await fill("اسم الشركة", "شركة اختبار");
   await fill("البادئات", "77");
   await fill("أطوال الأرقام", "9");
+  // نافذة الظهور فارغة ومطلوبة بلا افتراضي (قرار 2026-11-01): الحفظ دونها مرفوض
+  assert.equal(await t.page.getByLabel("نافذة ظهور المهام المستحقة").first().inputValue(), "");
+  await t.page.click("button:has-text('حفظ')");
+  await t.page.waitForTimeout(300);
+  assert.equal((await t.page.evaluate(() => window.AMANAdminServices.listCompanies())).companies.length, 0);
+  await fill("نافذة ظهور المهام المستحقة", "10");
   await t.page.click("button:has-text('حفظ')");
   await t.page.waitForSelector("text=شركة اختبار");
   const saved = await t.page.evaluate(() => window.AMANAdminServices.listCompanies());
@@ -127,6 +133,7 @@ test("فشل الحفظ: لا نجاح زائف وتبقى المدخلات", { 
   await t.page.getByLabel("اسم الشركة").first().fill("شركة فاشلة");
   await t.page.getByLabel("البادئات").first().fill("71");
   await t.page.getByLabel("أطوال الأرقام").first().fill("9");
+  await t.page.getByLabel("نافذة ظهور المهام المستحقة").first().fill("10");
   await t.page.click("button:has-text('حفظ')");
   await t.page.waitForTimeout(400);
   const body = await t.page.locator("#admin-generic-view").innerText();
