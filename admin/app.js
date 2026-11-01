@@ -11,7 +11,9 @@ const definitions={
  tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"◷",emptyTitle:"لا توجد مهام سداد",emptyDescription:"قسم المهام ضمن دفعة لاحقة."},
  complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"⚑",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات بعد ربط الخدمة."},
  reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"▥",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"قسم التقارير ضمن دفعة لاحقة."},
- settings:{title:"الإعدادات",description:"إدارة الشركات والبادئات والباقات ووسائل الدفع وإعدادات الخدمة.",icon:"⚙",emptyTitle:"لم تُضَف بيانات بعد",emptyDescription:"قسم الإعدادات ضمن دفعة لاحقة."}
+ settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"⚙",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
+ notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"♧",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
+ alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"⚑",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
 const statusLabel={pending:"قيد المراجعة",approved:"معتمد",rejected:"مرفوض"};
@@ -128,7 +130,7 @@ $("admin-login-form").addEventListener("submit",async e=>{
  finally{button.disabled=false;}
 });
 $("dashboard-refresh").addEventListener("click",loadDashboard);
-$("admin-account").addEventListener("click",async()=>{const s=service();if(adminSession&&s&&typeof s.signOutAdmin==="function"){try{await s.signOutAdmin();}catch{}}adminSession=null;showLogin();});
+$("admin-account").addEventListener("click",()=>navigate("account"));
 tabs.forEach(t=>t.addEventListener("click",()=>navigate(t.dataset.adminTab)));
 document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.section)));
 $("admin-back").addEventListener("click",back);$("request-detail-back").addEventListener("click",back);
