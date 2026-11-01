@@ -6,11 +6,11 @@ const tabs=[...document.querySelectorAll("[data-admin-tab]")];
 const service=()=>window.AMANAdminServices||null;
 const definitions={
  requests:{title:"الطلبات",description:"مراجعة طلبات الاشتراك والتمديد والتنشيط واتخاذ القرار بشأنها.",icon:"▤",emptyTitle:"لا توجد طلبات حتى الآن",emptyDescription:"ستظهر الطلبات الواردة بعد ربط خدمة الطلبات."},
- numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"▦",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"قسم الأرقام ضمن دفعة لاحقة."},
- customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"♙",emptyTitle:"لا يوجد عملاء",emptyDescription:"قسم العملاء ضمن دفعة لاحقة."},
- tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"◷",emptyTitle:"لا توجد مهام سداد",emptyDescription:"قسم المهام ضمن دفعة لاحقة."},
+ numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"▦",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"ستظهر الأرقام وحالات الحماية بعد ربط الخدمة وتسجيل طلبات معتمدة."},
+ customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"♙",emptyTitle:"لا يوجد عملاء",emptyDescription:"ستظهر حسابات العملاء هنا بعد ربط الخدمة."},
+ tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"◷",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
  complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"⚑",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات بعد ربط الخدمة."},
- reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"▥",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"قسم التقارير ضمن دفعة لاحقة."},
+ reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"▥",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"ستظهر الإيرادات هنا بعد وجود عمليات معتمدة."},
  settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"⚙",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
  notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"♧",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
  alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"⚑",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
