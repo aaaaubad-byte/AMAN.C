@@ -103,7 +103,7 @@ async function openRequest(id){
  activeRequestId=id;$("requests-list-view").hidden=true;$("request-detail-view").hidden=false;$("request-detail-content").replaceChildren();current="request-detail";window.scrollTo({top:0,behavior:"smooth"});
  const host=$("request-detail-content"),s=service();const loadingBox=document.createElement("div");loadingBox.className="surface empty-state";loadingBox.textContent="جارٍ تحميل تفاصيل الطلب…";host.append(loadingBox);
  if(!s||typeof s.getRequestDetails!=="function"){loadingBox.textContent="تفاصيل الطلب غير متاحة حتى ربط خدمة الطلبات الآمنة.";return;}
- try{const r=await s.getRequestDetails({request_id:id});if(r?.success!==true||!r.request)throw Error();detailRecord=r.request;host.replaceChildren();const q=detailRecord;
+ try{const r=await s.getRequestDetails({request_id:id});if(r?.success!==true||!r.request)throw Error();detailRecord=r.request;window.AMANAdminCurrentRequest=detailRecord;host.replaceChildren();const q=detailRecord;
  const status=statusLabel[q.status]||"حالة غير معروفة";
  host.append(panel("بيانات الطلب",[["رقم الطلب",q.request_number||q.id],["نوع العملية",typeLabel[q.operation_type]||q.operation_type],["الحالة",status],["تاريخ الطلب",q.created_at],["الرقم",q.phone,"ltr"],["الشركة",q.company_name],["الباقة",q.package_name],["المدة",q.duration_days? q.duration_days+" يوم":null],["السعر",q.price_yer===undefined?null:Number(q.price_yer).toLocaleString("ar")+" ر.ي"],["وسيلة الدفع",q.payment_method_name],["مرجع الدفع",q.payment_reference,"ltr"]]));
  host.append(panel("بيانات العميل",[["اسم العميل",q.customer_name],["تصنيف الحساب",q.customer_type],["حالة الحساب",q.customer_status],["معرّف العميل",q.customer_id]]));
