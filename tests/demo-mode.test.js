@@ -121,3 +121,44 @@ test("A24 requires a fresh impact preview after changing the interval",()=>{
 test("A23 company cards show the enabled or disabled state",()=>{
  assert.match(adminA18A25,/حالة الشركة:/);
 });
+
+
+const adminA26A31=readFileSync("admin/phase5-a26-a31.js","utf8");
+test("A26-A31 module is loaded and all five destinations are registered in admin navigation",()=>{
+ assert.ok(admin.includes("phase5-a26-a31.js"));
+ for(const screen of ["packages","payments","content","audit","account"]) {
+  assert.match(adminA26A31,new RegExp('s==="'+screen+'"'));
+  assert.match(readFileSync("admin/app.js","utf8"),new RegExp(screen+':\\{title:'));
+ }
+});
+test("A26 packages are scoped by company and operation with positive duration and price and active state",()=>{
+ for(const field of ["company_id","operation_type","days","price_yer","active"]) assert.ok(adminA26A31.includes(field));
+ assert.match(demo,/savePackage:async p=>/);
+ assert.match(demo,/duration_days:p\.days/);
+});
+test("A26 package edits are isolated from existing requests and protection periods",()=>{
+ assert.match(demo,/savePackage:async p=>[\s\S]*?db\.packages\.push\(target\)/);
+ assert.doesNotMatch(demo,/savePackage:async p=>[\s\S]*?db\.requests\.forEach/);
+});
+test("A27 payment methods store instructions and reference rules without receipt attachments",()=>{
+ for(const field of ["summary","instructions","reference_required","reference_pattern","active"]) assert.ok(adminA26A31.includes(field));
+ assert.match(adminA26A31,/لا تُرفع صور أو مرفقات إيصالات/);
+ assert.match(demo,/savePaymentMethod:async p=>/);
+});
+test("A28 content editing confirms each save and retains the entered text when saving fails",()=>{
+ assert.match(adminA26A31,/تأكيد حفظ نص/);
+ assert.match(adminA26A31,/احتفظ بالنص وانسخه قبل إعادة المحاولة/);
+ assert.match(demo,/saveAppContent:async p=>/);
+});
+test("A29 audit log is read-only and supports action and entity filters",()=>{
+ assert.match(adminA26A31,/listAuditLog/);
+ assert.match(adminA26A31,/action\.input\.addEventListener/);
+ assert.match(adminA26A31,/entity\.input\.addEventListener/);
+ assert.doesNotMatch(adminA26A31,/deleteAudit|updateAudit|saveAudit/);
+});
+test("A30-A31 show the authenticated admin and require explicit confirmation before sign-out",()=>{
+ assert.match(adminA26A31,/getCurrentAdmin/);
+ assert.match(adminA26A31,/confirm\("هل تريد تسجيل الخروج/);
+ assert.match(adminA26A31,/signOutAdmin/);
+ assert.match(demo,/signOutAdmin:async/);
+});
