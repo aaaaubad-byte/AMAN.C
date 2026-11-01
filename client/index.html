@@ -47,6 +47,30 @@
 <div class="filter-grid single-filter"><div><label class="field-label" for="operations-status-filter">حالة الطلب</label><select class="field" id="operations-status-filter"><option value="">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div></div></section>
 <div id="operations-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات حتى الآن</strong><p>ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.</p></div></div>
 </section>
+
+<section id="operation-detail-screen" data-screen="operation-detail" hidden>
+<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى العمليات</button><p class="eyebrow">سجل طلباتك</p><h1 class="page-title">تفاصيل العملية</h1><p class="page-desc">تفاصيل الطلب وحالته الحالية.</p></div>
+<div id="operation-detail-content"></div>
+</section>
+<section id="protection-screen" data-screen="protection" hidden>
+<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">خدمات أمان</p><h1 class="page-title">طلب الحماية</h1><p class="page-desc">راجع بيانات الرقم واختر الباقة ووسيلة الدفع المتاحة.</p></div>
+<div class="surface"><div class="detail-label">الرقم</div><div class="detail-value" id="protection-phone" dir="ltr">—</div><div class="detail-label" style="margin-top:12px">الشركة</div><div class="detail-value" id="protection-company">—</div><div class="detail-label" style="margin-top:12px">نوع العملية</div><div class="detail-value" id="protection-type">—</div></div>
+<form id="protection-form">
+<div class="surface"><label class="field-label" for="protection-package">باقة الحماية</label><select class="field" id="protection-package" required><option value="">اختر الباقة المتاحة</option></select><p class="surface-desc" id="package-summary">تظهر الباقات المعتمدة لهذه الشركة ونوع العملية عند توفرها.</p></div>
+<div class="surface"><label class="field-label" for="protection-payment">وسيلة الدفع</label><select class="field" id="protection-payment" required><option value="">اختر وسيلة الدفع</option></select><div class="alert-note" id="payment-instructions" style="margin-top:12px">تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.</div>
+<div class="field-wrap"><label class="field-label" for="payment-reference">مرجع الدفع</label><input class="field" id="payment-reference" type="text" autocomplete="off" placeholder="أدخل مرجع عملية الدفع" required></div></div>
+<p id="protection-message" aria-live="polite"></p><button class="btn btn-block" id="protection-continue" type="submit">متابعة للمراجعة</button>
+</form></section>
+<section id="review-screen" data-screen="review" hidden>
+<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة للتعديل</button><p class="eyebrow">قبل الإرسال</p><h1 class="page-title">مراجعة العملية</h1><p class="page-desc">تأكد من صحة التفاصيل قبل إرسال الطلب إلى إدارة أمان.</p></div>
+<div class="surface" id="review-details"></div><div class="alert-note">إرسال الطلب لا يبدأ الحماية. تبدأ الحماية فقط بعد اعتماد الإدارة للطلب.</div>
+<p id="review-message" aria-live="polite"></p><button class="btn btn-block" id="confirm-protection" type="button">تأكيد وإرسال الطلب</button>
+</section>
+<section id="result-screen" data-screen="result" hidden>
+<div class="page-head"><p class="eyebrow">حالة الإرسال</p><h1 class="page-title" id="result-title">نتيجة العملية</h1><p class="page-desc" id="result-description">ستظهر نتيجة الخادم بعد إرسال الطلب.</p></div>
+<div class="surface" id="result-content"><div class="empty-state"><div class="empty-icon">◷</div><strong>لم يتم إرسال طلب بعد</strong><p>لن نعرض نجاحًا إلا بعد تأكيد استلام الطلب من الخادم.</p></div></div>
+<div class="sheet-actions"><button class="btn btn-block" id="result-to-operations" type="button">الانتقال إلى العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">العودة إلى تفاصيل الرقم</button></div>
+</section>
 <section id="account-screen" data-screen="account" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">بيانات الحساب وإعدادات الأمان.</p></div><div class="surface"><div class="empty-state"><div class="empty-icon">♙</div><strong>بيانات الحساب</strong><p>ستظهر بيانات حسابك بعد تسجيل الدخول وربط المصادقة.</p></div><button class="btn btn-outline btn-block" id="open-login" type="button">تسجيل الدخول</button></div></section>
 <section id="notifications-screen" data-screen="notifications" hidden><div class="page-head"><p class="eyebrow">ابقَ على اطلاع</p><h1 class="page-title">الإشعارات</h1><p class="page-desc">تنبيهات حالة الحماية ومواعيد التجديد وتحديثات الطلبات.</p></div><div class="soft-surface empty-state"><div class="empty-icon">♧</div><strong>لا توجد إشعارات</strong><p>ستظهر إشعاراتك هنا عند توفرها.</p></div></section>
 </main>
