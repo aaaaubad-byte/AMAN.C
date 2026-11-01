@@ -9,7 +9,7 @@ const panel=(title,rows)=>{const p=el("section","surface admin-detail-panel"),h=
 function host(){const h=$("admin-generic-view");h.replaceChildren();return h;}
 function msg(h,t,kind="info"){const p=el("p","notice-"+kind,t);h.append(p);}
 function button(text,cls,fn){const b=el("button",cls||"btn btn-outline",text);b.type="button";b.addEventListener("click",fn);return b;}
-async async function taskDetail(t){
+async function taskDetail(t){
  const h=host(),back=button("العودة إلى المهام","btn btn-outline",()=>{renderTasks(h);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
  h.append(panel("تفاصيل المهمة",[["رقم الهاتف",t.phone],["الشركة",t.company_name],["تاريخ الاستحقاق",fmtDate(t.due_at)],["الحالة",({planned:"مخططة",due:"مستحقة",executed:"منفذة"})[t.status]||t.status],["تاريخ التنفيذ الفعلي",fmtDate(t.executed_at)],["معرّف الحماية",t.protection_id||"—"],["سياق الحماية",t.protection_context||"—"]]));
  if(t.status!=="executed"){
