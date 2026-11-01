@@ -1,4 +1,4 @@
-// اختبارات سلوكية لقاعدة المصادرة والمهام (docs/DECISIONS.md: D2/D4/D5/D6).
+// اختبارات سلوكية لقاعدة المصادرة والمهام (docs/DECISIONS.md: D2/D4/D5/D6 + توضيحات 2026-11-01).
 // تحمّل محوّل المحاكاة في بيئة vm معزولة بساعة قابلة للتحكم، وتستدعي عقود الخدمات كما تفعل الواجهات.
 // التقويم ميلادي وتوقيت Asia/Aden (UTC+3).
 import test from "node:test";
@@ -9,7 +9,7 @@ import vm from "node:vm";
 const CODE = fs.readFileSync(new URL("../simulation/simulation-adapter.js", import.meta.url), "utf8");
 const ADMIN = { email: "admin@simulation.local", password: "simulation-1234" };
 
-function setup(startIso = "2026-01-01T09:00:00+03:00") {
+function setup(startIso = "2026-01-01T09:00:00+03:00", { windowDays } = {}) {
   let current = Date.parse(startIso);
   class FakeDate extends Date {
     constructor(...a) { if (a.length) super(...a); else super(current); }
@@ -30,10 +30,12 @@ function setup(startIso = "2026-01-01T09:00:00+03:00") {
   const must = (res, what) => { assert.equal(res.success, true, what + ": " + JSON.stringify(res)); return res; };
 
   must(admin.signInAdmin(ADMIN), "دخول المدير");
-  const company = must(admin.saveCompanySettings({
+  const companyInput = {
     name: "شركة اختبار", prefixes: ["71"], number_lengths: [9], task_interval_days: 90,
     is_active: true, create_first_task: true, reactivation_enabled: true, reactivation_days: 5
-  }), "إضافة شركة").company;
+  };
+  if (windowDays !== undefined) companyInput.task_due_window_days = windowDays;
+  const company = must(admin.saveCompanySettings(companyInput), "إضافة شركة").company;
   const pkgs = {};
   [["act365", "activation", 365], ["act30", "activation", 30], ["react30", "reactivation", 30]].forEach(([k, op, days]) => {
     admin.savePackage({ company_id: company.id, operation_type: op, name: k, days, price_yer: 1000, active: true });
@@ -53,7 +55,7 @@ function setup(startIso = "2026-01-01T09:00:00+03:00") {
   const tasks = () => admin.listTasks().tasks;
   const pending = () => tasks().find(t => t.status !== "executed");
   const numStatus = () => client.listMyNumbers().items[0].status;
-  return { admin, client, setNow, must, request, runOp, tasks, pending, numStatus };
+  return { admin, client, company, setNow, must, request, runOp, tasks, pending, numStatus };
 }
 
 // 04-01 00:00 بتوقيت عدن = 03-31T21:00Z
@@ -66,16 +68,21 @@ test("اشتراك جديد: المهمة الأولى = يوم الاعتماد
   assert.equal(t[0].status, "planned");
 });
 
-test("لا تُنفَّذ المهمة قبل يوم موعدها", () => {
+test("التنفيذ داخل الفاصل جائز مبكرًا: تُسجَّل مكتملة والتالية = يوم التنفيذ + الفاصل", () => {
   const s = setup();
   s.runOp("activation", "act365");
-  s.setNow("2026-03-31T10:00:00+03:00");
-  const res = s.admin.executeTask({ task_id: s.pending().id });
-  assert.equal(res.success, false);
-  assert.equal(res.code, "task_not_due");
+  s.setNow("2026-02-10T10:00:00+03:00");
+  const first = s.pending();
+  assert.equal(first.status, "planned"); // قبل الموعد وخارج نافذة الظهور (الافتراضي 0)
+  s.must(s.admin.executeTask({ task_id: first.id }), "تنفيذ مبكر");
+  const open = s.tasks().filter(t => t.status !== "executed");
+  assert.equal(open.length, 1);
+  assert.equal(open[0].due_at, "2026-05-10T21:00:00.000Z"); // 05-11 بتوقيت عدن = 02-10 + 90
+  assert.equal(s.tasks().filter(t => t.status === "executed").length, 1);
+  assert.notEqual(open[0].id, first.id);
 });
 
-test("تنفيذ المهمة يكسر الخمول: التالية = يوم التنفيذ + الفاصل، ولا تبقى مهمة غير منفذة قديمة", () => {
+test("التنفيذ في يوم الموعد يعيد الحساب من يوم التنفيذ، ولا تبقى مهمة غير منفذة قديمة", () => {
   const s = setup();
   s.runOp("activation", "act365");
   s.setNow("2026-04-01T10:00:00+03:00");
@@ -85,7 +92,37 @@ test("تنفيذ المهمة يكسر الخمول: التالية = يوم ا�
   const open = s.tasks().filter(t => t.status !== "executed");
   assert.equal(open.length, 1);
   assert.equal(open[0].due_at, "2026-06-29T21:00:00.000Z"); // 06-30 بتوقيت عدن
-  assert.equal(s.tasks().filter(t => t.status === "executed").length, 1);
+});
+
+test("نافذة الظهور: تظهر المهمة «مستحقة» قبل موعدها بعدد الأيام المحدد فقط", () => {
+  const s = setup("2026-01-01T09:00:00+03:00", { windowDays: 10 });
+  s.runOp("activation", "act365"); // الموعد 04-01
+  s.setNow("2026-03-21T10:00:00+03:00"); // قبل الموعد بـ 11 يومًا
+  assert.equal(s.pending().status, "planned");
+  assert.equal(s.admin.getDashboardSummary().summary.due_tasks, 0);
+  s.setNow("2026-03-22T00:00:01+03:00"); // قبل الموعد بـ 10 أيام
+  assert.equal(s.pending().status, "due");
+  assert.equal(s.admin.getDashboardSummary().summary.due_tasks, 1);
+  assert.equal(s.pending().due_window_days, 10);
+});
+
+test("نافذة الظهور لا تغيّر تاريخ المصادرة (يبقى آخر يوم في الفاصل)", () => {
+  const s = setup("2026-01-01T09:00:00+03:00", { windowDays: 10 });
+  s.runOp("activation", "act365");
+  s.setNow("2026-04-01T23:59:59+03:00");
+  assert.equal(s.numStatus(), "protected");
+  s.setNow("2026-04-02T00:00:00+03:00");
+  assert.equal(s.numStatus(), "confiscated");
+});
+
+test("التحقق من نافذة الظهور: سالبة مرفوضة، وغيابها في التعديل يُبقي القيمة الحالية", () => {
+  const s = setup("2026-01-01T09:00:00+03:00", { windowDays: 7 });
+  const base = { id: s.company.id, name: "شركة اختبار", prefixes: ["71"], number_lengths: [9], task_interval_days: 90, is_active: true, create_first_task: true, reactivation_enabled: true, reactivation_days: 5 };
+  const bad = s.admin.saveCompanySettings({ ...base, task_due_window_days: -1 });
+  assert.equal(bad.success, false);
+  assert.equal(bad.code, "validation_failed");
+  s.must(s.admin.saveCompanySettings(base), "حفظ دون نافذة");
+  assert.equal(s.admin.listCompanies().companies[0].task_due_window_days, 7);
 });
 
 test("تجاوز تاريخ المصادرة دون تنفيذ ← الرقم مصادَر؛ وقبل انتهاء اليوم لا يزال محميًا", () => {
@@ -97,7 +134,7 @@ test("تجاوز تاريخ المصادرة دون تنفيذ ← الرقم م
   assert.equal(s.numStatus(), "confiscated");
 });
 
-test("إعادة الجدولة تغيّر موعد المهمة المعلّقة وتزيح القادمة بالمقدار نفسه", () => {
+test("إعادة الجدولة بالزيادة تؤجل المصادرة وتزيح القادمة بالمقدار نفسه", () => {
   const s = setup();
   s.runOp("activation", "act365");
   s.setNow("2026-03-20T10:00:00+03:00");
@@ -106,9 +143,22 @@ test("إعادة الجدولة تغيّر موعد المهمة المعلّق�
   assert.ok(prev.affected_count >= 2);
   s.must(s.admin.rescheduleTask({ task_id: t.id, new_due_at: "2026-04-11" }), "إعادة جدولة");
   assert.equal(s.pending().due_at, "2026-04-10T21:00:00.000Z"); // 04-11 بتوقيت عدن
+  s.setNow("2026-04-05T10:00:00+03:00");
+  assert.equal(s.numStatus(), "protected"); // كان سيُصادَر لولا إعادة الجدولة؟ لا: 04-05 بعد الموعد الأصلي
   s.setNow("2026-04-11T10:00:00+03:00");
   s.must(s.admin.executeTask({ task_id: s.pending().id }), "تنفيذ");
   assert.equal(s.pending().due_at, "2026-07-09T21:00:00.000Z"); // 07-10 بتوقيت عدن
+});
+
+test("إعادة الجدولة بالنقصان جائزة ما لم تسبق اليوم", () => {
+  const s = setup();
+  s.runOp("activation", "act365");
+  s.setNow("2026-03-01T10:00:00+03:00");
+  const t = s.pending();
+  s.must(s.admin.rescheduleTask({ task_id: t.id, new_due_at: "2026-03-10" }), "تقديم الموعد");
+  assert.equal(s.pending().due_at, "2026-03-09T21:00:00.000Z"); // 03-10 بتوقيت عدن
+  s.setNow("2026-03-11T00:00:00+03:00");
+  assert.equal(s.numStatus(), "confiscated"); // الموعد الجديد فاته
 });
 
 test("لا إعادة جدولة إلى تاريخ سابق لليوم", () => {
