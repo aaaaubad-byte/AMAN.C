@@ -53,7 +53,7 @@
 <div id="operation-detail-content"></div>
 </section>
 <section id="protection-screen" data-screen="protection" hidden>
-<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">خدمات أمان</p><h1 class="page-title">طلب الحماية</h1><p class="page-desc">راجع بيانات الرقم واختر الباقة ووسيلة الدفع المتاحة.</p></div>
+<div class="page-head"><button class="quiet-link" type="button" id="protection-back">‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">خدمات أمان</p><h1 class="page-title">طلب الحماية</h1><p class="page-desc">راجع بيانات الرقم واختر الباقة ووسيلة الدفع المتاحة.</p></div>
 <div class="surface"><div class="detail-label">الرقم</div><div class="detail-value" id="protection-phone" dir="ltr">—</div><div class="detail-label" style="margin-top:12px">الشركة</div><div class="detail-value" id="protection-company">—</div><div class="detail-label" style="margin-top:12px">نوع العملية</div><div class="detail-value" id="protection-type">—</div></div>
 <form id="protection-form">
 <div class="surface"><label class="field-label" for="protection-package">باقة الحماية</label><select class="field" id="protection-package" required><option value="">اختر الباقة المتاحة</option></select><p class="surface-desc" id="package-summary">تظهر الباقات المعتمدة لهذه الشركة ونوع العملية عند توفرها.</p></div>
@@ -62,7 +62,7 @@
 <p id="protection-message" aria-live="polite"></p><button class="btn btn-block" id="protection-continue" type="submit">متابعة للمراجعة</button>
 </form></section>
 <section id="review-screen" data-screen="review" hidden>
-<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة للتعديل</button><p class="eyebrow">قبل الإرسال</p><h1 class="page-title">مراجعة العملية</h1><p class="page-desc">تأكد من صحة التفاصيل قبل إرسال الطلب إلى إدارة أمان.</p></div>
+<div class="page-head"><button class="quiet-link" type="button" id="review-back">‹ العودة للتعديل</button><p class="eyebrow">قبل الإرسال</p><h1 class="page-title">مراجعة العملية</h1><p class="page-desc">تأكد من صحة التفاصيل قبل إرسال الطلب إلى إدارة أمان.</p></div>
 <div class="surface" id="review-details"></div><div class="alert-note">إرسال الطلب لا يبدأ الحماية. تبدأ الحماية فقط بعد اعتماد الإدارة للطلب.</div>
 <p id="review-message" aria-live="polite"></p><button class="btn btn-block" id="confirm-protection" type="button">تأكيد وإرسال الطلب</button>
 </section>
