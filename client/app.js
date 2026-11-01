@@ -60,6 +60,58 @@ const has = value => value !== null && value !== undefined && value !== "";
 function el(tag, cls, content) { const n = document.createElement(tag); if (cls) n.className = cls; if (content !== undefined) n.textContent = content; return n; }
 function setMessage(node, message, kind = "error") { if (!node) return; node.textContent = message; node.className = kind === "success" ? "notice-success" : kind === "info" ? "notice-info" : "notice-error"; }
 function detailBlock(label, value, dir) { const b = el("div", "detail-block"), l = el("div", "detail-label", label), v = el("div", "detail-value", value); if (dir) v.dir = dir; b.append(l, v); return b; }
+function companyDetailBlock(company) {
+ const block = el("div", "detail-block detail-company"), line = el("div", "detail-line"), icon = el("span", "detail-icon"), copy = el("div", ""), label = el("div", "detail-label", "شركة الاتصالات"), value = el("div", "detail-value", company);
+ icon.setAttribute("aria-hidden", "true"); const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+ const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.setAttribute("d", "M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1M9 13h1m4 0h1M9 17h1m4 0h1M12 21v-3"); svg.append(path); icon.append(svg); copy.append(label, value); line.append(icon, copy); block.append(line); return block;
+}
+function packageDurationBlock(number) {
+ const rows = [["باقة الحماية", number.package_name], ["مدة الحماية", number.duration_days ? number.duration_days + " يوم" : null]].filter(([, value]) => has(value));
+ if (!rows.length) return null;
+ const block = el("div", "detail-block detail-meta");
+ rows.forEach(([label, value], index) => { const row = el("div", "detail-meta-row"), name = el("div", "detail-label", label), detail = el("div", "detail-value", value); row.append(name, detail); if (index) row.classList.add("detail-meta-secondary"); block.append(row); });
+ return block;
+}
+function detailDay(value) {
+ const date = new Date(value);
+ if (Number.isNaN(date.getTime())) return runtime().formatDate(value);
+ const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Aden", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date).map(part => [part.type, part.value]));
+ return `${parts.year}/${parts.month}/${parts.day}`;
+}
+function datePairBlock(number) {
+ const values = [["تاريخ البداية", number.starts_at], ["تاريخ الانتهاء", number.ends_at]].filter(([, value]) => has(value));
+ if (!values.length) return null;
+ const block = el("div", "detail-block detail-period"), grid = el("div", "detail-split" + (values.length === 1 ? " detail-split-single" : ""));
+ values.forEach(([label, value]) => { const cell = el("div", ""), name = el("div", "detail-label", label), date = el("div", "detail-value", detailDay(value)); date.dir = "ltr"; cell.append(name, date); grid.append(cell); });
+ block.append(grid);
+ return block;
+}
+function progressBlock(number) {
+ if (!has(number.remaining_label)) return null;
+ const block = el("div", "detail-block detail-progress"), label = el("div", "detail-label", "المدة المتبقية"), value = el("div", "remaining", number.remaining_label);
+ const start = Date.parse(number.starts_at), end = Date.parse(number.ends_at);
+ if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+  const elapsed = Math.max(0, Math.min(100, Math.round(((Date.now() - start) / (end - start)) * 100)));
+  const track = el("div", "progress-track"), fill = el("div", "progress-fill");
+  track.setAttribute("role", "progressbar"); track.setAttribute("aria-label", "المدة المنقضية من فترة الحماية"); track.setAttribute("aria-valuemin", "0"); track.setAttribute("aria-valuemax", "100"); track.setAttribute("aria-valuenow", String(elapsed));
+  fill.style.width = elapsed + "%"; track.append(fill); block.append(label, value, track);
+ } else block.append(label, value);
+ return block;
+}
+function sheetIcon(kind) {
+ const paths = {
+  alerts: "M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",
+  renew: "M20 7v5h-5M4 17v-5h5M5.6 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.4-3",
+  report: "M5 21V4m0 1h12l-2 4 2 4H5",
+  protect: "M12 3 4.5 6v5.5c0 4.5 3.2 7.8 7.5 9.5 4.3-1.7 7.5-5 7.5-9.5V6z"
+ };
+ const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+ const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.setAttribute("d", paths[kind] || paths.protect); svg.append(path); return svg;
+}
+function sheetAction(label, description, icon, run) {
+ const button = el("button", "sheet-action"), glyph = el("span", "sheet-action-icon"), copy = el("span", "sheet-action-copy"), arrow = el("span", "sheet-action-chevron", "‹");
+ button.type = "button"; glyph.append(sheetIcon(icon)); copy.append(el("strong", "", label), el("small", "", description)); button.append(glyph, copy, arrow); button.addEventListener("click", run); return button;
+}
 function emptyBox(icon, title, text, action) {
  const box = el("div", "soft-surface empty-state");
  box.append(el("div", "empty-icon", icon), el("strong", "", title));
@@ -228,12 +280,14 @@ function openNumberDetails(number, source = "numbers") {
  const badge = numberSheet.querySelector(".state");
  badge.textContent = numberStatusLabels[status] || "غير متاح";
  badge.className = "state " + (stateClass[status] || "state-off");
- const rows = [["شركة الاتصالات", number.company]];
- if (status === "protected") rows.push(["باقة الحماية", number.package_name], ["مدة الحماية", number.duration_days ? number.duration_days + " يوم" : null], ["بداية الحماية", fmt(number.starts_at)], ["نهاية الحماية", fmt(number.ends_at)], ["المدة المتبقية", number.remaining_label]);
+ const rows = [];
  if (status === "inactive" || status === "confiscated") rows.push(["الباقة السابقة", number.package_name], ["بداية الفترة السابقة", has(number.starts_at) ? fmt(number.starts_at) : null], ["تاريخ الانتهاء", has(number.ends_at) ? fmt(number.ends_at) : null]);
  if (status === "inactive") rows.push(["آخر يوم للتنشيط", has(number.last_activation_date) ? fmt(number.last_activation_date) : null]);
  const extra = $("sheet-details-extra"); extra.replaceChildren();
+ if (has(number.company) && number.company !== "—") extra.append(companyDetailBlock(number.company));
+ if (status === "protected") { const packageInfo = packageDurationBlock(number); if (packageInfo) extra.append(packageInfo); }
  rows.filter(([, v]) => has(v) && v !== "—").forEach(([l, v]) => extra.append(detailBlock(l, v)));
+ if (status === "protected") { const dates = datePairBlock(number), progress = progressBlock(number); if (dates) extra.append(dates); if (progress) extra.append(progress); }
  const notes = {
   not_subscribed: "الرقم غير مشمول حاليًا بحماية أمان.",
   protected: "الرقم مشمول بالحماية لدى حسابك.",
@@ -241,13 +295,13 @@ function openNumberDetails(number, source = "numbers") {
   inactive: "انتهت فترة الحماية السابقة؛ يتاح التنشيط ضمن مهلة التنشيط.",
   confiscated: "انتهت مهلة التنشيط. لا يتاح إجراء التنشيط."
  };
- const privacy = $("sheet-privacy-note"); privacy.hidden = false; privacy.textContent = notes[status] || ""; privacy.hidden = !notes[status];
+ const privacy = $("sheet-privacy-note"); privacy.hidden = false; privacy.textContent = notes[status] || ""; privacy.hidden = !notes[status] || status === "protected";
  const actions = $("sheet-actions"); actions.replaceChildren();
- const add = (label, run, cls = "btn btn-block") => { const b = el("button", cls, label); b.type = "button"; b.addEventListener("click", run); actions.append(b); };
- if (status === "not_subscribed") add(operationLabels.activation, () => openProtection(number, "activation"));
- if (status === "protected") { add(operationLabels.extension, () => openProtection(number, "extension")); add("التنبيهات", () => openNumberAlerts(number), "btn btn-outline btn-block"); }
- if (status === "inactive") { add(operationLabels.reactivation, () => openProtection(number, "reactivation")); add("التنبيهات", () => openNumberAlerts(number), "btn btn-outline btn-block"); }
- if (status === "other_protected") add("تقديم بلاغ", () => openReport(number));
+ const add = (label, description, icon, run) => actions.append(sheetAction(label, description, icon, run));
+ if (status === "not_subscribed") add(operationLabels.activation, "ابدأ طلب الحماية لهذا الرقم.", "protect", () => openProtection(number, "activation"));
+ if (status === "protected") { add("إشعارات الرقم", "تابع التحديثات والتنبيهات الخاصة بالرقم.", "alerts", () => openNumberAlerts(number)); add(operationLabels.extension, "قدّم طلب تمديد الحماية وفق الباقات المتاحة.", "renew", () => openProtection(number, "extension")); }
+ if (status === "inactive") { add(operationLabels.reactivation, "قدّم طلب التنشيط ضمن المهلة المتاحة.", "renew", () => openProtection(number, "reactivation")); add("إشعارات الرقم", "تابع التحديثات والتنبيهات الخاصة بالرقم.", "alerts", () => openNumberAlerts(number)); }
+ if (status === "other_protected") add("تقديم بلاغ", "أرسل بلاغًا للمراجعة دون كشف بيانات العميل الآخر.", "report", () => openReport(number));
  numberSheet.hidden = false;
  return true;
 }

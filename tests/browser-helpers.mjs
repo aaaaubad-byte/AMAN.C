@@ -63,10 +63,11 @@ export async function submitRequest(page, { op = "activation", pkg = "اشترا
 export async function approve(page, requestId) {
   return page.evaluate(async id => { const r = await window.AMANAdminServices.approveRequest({ request_id: id }); if (!r.success) throw new Error(JSON.stringify(r)); }, requestId);
 }
-/* يفرض فشل عملية إدارية واحدة (الواجهة الموحدة مجمّدة فنستبدل المرجع عبر Proxy). */
+/* يفرض فشل عملية إدارية واحدة. واجهة الخدمات مجمّدة؛ تُستبدل بنسخة سطحية للاختبار فقط. */
 export async function breakService(page, method) {
   await page.evaluate(m => {
-    Object.defineProperty(window, "AMANAdminServices", { configurable: true, value: new Proxy(window.AMANAdminServices, { get: (o, k) => k === m ? async () => ({ success: false, code: "service_unreachable", message: "تعذر الوصول إلى الخدمة." }) : o[k] }) });
+    const services = window.AMANAdminServices;
+    Object.defineProperty(window, "AMANAdminServices", { configurable: true, value: { ...services, [m]: async () => ({ success: false, code: "service_unreachable", message: "تعذر الوصول إلى الخدمة." }) } });
   }, method);
 }
 export const adenToday = page => page.evaluate(() => new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10));

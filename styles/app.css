@@ -18,7 +18,7 @@
 .admin-app{max-width:1000px}.admin-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.stat-card{padding:16px;background:var(--panel);border-radius:20px;min-height:125px}.stat-icon{width:38px;height:38px;border-radius:13px;background:#f9fbfc;color:var(--navy);display:grid;place-items:center;margin-bottom:12px}.stat-card small{display:block;color:var(--muted);font-size:10px}.stat-card strong{display:block;font-size:22px;color:var(--navy);margin-top:5px}.stat-card em{font-style:normal;color:var(--muted);font-size:9px}
 .admin-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-shortcut{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;text-align:right}.admin-shortcut .quick-icon{margin-bottom:10px}.admin-shortcut strong{display:block;font-size:12px}.admin-shortcut small{display:block;font-size:10px;color:var(--muted);margin-top:4px}
 @media(min-width:650px){.app{padding-left:28px;padding-right:28px}.admin-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}.surface,.soft-surface{padding:25px}}
-@keyframes sheet-in{from{transform:translateY(35px);opacity:.6}to{transform:translateY(0);opacity:1}}
+@keyframes sheet-in{from{transform:translateY(35px)}to{transform:translateY(0)}}
 /* Phase 1 application shell */
 .topbar-actions{display:flex;align-items:center;gap:8px}
 .topbar-actions .icon-btn{width:42px;height:42px}
@@ -72,3 +72,79 @@
 button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid rgba(19,169,130,.42);outline-offset:2px}
 .sheet-close:focus-visible{border-radius:12px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Number details: paired protection dates, real-data progress, and reference-style action rows */
+.detail-split-single{grid-template-columns:minmax(0,1fr)}
+.detail-period .detail-value{font-size:14px;direction:ltr;text-align:right;white-space:nowrap}
+.detail-progress .remaining{line-height:1.35}
+.detail-progress .progress-track{margin-top:15px}
+.sheet-actions{gap:10px}
+.sheet-action{width:100%;min-height:74px;display:flex;align-items:center;gap:13px;padding:14px 15px;border:1px solid rgba(220,229,233,.55);border-radius:19px;background:var(--panel);color:var(--text);font:inherit;text-align:right;transition:background .15s,transform .15s}
+.sheet-action:hover{background:var(--panel-2)}
+.sheet-action:active{transform:scale(.99)}
+.sheet-action-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:15px;background:#f8fafb;color:var(--navy)}
+.sheet-action-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sheet-action-copy{display:grid;gap:4px;flex:1;min-width:0}
+.sheet-action-copy strong{font-size:13px;font-weight:800;color:var(--navy)}
+.sheet-action-copy small{font-size:10px;line-height:1.75;color:var(--muted)}
+.sheet-action-chevron{font-size:23px;line-height:1;color:#547087;flex:0 0 auto}
+@media(max-width:380px){.detail-period .detail-value{font-size:12px}.sheet-action{padding:12px;gap:10px}}
+
+/* SVG details icons follow the shared outline-icon language */
+.sheet-hero-icon svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.detail-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Compact number sheet proportions for phone viewports, based on the supplied reference */
+.sheet-hero{padding:4px 0 16px}
+.sheet-hero-icon{width:58px;height:58px;margin:0 auto 9px}
+.sheet-hero-icon svg{width:29px;height:29px}
+.sheet-hero h2{font-size:22px}
+.sheet .detail-block{padding:13px;border-radius:19px;margin-bottom:9px}
+.sheet .detail-value{font-size:14px;margin-top:5px}
+.sheet .remaining{font-size:25px}
+.detail-meta-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.detail-meta-row .detail-value{margin:0;text-align:left;overflow-wrap:anywhere}
+.detail-meta-secondary{border-top:1px solid #d2dce1;margin-top:8px;padding-top:8px}
+.detail-period .detail-value{font-size:13px}
+.sheet-action{min-height:58px;padding:10px 12px}
+.sheet-action-icon{width:38px;height:38px;flex-basis:38px;border-radius:13px}
+.sheet-action-icon svg{width:20px;height:20px}
+.sheet-primary-close{min-height:46px;margin-top:10px}
+
+/* Shared design-system layer applied across client and admin screens */
+:root{
+ --surface-soft:#edf2f4;--surface-raised:#f8fafb;--border-soft:#dce5e9;
+ --radius-card:23px;--radius-control:16px;--radius-pill:999px;
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+ --focus-ring:0 0 0 3px rgba(19,169,130,.14)
+}
+/* Surfaces and panels */
+.surface{background:var(--surface-soft);border-color:var(--border-soft);border-radius:var(--radius-card);box-shadow:0 5px 18px rgba(21,49,73,.035)}
+.soft-surface{background:var(--surface-raised);border-color:var(--border-soft);border-radius:var(--radius-card)}
+.auth-card{border-radius:var(--radius-card);box-shadow:0 12px 34px rgba(21,49,73,.065)}
+.detail-block,.admin-request-card,.admin-shortcut,.notification-card,.operation-card{border-color:var(--border-soft)}
+.section-head{margin-top:var(--space-6)}
+/* Shared controls, focus, and state feedback */
+.btn{border-radius:var(--radius-control);transition:transform .15s ease,background-color .15s ease,box-shadow .15s ease}
+.btn:hover:not(:disabled){background:var(--navy-deep);box-shadow:0 5px 12px rgba(16,38,56,.12)}
+.btn-outline:hover:not(:disabled){background:var(--surface-raised);color:var(--navy)}
+.field{border-radius:var(--radius-control)}
+.field:hover{border-color:#b8c7cf}
+.field:focus{box-shadow:var(--focus-ring)}
+.state{border-radius:var(--radius-pill)}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline-color:var(--green)}
+/* Consistent clickable cards across navigation, results, lists, and admin tools */
+.quick-link,.phone-card,.admin-shortcut,.admin-request-card,.notification-card,.operation-card{transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.quick-link:hover,.phone-card:hover,.admin-shortcut:hover,.admin-request-card:hover,.notification-card:hover,.operation-card:hover{border-color:#c4d6dc;box-shadow:0 8px 22px rgba(21,49,73,.07)}
+.admin-shortcut{background:var(--surface-soft);border-radius:20px;min-height:112px}
+.admin-request-card{background:var(--surface-soft);border-radius:20px}
+.admin-detail-panel{border-radius:20px}
+.list-tools,.filter-grid,.admin-filter-grid{gap:var(--space-3)}
+.notice-info,.notice-error,.notice-success{line-height:1.8}
+/* Narrow phones: preserve readable controls and prevent card overflow */
+@media(max-width:420px){
+ .app{padding-left:14px;padding-right:14px}
+ .surface,.soft-surface{padding:16px}
+ .admin-request-card{padding:13px}
+ .review-row,.admin-detail-row{overflow-wrap:anywhere}
+}

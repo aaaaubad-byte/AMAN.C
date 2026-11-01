@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { startServer } from "../scripts/local-preview.mjs";
+import { seed, submitRequest, approve } from "./browser-helpers.mjs";
 
 /* اختبارات سلوكية في متصفح حقيقي (Playwright). إن لم يتوفر Playwright تُتخطى صراحةً،
    ويفشل الاختبار إن كان AMAN_REQUIRE_BROWSER=1 (كما في CI). */
@@ -124,11 +125,10 @@ test("فشل الحفظ: لا نجاح زائف وتبقى المدخلات", { 
   await goSettings(t.page);
   await t.page.click("text=إضافة شركة");
   await t.page.waitForSelector("text=حفظ");
-  // نحاكي فشل الخدمة بإبطال الدالة داخل المحوّل: الواجهة تمر عبر الواجهة الموحدة التي تُرجع service_unreachable
+  // واجهة الخدمات مجمّدة؛ نبدلها بنسخة اختبار سطحية ونحافظ على بقية العقود.
   await t.page.evaluate(() => {
-    const original = window.AMANAdminServices.saveCompanySettings;
-    // الواجهة الموحدة مجمّدة؛ نستبدل ما تستدعيه الصفحة عبر fetch-less patch على الكائن المرجعي
-    Object.defineProperty(window, "AMANAdminServices", { value: new Proxy(window.AMANAdminServices, { get: (o, k) => k === "saveCompanySettings" ? async () => ({ success: false, code: "service_unreachable", message: "تعذر الاتصال بالخدمة." }) : o[k] }), configurable: true });
+    const services = window.AMANAdminServices;
+    Object.defineProperty(window, "AMANAdminServices", { value: { ...services, saveCompanySettings: async () => ({ success: false, code: "service_unreachable", message: "تعذر الاتصال بالخدمة." }) }, configurable: true });
   });
   await t.page.getByLabel("اسم الشركة").first().fill("شركة فاشلة");
   await t.page.getByLabel("البادئات").first().fill("71");
@@ -139,6 +139,7 @@ test("فشل الحفظ: لا نجاح زائف وتبقى المدخلات", { 
   const body = await t.page.locator("#admin-generic-view").innerText();
   assert.doesNotMatch(body, /تم حفظ|تمت الإضافة|نجاح/);
   assert.equal(await t.page.getByLabel("اسم الشركة").first().inputValue(), "شركة فاشلة");
+  assert.deepEqual(t.errors, []);
   await t.done();
 });
 
@@ -151,4 +152,43 @@ test("RTL وعدم وجود تمرير أفقي على شاشة هاتف لصف�
     assert.deepEqual(t.errors, []);
     await t.done();
   }
+});
+
+test("تفاصيل الرقم: بيانات الحماية والتاريخان والتقدم والإجراءات وزر الإغلاق وفق المرجع", { skip }, async () => {
+  const t = await open("/client/", { viewport: { width: 390, height: 844 } });
+  const phone = "711234567";
+  await t.page.evaluate(async () => {
+    const result = await window.AMANAdminServices.signInAdmin({ email: "admin@simulation.local", password: "simulation-1234" });
+    if (result?.success !== true) throw new Error("تعذر دخول مدير المحاكاة لتهيئة اختبار الواجهة.");
+  });
+  await seed(t.page);
+  await t.page.evaluate(async () => {
+    const result = await window.AMANClientServices.signUp({ email: "ui-detail@example.test", password: "test-password-123" });
+    if (result?.success !== true) throw new Error("تعذر إنشاء حساب المحاكاة للاختبار.");
+  });
+  const requestId = await submitRequest(t.page, { phone });
+  await approve(t.page, requestId);
+  await t.page.reload({ waitUntil: "domcontentloaded" });
+  await t.page.waitForSelector("#home-screen:not([hidden])");
+  await t.page.fill("#phone-search", phone);
+  await t.page.click("#search-form button[type=submit]");
+  await t.page.waitForSelector("#number-sheet:not([hidden])");
+  assert.match(await t.page.locator("#sheet-phone").innerText(), new RegExp(phone));
+  assert.match(await t.page.locator("#number-sheet .state").innerText(), /محمي/);
+  const detailText = await t.page.locator("#sheet-details-extra").innerText();
+  assert.match(detailText, /شركة الاتصالات/);
+  assert.match(detailText, /تاريخ البداية/);
+  assert.match(detailText, /تاريخ الانتهاء/);
+  assert.equal(await t.page.locator(".detail-period .detail-value").evaluateAll(nodes => nodes.length === 2 && nodes.every(node => /^\d{4}\/\d{2}\/\d{2}$/.test(node.textContent.trim()))), true);
+  assert.match(detailText, /المدة المتبقية/);
+  assert.ok(await t.page.locator("#sheet-details-extra [role=progressbar]").count());
+  assert.ok(await t.page.getByRole("button", { name: /إشعارات الرقم/ }).count());
+  assert.ok(await t.page.getByRole("button", { name: /تمديد الاشتراك/ }).count());
+  const primaryColor = await t.page.locator("#sheet-done").evaluate(node => getComputedStyle(node).backgroundColor);
+  assert.equal(primaryColor, "rgb(21, 49, 73)");
+  assert.equal(await t.page.locator("#number-sheet .sheet").evaluate(node => getComputedStyle(node).opacity), "1");
+  await t.page.click("#sheet-done");
+  assert.equal(await t.page.locator("#number-sheet").isHidden(), true);
+  assert.deepEqual(t.errors, []);
+  await t.done();
 });

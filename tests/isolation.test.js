@@ -29,7 +29,9 @@ test("سكربتات الواجهة لا تصل إلى localStorage مباشرة
 test("لا يوجد مجلد demo ولا مفاتيح أو عناوين اتصال في ملفات الواجهة", () => {
   assert.ok(!existsSync("demo"));
   for (const f of ["services/runtime.js", "simulation/simulation-adapter.js", "client/app.js", "admin/app.js"]) {
-    assert.doesNotMatch(read(f), /service_role|supabase\.co|https?:\/\/(?!127\.0\.0\.1)[a-z]/i, f);
+    // معرّف SVG XML القياسي ليس عنوان خدمة أو اتصالًا خارجيًا.
+    const source = read(f).replace(/http:\/\/www\.w3\.org\/2000\/svg/g, "");
+    assert.doesNotMatch(source, /service_role|supabase\.co|https?:\/\/(?!127\.0\.0\.1)[a-z]/i, f);
   }
 });
 

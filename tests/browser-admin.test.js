@@ -295,7 +295,7 @@ test("المهام: فشل التنفيذ لا يُظهر نجاحًا", { skip 
   await t.page.click("button:has-text('تنفيذ المهمة')");
   await breakService(t.page, "executeTask");
   await t.page.click("button:has-text('تأكيد التنفيذ')");
-  await t.page.waitForSelector("dialog >> text=لم يصل تأكيد موثوق", T);
+  await t.page.waitForSelector("dialog >> text=تعذر الوصول إلى الخدمة", T);
   assert.doesNotMatch(await view(t.page).innerText(), /تم تسجيل تنفيذ المهمة/);
   assert.equal((await t.page.evaluate(() => window.AMANAdminServices.listTasks())).tasks.filter(x => x.status === "executed").length, 0);
   await t.done();
