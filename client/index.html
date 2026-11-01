@@ -7,9 +7,16 @@
 </head>
 <body>
 <main class="app" id="client-app">
-<header class="topbar"><button class="icon-btn" id="menu-button" aria-label="القائمة"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="brand" href="./"><span class="brand-symbol">أ</span><span class="brand-copy"><strong>أمان</strong><small>حماية وضمان</small></span></a></header>
+<header class="topbar">
+<div class="topbar-actions">
+<button class="icon-btn" id="account-button" type="button" aria-label="الحساب"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+<button class="icon-btn" id="notifications-button" type="button" aria-label="الإشعارات"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+</div>
+<a class="brand" href="./" aria-label="أمان - الرئيسية"><span class="brand-symbol">أ</span><span class="brand-copy"><strong>أمان</strong><small>حماية وضمان</small></span></a>
+</header>
 
-<section id="auth-screen" hidden>
+<section id="number-alerts-screen" data-screen="number-alerts" hidden><div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">متابعة الرقم</p><h1 class="page-title">تنبيهات الرقم</h1><p class="page-desc">اختر التنبيهات التي تريد تلقيها لهذا الرقم.</p></div><div class="surface"><div class="detail-label">الرقم</div><div class="detail-value" id="alerts-phone" dir="ltr">—</div><form id="number-alerts-form"><label class="check-row"><input type="checkbox" id="alert-before-due" name="before_due"><span>التنبيه قبل موعد السداد</span></label><label class="check-row"><input type="checkbox" id="alert-protection-expiry" name="protection_expiry"><span>التنبيه قبل انتهاء الحماية</span></label><label class="check-row"><input type="checkbox" id="alert-status-change" name="status_change"><span>التنبيه عند تغير حالة الرقم</span></label><label class="field-label" for="alert-channel">قناة التنبيه</label><select class="field" id="alert-channel" name="channel"><option value="in_app">داخل أمان</option><option value="email">البريد الإلكتروني</option></select><p id="number-alerts-message" aria-live="polite"></p><button class="btn btn-block" type="submit">حفظ إعدادات التنبيه</button></form></div></section>
+<section id="report-screen" data-screen="report" hidden><div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة</button><p class="eyebrow">الدعم والمتابعة</p><h1 class="page-title">تقديم بلاغ</h1><p class="page-desc">أرسل بلاغًا عن رقم أو حالة تحتاج إلى مراجعة فريق أمان.</p></div><form id="report-form"><div class="surface"><label class="field-label" for="report-phone">رقم الهاتف محل البلاغ</label><input class="field" id="report-phone" name="phone" type="tel" inputmode="tel" required maxlength="20" placeholder="رقم الهاتف"><label class="field-label" for="report-type">نوع البلاغ</label><select class="field" id="report-type" name="type" required><option value="">اختر نوع البلاغ</option><option value="ownership">اشتباه في ملكية الرقم</option><option value="protection">مشكلة في حالة الحماية</option><option value="payment">مشكلة في الدفع أو الطلب</option><option value="other">أخرى</option></select><label class="field-label" for="report-description">تفاصيل البلاغ</label><textarea class="field" id="report-description" name="description" rows="5" maxlength="2000" required placeholder="اشرح المشكلة بوضوح (حتى 2000 حرف)"></textarea><p class="surface-desc">لا تدرج كلمات المرور أو بيانات مالية سرية. لا ترفق مستندات حساسة في وصف البلاغ.</p><p id="report-message" aria-live="polite"></p><button class="btn btn-block" type="submit" id="report-submit">إرسال البلاغ</button></div></form></section>\n<section id="auth-screen" hidden>
 <div class="auth-wrap"><div class="auth-brand"><div class="brand-symbol">أ</div><h1>أمان</h1><p>حماية وضمان</p></div>
 <div class="auth-card"><h2 id="auth-title">تسجيل الدخول</h2><p id="auth-description">أدخل بريدك الإلكتروني للمتابعة إلى حسابك.</p>
 <form id="auth-form"><label class="field-label" for="auth-email">البريد الإلكتروني</label><input class="field" id="auth-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
@@ -18,38 +25,78 @@
 <button class="quiet-link" id="auth-switch" type="button" style="width:100%;margin-top:13px">إنشاء حساب جديد</button></div>
 <p class="auth-foot">لن يتم إنشاء جلسة دخول فعلية قبل ربط نظام المصادقة الآمن.</p></div></section>
 
-<section id="home-screen">
+<section id="home-screen" data-screen="home">
 <div class="page-head"><p class="eyebrow">مرحبًا بك في أمان</p><h1 class="page-title">حافظ على رقمك،<br>واطمئن على حمايته.</h1><p class="page-desc">ابحث عن حالة الرقم وتابع خدمات الحماية من مكان واحد.</p></div>
 <section class="surface"><h2 class="surface-title">البحث عن حالة الرقم في أمان</h2><p class="surface-desc">أدخل رقم الهاتف للتحقق من حالته.</p>
 <form id="search-form"><div class="field-row"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="رقم الهاتف" aria-label="رقم الهاتف" required><button class="btn" type="submit">بحث</button></div></form><p id="search-message" class="notice-error" aria-live="polite"></p></section>
 <div class="section-head"><h2>أرقامي</h2><button class="quiet-link" id="show-all-numbers" type="button">عرض الكل</button></div>
 <div id="my-numbers"><div class="soft-surface empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/></svg></div><strong>لا توجد أرقام مرتبطة بحسابك</strong><p>ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.</p></div></div>
 <div class="section-head"><h2>خدماتك</h2></div>
-<a class="quick-link" href="#operations" data-view="operations"><span class="quick-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg></span><span class="quick-text"><strong>العمليات</strong><small>تابع طلبات الاشتراك والتمديد والتنشيط</small></span><span class="chevron">‹</span></a>
-<a class="quick-link" href="#notifications" data-view="notifications"><span class="quick-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span><span class="quick-text"><strong>الإشعارات</strong><small>التحديثات والتنبيهات الخاصة بأرقامك</small></span><span class="chevron">‹</span></a>
+<button class="quick-link" type="button" data-navigate="operations"><span class="quick-icon">▤</span><span class="quick-text"><strong>العمليات</strong><small>تابع طلبات الاشتراك والتمديد والتنشيط</small></span><span class="chevron">‹</span></button>
+<button class="quick-link" type="button" data-navigate="notifications"><span class="quick-icon">♧</span><span class="quick-text"><strong>الإشعارات</strong><small>التحديثات والتنبيهات الخاصة بأرقامك</small></span><span class="chevron">‹</span></button>
 </section>
 
-<section id="numbers-screen" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام التي أصبحت مرتبطة بحسابك بعد اعتماد طلباتها.</p></div><div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام بعد</strong><p>ستظهر الأرقام المعتمدة في هذا القسم.</p></div></section>
-<section id="operations-screen" hidden><div class="page-head"><p class="eyebrow">متابعة الخدمة</p><h1 class="page-title">العمليات</h1><p class="page-desc">طلبات الاشتراك والتمديد والتنشيط وحالات مراجعتها.</p></div><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات لعرضها</strong><p>ستظهر عملياتك هنا بعد تقديم طلبات الخدمة.</p></div></section>
-<section id="account-screen" hidden><div class="page-head"><p class="eyebrow">إعداداتك</p><h1 class="page-title">الحساب</h1><p class="page-desc">بيانات الحساب وإعدادات الأمان.</p></div><div class="surface"><div class="empty-state"><div class="empty-icon">♙</div><strong>بيانات الحساب</strong><p>ستظهر بيانات حسابك بعد تسجيل الدخول وربط المصادقة.</p></div><button class="btn btn-outline btn-block" id="open-login" type="button">تسجيل الدخول</button></div></section>
-<section id="notifications-screen" hidden><div class="page-head"><p class="eyebrow">ابقَ على اطلاع</p><h1 class="page-title">الإشعارات</h1><p class="page-desc">تنبيهات حالة الحماية ومواعيد التجديد وتحديثات الطلبات.</p></div><div class="soft-surface empty-state"><div class="empty-icon">♧</div><strong>لا توجد إشعارات</strong><p>ستظهر إشعاراتك هنا عند توفرها.</p></div></section>
+<section id="numbers-screen" data-screen="numbers" hidden>
+<div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام المرتبطة بحسابك بعد اعتماد طلب الاشتراك فقط.</p></div>
+<section class="surface list-tools"><label class="field-label" for="numbers-search">البحث في أرقامك</label><div class="field-row"><input class="field" id="numbers-search" type="search" placeholder="ابحث برقم الهاتف" autocomplete="off"><button class="btn btn-outline" id="clear-numbers-search" type="button" aria-label="مسح البحث">مسح</button></div>
+<div class="filter-grid"><div><label class="field-label" for="numbers-company-filter">شركة الاتصالات</label><select class="field" id="numbers-company-filter"><option value="">كل الشركات</option></select></div><div><label class="field-label" for="numbers-status-filter">حالة الحماية</label><select class="field" id="numbers-status-filter"><option value="">كل الحالات</option><option value="protected">محمي</option><option value="inactive">غير نشط</option><option value="confiscated">منتهي-مصادر</option></select></div></div></section>
+<div id="numbers-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام بعد</strong><p>تظهر هنا الأرقام بعد اعتماد طلب الاشتراك. البحث عن رقم لا يضيفه إلى قائمتك.</p></div></div>
+</section>
+<section id="operations-screen" data-screen="operations" hidden>
+<div class="page-head"><p class="eyebrow">متابعة الخدمة</p><h1 class="page-title">العمليات</h1><p class="page-desc">تابع طلبات الاشتراك والتمديد والتنشيط وحالة كل طلب.</p></div>
+<section class="surface list-tools"><label class="field-label" for="operations-search">البحث في العمليات</label><input class="field" id="operations-search" type="search" placeholder="رقم الهاتف أو رقم الطلب" autocomplete="off">
+<div class="filter-grid single-filter"><div><label class="field-label" for="operations-status-filter">حالة الطلب</label><select class="field" id="operations-status-filter"><option value="">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div></div></section>
+<div id="operations-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات حتى الآن</strong><p>ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.</p></div></div>
+</section>
+
+<section id="operation-detail-screen" data-screen="operation-detail" hidden>
+<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى العمليات</button><p class="eyebrow">سجل طلباتك</p><h1 class="page-title">تفاصيل العملية</h1><p class="page-desc">تفاصيل الطلب وحالته الحالية.</p></div>
+<div id="operation-detail-content"></div>
+</section>
+<section id="protection-screen" data-screen="protection" hidden>
+<div class="page-head"><button class="quiet-link" type="button" id="protection-back">‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">خدمات أمان</p><h1 class="page-title">طلب الحماية</h1><p class="page-desc">راجع بيانات الرقم واختر الباقة ووسيلة الدفع المتاحة.</p></div>
+<div class="surface"><div class="detail-label">الرقم</div><div class="detail-value" id="protection-phone" dir="ltr">—</div><div class="detail-label" style="margin-top:12px">الشركة</div><div class="detail-value" id="protection-company">—</div><div class="detail-label" style="margin-top:12px">نوع العملية</div><div class="detail-value" id="protection-type">—</div></div>
+<form id="protection-form">
+<div class="surface"><label class="field-label" for="protection-package">باقة الحماية</label><select class="field" id="protection-package" required><option value="">اختر الباقة المتاحة</option></select><p class="surface-desc" id="package-summary">تظهر الباقات المعتمدة لهذه الشركة ونوع العملية عند توفرها.</p></div>
+<div class="surface"><label class="field-label" for="protection-payment">وسيلة الدفع</label><select class="field" id="protection-payment" required><option value="">اختر وسيلة الدفع</option></select><div class="alert-note" id="payment-instructions" style="margin-top:12px">تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.</div>
+<div class="field-wrap"><label class="field-label" for="payment-reference">مرجع الدفع</label><input class="field" id="payment-reference" type="text" autocomplete="off" placeholder="أدخل مرجع عملية الدفع" required></div></div>
+<p id="protection-message" aria-live="polite"></p><button class="btn btn-block" id="protection-continue" type="submit">متابعة للمراجعة</button>
+</form></section>
+<section id="review-screen" data-screen="review" hidden>
+<div class="page-head"><button class="quiet-link" type="button" id="review-back">‹ العودة للتعديل</button><p class="eyebrow">قبل الإرسال</p><h1 class="page-title">مراجعة العملية</h1><p class="page-desc">تأكد من صحة التفاصيل قبل إرسال الطلب إلى إدارة أمان.</p></div>
+<div class="surface" id="review-details"></div><div class="alert-note">إرسال الطلب لا يبدأ الحماية. تبدأ الحماية فقط بعد اعتماد الإدارة للطلب.</div>
+<p id="review-message" aria-live="polite"></p><button class="btn btn-block" id="confirm-protection" type="button">تأكيد وإرسال الطلب</button>
+</section>
+<section id="result-screen" data-screen="result" hidden>
+<div class="page-head"><p class="eyebrow">حالة الإرسال</p><h1 class="page-title" id="result-title">نتيجة العملية</h1><p class="page-desc" id="result-description">ستظهر نتيجة الخادم بعد إرسال الطلب.</p></div>
+<div class="surface" id="result-content"><div class="empty-state"><div class="empty-icon">◷</div><strong>لم يتم إرسال طلب بعد</strong><p>لن نعرض نجاحًا إلا بعد تأكيد استلام الطلب من الخادم.</p></div></div>
+<div class="sheet-actions"><button class="btn btn-block" id="result-to-operations" type="button">الانتقال إلى العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">العودة إلى تفاصيل الرقم</button></div>
+</section>
+<section id="account-screen" data-screen="account" hidden>
+<div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">إدارة بياناتك وإعدادات أمان حسابك.</p></div>
+<div class="surface"><h2 class="surface-title">البيانات الشخصية</h2><form id="profile-form"><label class="field-label" for="profile-name">الاسم</label><input class="field" id="profile-name" name="full_name" autocomplete="name" maxlength="120" placeholder="الاسم المسجل"><div class="field-wrap"><label class="field-label" for="profile-email">البريد الإلكتروني</label><input class="field" id="profile-email" name="email" type="email" autocomplete="email" disabled placeholder="يظهر بعد تسجيل الدخول"></div><p id="profile-message" aria-live="polite"></p><button class="btn btn-block" type="submit">حفظ البيانات</button></form></div>
+<div class="surface"><h2 class="surface-title">تغيير كلمة المرور</h2><form id="password-form"><label class="field-label" for="current-password">كلمة المرور الحالية</label><input class="field" id="current-password" type="password" autocomplete="current-password" minlength="4" required><div class="field-wrap"><label class="field-label" for="new-password">كلمة المرور الجديدة</label><input class="field" id="new-password" type="password" autocomplete="new-password" minlength="4" required></div><p id="password-message" aria-live="polite"></p><button class="btn btn-outline btn-block" type="submit">تحديث كلمة المرور</button></form></div>
+<div class="surface"><h2 class="surface-title">جلسة الحساب</h2><p class="surface-desc">يمكنك تسجيل الخروج من الحساب الحالي عند ربط خدمة المصادقة.</p><button class="btn btn-outline btn-block" id="account-signout" type="button">تسجيل الخروج</button><p id="signout-message" aria-live="polite"></p></div></section>
+<section id="notifications-screen" data-screen="notifications" hidden><div class="page-head"><p class="eyebrow">ابقَ على اطلاع</p><h1 class="page-title">الإشعارات</h1><p class="page-desc">تحديثات الطلبات وحالة الحماية ومواعيد التجديد.</p></div><div class="surface list-tools"><div class="field-row"><select class="field" id="notification-filter" aria-label="تصفية الإشعارات"><option value="all">كل الإشعارات</option><option value="unread">غير المقروءة</option><option value="read">المقروءة</option></select><button class="btn btn-outline" id="notifications-refresh" type="button">تحديث</button></div><p id="notifications-message" aria-live="polite"></p></div><div id="notifications-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon">♧</div><strong>الإشعارات غير متاحة</strong><p>ستظهر الإشعارات بعد ربط خدمة الإشعارات الآمنة.</p></div></div></section>
 </main>
 <nav class="bottom-nav" aria-label="التنقل الرئيسي">
-<button class="nav-item" data-tab="numbers"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h2m3 0h1M9 15h2m3 0h1"/></svg><span>أرقامي</span></button>
-<button class="nav-item active" data-tab="home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></button>
-<button class="nav-item" data-tab="operations"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg><span>العمليات</span></button>
-<button class="nav-item" data-tab="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>حسابي</span></button>
+<button class="nav-item" data-tab="numbers" type="button"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h2m3 0h1M9 15h2m3 0h1"/></svg><span>الأرقام</span></button>
+<button class="nav-item active" data-tab="home" type="button"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></button>
+<button class="nav-item" data-tab="operations" type="button"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg><span>العمليات</span></button>
 </nav>
 <div class="overlay" id="number-sheet" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
 <div class="sheet-handle"></div><div class="sheet-top"><button class="sheet-close" id="close-sheet" aria-label="إغلاق">×</button><span></span></div>
-<div class="sheet-hero"><div class="sheet-hero-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m3 0h3M8 14h2m3 0h3M8 18h2"/><path d="m16 17 2 2 4-5"/></svg></div><h2 id="sheet-title">تفاصيل الرقم</h2></div>
+<div class="sheet-hero"><div class="sheet-hero-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m3 0h3M8 14h2m3 0h3M8 18h2"/></svg></div><h2 id="sheet-title">تفاصيل الرقم</h2></div>
 <div class="detail-block"><div class="detail-line"><div><div class="detail-label">رقم الهاتف</div><div class="detail-value" id="sheet-phone" dir="ltr">—</div></div><span class="state state-off">غير متحقق</span><span class="detail-icon">♧</span></div></div>
-<div class="detail-block"><div class="detail-line"><div><div class="detail-label">شركة الاتصالات</div><div class="detail-value">تُحدد بعد التحقق</div></div><span class="detail-icon">▦</span></div></div>
-<div class="detail-block"><div class="detail-split"><div><div class="detail-label">تاريخ البداية</div><div class="detail-value">—</div></div><div><div class="detail-label">تاريخ الانتهاء</div><div class="detail-value">—</div></div></div></div>
-<div class="detail-block"><div class="detail-line"><div><div class="detail-label">مدة الحماية المتبقية</div><div class="remaining">— <small>يومًا</small></div></div><span class="detail-icon">◷</span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
-<div class="detail-block"><div class="detail-line"><div><strong style="font-size:13px">إشعارات الرقم</strong><div class="surface-desc">متابعة التحديثات والتنبيهات الخاصة بالرقم.</div></div><span class="detail-icon">♧</span></div></div>
-<div class="alert-note">ستظهر بيانات الحماية والإجراءات المتاحة بعد التحقق من الرقم وربط الخدمة.</div>
-<button class="btn btn-block" style="margin-top:14px" id="sheet-done">إغلاق</button>
+<div id="sheet-details-extra"></div>
+<div class="alert-note" id="sheet-privacy-note" hidden></div>
+<div class="sheet-actions" id="sheet-actions"></div>
+<button class="btn btn-outline btn-block" style="margin-top:14px" id="sheet-done">إغلاق</button>
 </section></div>
-<script type="application/json" id="screen-contract">{"status":"ui-foundation","data_source":"not-connected","mock_data":false}</script>
+<div class="overlay" id="operation-sheet" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="operation-sheet-title">
+<div class="sheet-handle"></div><div class="sheet-top"><button class="sheet-close" id="close-operation-sheet" aria-label="إغلاق">×</button><span></span></div>
+<div class="sheet-hero"><div class="sheet-hero-icon">▤</div><h2 id="operation-sheet-title">تفاصيل العملية</h2></div>
+<div id="operation-sheet-content"></div><button class="btn btn-outline btn-block" id="operation-sheet-done" type="button">إغلاق</button>
+</section></div>
+<script type="application/json" id="screen-contract">{"status":"phase-2-c1-c8-ui","data_source":"not-connected","mock_data":false}</script>
 </body></html>
