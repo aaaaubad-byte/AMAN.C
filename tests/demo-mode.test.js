@@ -69,3 +69,25 @@ test("Revenue report includes approved requests only and complaints are read-onl
  assert.match(adminA13A17,/function complaintDetail/);
  assert.doesNotMatch(adminA13A17,/resolveComplaint|deleteComplaint/);
 });
+
+const adminA18A25=readFileSync("admin/phase4-a18-a25.js","utf8");
+test("A18-A25 module is loaded and covers complaints, notifications, alerts and company settings",()=>{
+ assert.ok(admin.includes("phase4-a18-a25.js"));
+ for(const screen of ["complaints","notifications","alerts","settings"])assert.ok(adminA18A25.includes('s==="'+screen+'"')||adminA18A25.includes('s==="'+screen+'"'));
+ for(const method of ["decideComplaint","listAdminNotifications","createAdminNotification","listAdminAlerts","createAdminAlert","listCompanies","saveCompanySettings"])assert.ok(demo.includes(method));
+});
+test("Complaint decisions require a reason and protection termination requires an active protection",()=>{
+ assert.match(demo,/!String\(p\.reason\|\|""\)\.trim\(\)/);
+ assert.match(demo,/n\.status!=="protected"/);
+ assert.match(adminA18A25,/سبب القرار \(إلزامي\)/);
+});
+test("Reactivation and task schedule settings are stored independently per company",()=>{
+ assert.match(demo,/reactivation_enabled:p\.reactivation_enabled/);
+ assert.match(demo,/reactivation_days:p\.reactivation_days/);
+ assert.match(demo,/task_interval_days:p\.task_interval_days/);
+ assert.match(adminA18A25,/إعداد التنشيط مستقل لهذه الشركة/);
+});
+test("Manual number alerts validate the selected number-to-customer relationship",()=>{
+ assert.match(demo,/n\.customer_id/);
+ assert.match(demo,/createAdminAlert/);
+});
