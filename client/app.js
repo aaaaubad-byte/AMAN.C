@@ -184,8 +184,13 @@ document.getElementById("search-form").addEventListener("submit",event=>{
  const phone=normalizePhone(input.value);
  if(!phone){setMessage(message,"أدخل رقم الهاتف بصيغته المحلية.");input.focus();return;}
  if(phone.length<7||phone.length>15){setMessage(message,"تحقق من طول الرقم المدخل.");input.focus();return;}
+ const submit=event.currentTarget.querySelector('button[type="submit"]');
+ submit.disabled=true;
  setMessage(message,"جارٍ التحقق من الرقم…","info");
- setMessage(message,"تعذر التحقق من الرقم لأن خدمة البحث وقاعدة البيانات غير مرتبطتين بعد. لم تتم إضافة الرقم إلى أرقامك.","error");
+ window.setTimeout(()=>{
+  setMessage(message,"تعذر التحقق من الرقم لأن خدمة البحث وقاعدة البيانات غير مرتبطتين بعد. لم تتم إضافة الرقم إلى أرقامك.","error");
+  submit.disabled=false;
+ },350);
 });
 document.getElementById("phone-search").addEventListener("input",event=>{
  event.target.value=normalizeDigits(event.target.value).replace(/[^0-9٠-٩۰-۹]/g,"");
