@@ -106,6 +106,14 @@ function openNumberDetails(number,source="numbers"){
  return true;
 }
 
+
+function renderHomeNumbers(){
+ const host=document.getElementById("my-numbers");
+ if(!numbers.length){host.innerHTML='<div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام مرتبطة بحسابك</strong><p>ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.</p></div>';return;}
+ host.innerHTML=numbers.slice(0,3).map((item,index)=>'<button class="phone-card" type="button" data-home-number-index="'+index+'"><span class="phone-icon">▦</span><span class="phone-info"><strong dir="ltr">'+escapeHtml(item.phone)+'</strong><small>'+escapeHtml(text(item.company))+'</small></span><span class="state '+(item.status==="protected"?"state-active":item.status==="inactive"?"state-wait":"state-expired")+'">'+escapeHtml(numberStatusLabels[item.status]||"—")+'</span></button>').join("");
+ host.querySelectorAll("[data-home-number-index]").forEach(button=>button.addEventListener("click",()=>openNumberDetails(numbers[Number(button.dataset.homeNumberIndex)],"home")));
+}
+
 function renderNumbers(){
  const list=document.getElementById("numbers-list");
  const query=normalizeDigits(document.getElementById("numbers-search").value).replace(/\D/g,"");
@@ -158,7 +166,7 @@ function openOperationDetails(item){
 
 function setNumbers(items){
  numbers=Array.isArray(items)?items.filter(item=>item&&item.phone&&numberStatusLabels[item.status]):[];
- updateCompanyFilter();renderNumbers();
+ updateCompanyFilter();renderNumbers();renderHomeNumbers();
  document.dispatchEvent(new CustomEvent("aman:numbers-updated",{detail:{count:numbers.length}}));
 }
 function setOperations(items){
@@ -166,7 +174,7 @@ function setOperations(items){
  renderOperations();
  document.dispatchEvent(new CustomEvent("aman:operations-updated",{detail:{count:operations.length}}));
 }
-window.AMANClientData=Object.freeze({setNumbers,setOperations,openNumberDetails,openOperationDetails});
+window.AMANClientData=Object.freeze({setNumbers,setOperations,openNumberDetails,openOperationDetails,showSearchResult:number=>openNumberDetails(number,"home")});
 
 const normalizePhone=value=>normalizeDigits(value).replace(/[^0-9]/g,"");
 document.getElementById("search-form").addEventListener("submit",event=>{
@@ -198,5 +206,5 @@ document.getElementById("auth-form").addEventListener("submit",event=>{
  setMessage(document.getElementById("auth-message"),"لم يتم إرسال بياناتك. يلزم ربط خدمة المصادقة الآمنة قبل تفعيل الدخول وإنشاء الحساب.");
 });
 
-renderNumbers();renderOperations();navigate("home",{scroll:false,remember:false});
+renderNumbers();renderHomeNumbers();renderOperations();navigate("home",{scroll:false,remember:false});
 })();
