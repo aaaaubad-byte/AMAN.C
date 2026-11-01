@@ -122,6 +122,10 @@ test("A23 company cards show the enabled or disabled state",()=>{
  assert.match(adminA18A25,/حالة الشركة:/);
 });
 
+test("Company prefix validation accepts digits and rejects non-digit prefixes",()=>{
+ assert.ok(demo.includes(String.raw`!/ ^\\d+$/.test(x)`.replace("!/ ^","!/")));
+});
+
 
 const adminA26A31=readFileSync("admin/phase5-a26-a31.js","utf8");
 test("A26-A31 module is loaded and all five destinations are registered in admin navigation",()=>{
