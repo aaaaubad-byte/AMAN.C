@@ -98,6 +98,4 @@ document.addEventListener("click",e=>{
  if(target.textContent.trim()==="مراجعة أثر الاعتماد"){e.preventDefault();e.stopImmediatePropagation();openApprovalDialog();}
  if(target.textContent.trim()==="رفض الطلب"){e.preventDefault();e.stopImmediatePropagation();openRejectDialog();}
 },true);
-const detailHost=$("request-detail-content");
-if(detailHost){new MutationObserver(()=>{const detail=detailHost.querySelector(".admin-detail-panel");if(!detail)return;const status=detailHost.textContent.includes("قيد المراجعة");if(status){const panels=[...detailHost.querySelectorAll(".admin-detail-panel")];const phone=panels[0]?.textContent;window.AMANAdminCurrentRequest=window.AMANAdminCurrentRequest||null;}}).observe(detailHost,{childList:true,subtree:true});}
 })();
