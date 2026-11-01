@@ -41,3 +41,16 @@
 .notice-info{color:#55758a;font-size:11px;line-height:1.8;margin-top:9px}
 .list-tools .field-row{margin-top:0}
 @media(max-width:380px){.filter-grid{grid-template-columns:1fr}.operation-card{align-items:flex-start}.operation-side .state{font-size:9px;padding:6px 8px}}
+
+/* Phase 2 — C5 to C8 protection request flow */
+.review-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:14px 2px;border-bottom:1px solid var(--line);font-size:12px}
+.review-row:last-child{border-bottom:0}
+.review-row span{color:var(--muted);flex:0 0 36%}
+.review-row strong{color:var(--navy);text-align:left;overflow-wrap:anywhere}
+.result-success{text-align:center;padding:24px 12px}
+.result-success>strong{display:block;color:var(--green);font-size:16px;margin:12px 0 20px}
+.result-success .detail-value{margin-bottom:18px}
+.detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+#protection-message,#review-message{font-size:11px;line-height:1.9;margin:10px 0}
+#protection-package,#protection-payment{appearance:auto}
+@media(max-width:380px){.detail-actions{grid-template-columns:1fr}.review-row{gap:8px}.review-row span{flex-basis:32%}}
