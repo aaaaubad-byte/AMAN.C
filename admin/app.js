@@ -130,7 +130,7 @@ $("admin-login-form").addEventListener("submit",async e=>{
  finally{button.disabled=false;}
 });
 $("dashboard-refresh").addEventListener("click",loadDashboard);
-$("admin-account").addEventListener("click",async()=>{const s=service();if(adminSession&&s&&typeof s.signOutAdmin==="function"){try{await s.signOutAdmin();}catch{}}adminSession=null;showLogin();});
+$("admin-account").addEventListener("click",()=>navigate("account"));
 tabs.forEach(t=>t.addEventListener("click",()=>navigate(t.dataset.adminTab)));
 document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.section)));
 $("admin-back").addEventListener("click",back);$("request-detail-back").addEventListener("click",back);
