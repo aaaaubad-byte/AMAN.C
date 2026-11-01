@@ -122,6 +122,10 @@ test("A23 company cards show the enabled or disabled state",()=>{
  assert.match(adminA18A25,/حالة الشركة:/);
 });
 
+test("Company prefix validation uses an anchored digits-only expression",()=>{
+ assert.ok(demo.includes("prefixes.some(x=>!/^\\d+$/.test(x))"));
+});
+
 
 const adminA26A31=readFileSync("admin/phase5-a26-a31.js","utf8");
 test("A26-A31 module is loaded and all five destinations are registered in admin navigation",()=>{
@@ -144,6 +148,8 @@ test("A27 payment methods store instructions and reference rules without receipt
  for(const field of ["summary","instructions","reference_required","reference_pattern","active"]) assert.ok(adminA26A31.includes(field));
  assert.match(adminA26A31,/لا تُرفع صور أو مرفقات إيصالات/);
  assert.match(demo,/savePaymentMethod:async p=>/);
+ assert.match(demo,/new RegExp\(p\.reference_pattern\)/);
+ assert.match(demo,/صيغة مرجع الدفع غير صالحة/);
 });
 test("A28 content editing confirms each save and retains the entered text when saving fails",()=>{
  assert.match(adminA26A31,/تأكيد حفظ نص/);
@@ -161,7 +167,19 @@ test("A30-A31 show the authenticated admin and require explicit confirmation bef
  assert.match(adminA26A31,/confirm\("هل تريد تسجيل الخروج/);
  assert.match(adminA26A31,/signOutAdmin/);
  assert.match(demo,/signOutAdmin:async/);
+ assert.match(demo,/action:"admin_signed_out"/);
 });
+
+test("A29 audit log supports text search and opening full event details",()=>{
+ assert.match(adminA26A31,/بحث في السجلات/);
+ assert.match(adminA26A31,/عرض التفاصيل/);
+ assert.match(adminA26A31,/showDetail/);
+});
+test("A20, A22, A23 and A18 administrative actions are recorded in the audit log",()=>{
+ for(const action of ["admin_notification_created","admin_alert_created","company_settings_updated","company_created","complaint_"]) assert.ok(demo.includes('action:"'+action));
+ assert.match(demo,/actor_name:admin\(\)\.full_name/);
+});
+
 
 const catalogClient=readFileSync("client/app.js","utf8");
 test("Client catalog supports activation packages and legacy multi-operation demo packages",()=>{

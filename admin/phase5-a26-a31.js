@@ -15,7 +15,49 @@ async function editPackage(p){const h=host();let companies=[];try{companies=(awa
 async function payments(){const h=host();try{const r=await S().listPaymentMethods();if(!r?.success)throw Error();h.append(button("إضافة وسيلة دفع",()=>editPayment(null)));if(!r.items.length)msg(h,"لم تُضَف وسائل دفع بعد.");r.items.forEach(p=>h.append(panel(p.name,[el("p","",p.summary||""),el("p","",p.instructions),el("p","",p.active?"فعالة":"معطلة"),button("تعديل",()=>editPayment(p))])));}catch{msg(h,"تعذر تحميل وسائل الدفع.",true);}}
 async function editPayment(p){const h=host(),name=field("اسم الوسيلة","text",p?.name||""),summary=field("ملخص الوسيلة","text",p?.summary||""),instructions=area("تعليمات الدفع",p?.instructions||""),required=select("اشتراط مرجع الدفع",[["true","مطلوب"],["false","غير مطلوب"]],String(p?.reference_required??true)),pattern=field("صيغة المرجع (إن عُرفت)","text",p?.reference_pattern||""),active=select("الحالة",[["true","فعالة"],["false","معطلة"]],String(p?.active??true)),feedback=el("p");h.append(panel(p?"تعديل وسيلة الدفع":"إضافة وسيلة دفع",[name.wrap,summary.wrap,instructions.wrap,required.wrap,pattern.wrap,active.wrap,el("p","notice-info","لا تُرفع صور أو مرفقات إيصالات."),feedback,button("حفظ وسيلة الدفع",async()=>{const v={id:p?.id,name:name.input.value.trim(),summary:summary.input.value.trim(),instructions:instructions.input.value.trim(),reference_required:required.input.value==="true",reference_pattern:pattern.input.value.trim()||null,active:active.input.value==="true"};if(!v.name||!v.instructions){feedback.textContent="الاسم والتعليمات مطلوبان.";return;}try{const r=await S().savePaymentMethod(v);if(!r?.success)throw Error();payments();}catch{feedback.textContent="تعذر الحفظ.";}},"btn btn-block"),button("إلغاء",payments)]));}
 async function content(){const h=host();try{const r=await S().getAppContent();if(!r?.success)throw Error();const labels={terms:"الشروط والأحكام",privacy:"سياسة الخصوصية",contact:"التواصل",help:"المساعدة والدعم"};Object.entries(labels).forEach(([key,label])=>{const f=area(label,r.items[key]||"");h.append(panel(label,[f.wrap,button("حفظ النص",async()=>{if(!confirm("تأكيد حفظ نص "+label+"؟"))return;try{const q=await S().saveAppContent({key,body:f.input.value});if(!q?.success)throw Error();msg(h,"تم حفظ "+label+".");}catch{msg(h,"تعذر الحفظ؛ احتفظ بالنص وانسخه قبل إعادة المحاولة.",true);}},"btn btn-block") ]));});}catch{msg(h,"تعذر تحميل المحتوى الثابت.",true);}}
-async function audit(){const h=host();try{const r=await S().listAuditLog();if(!r?.success)throw Error();const action=select("الإجراء",[["all","كل الإجراءات"],...r.actions.map(x=>[x,x])]),entity=select("نوع الكيان",[["all","كل الكيانات"],...r.entities.map(x=>[x,x])]),rows=el("div");const render=()=>{rows.replaceChildren();r.items.filter(x=>(action.input.value==="all"||x.action===action.input.value)&&(entity.input.value==="all"||x.entity_type===entity.input.value)).forEach(x=>rows.append(panel(x.action,[el("p","",x.summary||""),el("small","",[(x.entity_type||""),(x.entity_id||""),(x.created_at||"")].join(" • "))])));if(!rows.childNodes.length)msg(rows,"لا توجد سجلات مطابقة.");};action.input.addEventListener("change",render);entity.input.addEventListener("change",render);h.append(panel("مرشحات سجل التدقيق",[action.wrap,entity.wrap]),rows);render();}catch{msg(h,"تعذر تحميل سجل التدقيق.",true);}}
+async function audit(){
+ const h=host();
+ try{
+  const r=await S().listAuditLog();
+  if(!r?.success)throw Error();
+  const items=Array.isArray(r.items)?r.items:[];
+  const action=select("الإجراء", [["all","كل الإجراءات"],...(r.actions||[]).map(x=>[x,x])]);
+  const entity=select("نوع الكيان", [["all","كل الكيانات"],...(r.entities||[]).map(x=>[x,x])]);
+  const search=field("بحث في السجلات","search");
+  const rows=el("div"),detail=el("div");
+  const showDetail=x=>{
+   const values=[
+    ["الإجراء",x.action],["الملخص",x.summary],["نوع الكيان",x.entity_type],
+    ["معرّف الكيان",x.entity_id],["المنفذ",x.actor_name||x.admin_name||"غير مسجل"],
+    ["السبب",x.reason],["التاريخ والوقت",x.created_at]
+   ];
+   detail.replaceChildren(panel("تفاصيل سجل التدقيق",[
+    ...values.filter(([,v])=>v!==undefined&&v!==null&&v!=="").map(([k,v])=>el("p","admin-detail-row",k+" : "+String(v))),
+    button("إغلاق التفاصيل",()=>detail.replaceChildren())
+   ]));
+  };
+  const render=()=>{
+   rows.replaceChildren();
+   const q=search.input.value.trim().toLocaleLowerCase();
+   const filtered=items.filter(x=>
+    (action.input.value==="all"||x.action===action.input.value)&&
+    (entity.input.value==="all"||(x.entity_type||"غير محدد")===entity.input.value)&&
+    (!q||[x.action,x.summary,x.entity_type,x.entity_id,x.actor_name,x.admin_name,x.reason,x.created_at].some(v=>String(v??"").toLocaleLowerCase().includes(q)))
+   );
+   if(!filtered.length){msg(rows,"لا توجد سجلات مطابقة.");return;}
+   filtered.forEach(x=>rows.append(panel(x.summary||x.action,[
+    el("p","",x.action||"إجراء غير محدد"),
+    el("small","",[(x.entity_type||"غير محدد"),(x.entity_id||""),(x.created_at||"")].filter(Boolean).join(" • ")),
+    button("عرض التفاصيل",()=>showDetail(x))
+   ])));
+  };
+  action.input.addEventListener("change",render);
+  entity.input.addEventListener("change",render);
+  search.input.addEventListener("input",render);
+  h.append(panel("بحث ومرشحات سجل التدقيق",[search.wrap,action.wrap,entity.wrap]),detail,rows);
+  render();
+ }catch{msg(h,"تعذر تحميل سجل التدقيق.",true);}
+}
 async function account(){const h=host();try{const r=await S().getCurrentAdmin();if(!r?.success)throw Error();const a=r.admin;h.append(panel("الحساب الإداري",[el("p","", "الاسم: "+(a.full_name||"—")),el("p","", "البريد: "+(a.email||"—")),el("p","", "الدور: مدير النظام"),button("تسجيل الخروج",async()=>{if(!confirm("هل تريد تسجيل الخروج من حساب الإدارة؟"))return;const q=await S().signOutAdmin();if(!q?.success){msg(h,"تعذر تأكيد تسجيل الخروج.",true);return;}location.reload();},"btn btn-block")]));}catch{msg(h,"تعذر تحميل بيانات الحساب الإداري.",true);}}
 document.addEventListener("aman:admin-screenchange",e=>{const s=e.detail?.screen;if(s==="packages")packages();if(s==="payments")payments();if(s==="content")content();if(s==="audit")audit();if(s==="account")account();});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(b&&["packages","payments","content","audit","account"].includes(b.dataset.section)){e.preventDefault();window.AMANAdminNavigation?.navigate(b.dataset.section);}});

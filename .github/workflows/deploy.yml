@@ -3,6 +3,8 @@ name: Validate and deploy AMAN.C preview
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -18,10 +20,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Run automated tests
+        run: node --test tests/*.test.js
       - name: Validate site files and scripts
         run: node scripts/validate.mjs
 
   deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: validate
     runs-on: ubuntu-latest
     permissions:
