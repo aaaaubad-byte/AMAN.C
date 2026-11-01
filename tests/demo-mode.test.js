@@ -123,7 +123,7 @@ test("A23 company cards show the enabled or disabled state",()=>{
 });
 
 test("Company prefix validation uses an anchored digits-only expression",()=>{
- assert.ok(demo.includes("prefixes.some(x=>!/^\\\\d+$/.test(x))"));
+ assert.ok(demo.includes("prefixes.some(x=>!/^\\d+$/.test(x))"));
 });
 
 
