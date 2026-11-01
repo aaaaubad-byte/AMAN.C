@@ -2,16 +2,33 @@
  * AMAN.C — تطبيق العميل
  * يتعامل مع البيانات عبر window.AMANClientServices فقط (services/runtime.js).
  * لا يقرأ localStorage ولا يحتوي بيانات ثابتة ولا يعرض نجاحًا قبل تأكيد الخدمة.
+ *
+ * D3 (docs/DECISIONS.md): شاشتا تسجيل الدخول وإنشاء الحساب، وحارس جلسة: لا رئيسية ولا شاشة داخلية دون جلسة.
+ * الشاشات العامة (boot/login/signup) هي الوحيدة المتاحة بلا جلسة، وأي محاولة تنقل لغيرها تُحوَّل إلى تسجيل الدخول.
+ * فقدان الجلسة أثناء الاستخدام (auth_required من أي عملية) يعيد المستخدم إلى تسجيل الدخول برسالة واضحة.
  */
 (() => {
 "use strict";
 
 const $ = id => document.getElementById(id);
-const svc = () => window.AMANClientServices;
+/* واجهة الخدمات مع كشف انتهاء الجلسة: تُقرأ من window في كل استدعاء ليتسنى استبدالها في الاختبارات. */
+const AUTH_EXEMPT = new Set(["getSession", "signIn", "signUp", "signOut"]);
+const svc = () => {
+ const raw = window.AMANClientServices, out = {};
+ Object.keys(raw).forEach(name => {
+  out[name] = async payload => {
+   const result = await raw[name](payload);
+   if (result && result.success !== true && result.code === "auth_required" && !AUTH_EXEMPT.has(name)) sessionLost();
+   return result;
+  };
+ });
+ return out;
+};
 const runtime = () => window.AMANServices;
 const fmt = value => runtime().formatDateTime(value);
 
-const screenIds = ["home", "numbers", "operations", "operation-detail", "protection", "review", "result", "account", "notifications", "number-alerts", "report", "auth"];
+const screenIds = ["boot", "login", "signup", "home", "numbers", "operations", "operation-detail", "protection", "review", "result", "account", "notifications", "number-alerts", "report"];
+const PUBLIC_SCREENS = new Set(["boot", "login", "signup"]);
 const screens = Object.fromEntries(screenIds.map(id => [id, $(id + "-screen")]));
 const tabs = [...document.querySelectorAll("[data-tab]")];
 const numberSheet = $("number-sheet");
@@ -24,7 +41,7 @@ const operationLabels = { activation: "اشتراك", extension: "تمديد ا�
 const accountTypeLabels = { user: "مستخدم", customer: "عميل" };
 
 /* ---------- الحالة ---------- */
-let currentScreen = "home", previousScreen = "home";
+let currentScreen = "boot", previousScreen = "home";
 let session = null;
 const lists = {
  numbers: { state: "idle", items: [], message: "" },
@@ -33,7 +50,8 @@ const lists = {
 };
 let lastNumber = null, lastNumberSource = "home";
 let protectionContext = null, protectionCatalog = { packages: [], payment_methods: [] }, protectionSubmitting = false;
-let alertsToken = 0, authMode = "signin", authReturn = "home", searchToken = 0;
+let alertsToken = 0, searchToken = 0;
+let reportNumber = null, reportSubmitting = false;
 
 /* ---------- أدوات ---------- */
 const normalizeDigits = value => String(value ?? "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
@@ -51,15 +69,33 @@ function emptyBox(icon, title, text, action) {
 }
 function serviceProblem(result) { return result && result.message ? result.message : "تعذر إتمام العملية."; }
 
-/* ---------- التنقل ---------- */
+/* ---------- التنقل وحارس الجلسة (D3) ---------- */
+function renderAuthFoot() {
+ const st = runtime().status();
+ const text = !st.configured ? runtime().notConfiguredMessage : st.simulation ? "وضع المحاكاة: لا تُدخل بياناتك الحقيقية." : "";
+ $("login-foot").textContent = text; $("signup-foot").textContent = text;
+}
 function navigate(name, { scroll = true, remember = true } = {}) {
  if (!screens[name]) return false;
+ /* الحارس: بلا جلسة لا شاشة غير عامة؛ ومع جلسة لا عودة لشاشات الدخول. */
+ if (!session && !PUBLIC_SCREENS.has(name)) name = "login";
+ else if (session && PUBLIC_SCREENS.has(name)) name = "home";
  if (remember && name !== currentScreen) previousScreen = currentScreen;
  currentScreen = name;
  Object.entries(screens).forEach(([key, node]) => { if (node) node.hidden = key !== name; });
+ const bare = PUBLIC_SCREENS.has(name);
+ $("topbar-actions").style.display = bare ? "none" : "";
+ $("bottom-nav").style.display = bare ? "none" : "";
+ if (name === "login" || name === "signup") renderAuthFoot();
  tabs.forEach(node => node.classList.toggle("active", node.dataset.tab === tabForScreen[name]));
  closeNumberSheet();
  if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
+ /* تحديث هادئ للقوائم عند الدخول إلى شاشاتها لتعكس ما اعتمدته الإدارة منذ آخر تحميل. */
+ if (session) {
+  if (name === "home" || name === "numbers") refreshNumbers(true);
+  if (name === "operations") refreshOperations(true);
+  if (name === "notifications") refreshNotifications(true);
+ }
  document.dispatchEvent(new CustomEvent("aman:screenchange", { detail: { screen: name, previous: previousScreen } }));
  return true;
 }
@@ -67,13 +103,33 @@ function backToPrevious() { navigate(previousScreen || "home", { remember: false
 function returnToNumber() { if (lastNumber) openNumberDetails(lastNumber, lastNumberSource); else navigate(lastNumberSource || "home", { remember: false }); }
 window.AMANClientNavigation = Object.freeze({ navigate, back: backToPrevious, get current() { return currentScreen; }, get previous() { return previousScreen; } });
 
+function clearPrivateState() {
+ lastNumber = null; protectionContext = null; reportNumber = null; alertsToken++; searchToken++;
+ closeNumberSheet();
+ ["login-password", "signup-password", "signup-confirm", "current-password", "new-password", "payment-reference", "phone-search"].forEach(id => { const n = $(id); if (n) n.value = ""; });
+ $("search-message").textContent = "";
+}
+function showLogin(message, kind = "info") {
+ clearPrivateState();
+ setMessage($("login-message"), message || "", kind);
+ navigate("login");
+}
+function sessionLost() {
+ if (!session) return;
+ session = null;
+ resetLists("");
+ Object.values(lists).forEach(l => { l.state = "signedout"; });
+ renderAccount(); renderAll();
+ showLogin("انتهت الجلسة. سجّل الدخول من جديد.", "error");
+}
+
 tabs.forEach(node => node.addEventListener("click", () => navigate(node.dataset.tab)));
 document.querySelectorAll("[data-navigate]").forEach(node => node.addEventListener("click", () => navigate(node.dataset.navigate)));
 document.querySelectorAll("[data-back]").forEach(node => node.addEventListener("click", backToPrevious));
 document.querySelectorAll("[data-back-number]").forEach(node => node.addEventListener("click", returnToNumber));
 $("show-all-numbers").addEventListener("click", () => navigate("numbers"));
 $("account-button").addEventListener("click", () => { renderAccount(); navigate("account"); });
-$("notifications-button").addEventListener("click", () => { navigate("notifications"); refreshNotifications(); });
+$("notifications-button").addEventListener("click", () => navigate("notifications"));
 document.querySelector(".brand").addEventListener("click", event => { event.preventDefault(); navigate("home"); });
 
 function closeNumberSheet() { if (numberSheet) numberSheet.hidden = true; }
@@ -86,37 +142,41 @@ document.addEventListener("keydown", event => { if (event.key === "Escape") clos
 function resetLists(message) {
  Object.values(lists).forEach(l => { l.state = "idle"; l.items = []; l.message = message || ""; });
 }
-async function loadList(name, call) {
+/* silent: إن كانت القائمة محمّلة فلا نعرض «جارٍ التحميل» أثناء التحديث؛ الفشل يظهر دائمًا ولا تبقى بيانات قديمة. */
+async function loadList(name, call, silent = false) {
  const list = lists[name];
- list.state = "loading"; list.message = ""; renderAll();
+ if (!(silent && list.state === "ready")) { list.state = "loading"; list.message = ""; renderAll(); }
  const result = await call();
- if (result.success === true) { list.items = Array.isArray(result.items) ? result.items : []; list.state = "ready"; }
+ if (!session) return;
+ if (result.success === true) { list.items = Array.isArray(result.items) ? result.items : []; list.state = "ready"; list.message = ""; }
  else { list.items = []; list.state = result.code === "auth_required" ? "signedout" : "error"; list.message = serviceProblem(result); }
  renderAll();
 }
-const refreshNumbers = () => loadList("numbers", () => svc().listMyNumbers());
-const refreshOperations = () => loadList("operations", () => svc().listMyOperations());
-const refreshNotifications = () => loadList("notifications", () => svc().getNotifications());
+const refreshNumbers = silent => loadList("numbers", () => svc().listMyNumbers(), silent === true);
+const refreshOperations = silent => loadList("operations", () => svc().listMyOperations(), silent === true);
+const refreshNotifications = silent => loadList("notifications", () => svc().getNotifications(), silent === true);
 
+/* يحدد الجلسة الحالية؛ لا ينتظر القوائم (تعرض حالة التحميل بنفسها). يُرجع نتيجة الخدمة. */
 async function loadSession() {
  const result = await svc().getSession();
  if (result.success === true && result.user) {
   session = result.user;
   renderAccount();
-  await Promise.all([refreshNumbers(), refreshOperations(), refreshNotifications()]);
+  refreshNumbers(); refreshOperations(); refreshNotifications();
  } else {
   session = null;
   resetLists(result.success === true ? "" : serviceProblem(result));
   Object.values(lists).forEach(l => { l.state = result.success === true ? "signedout" : "error"; });
   renderAccount(); renderAll();
  }
+ return result;
 }
 
 /* ---------- حالات القوائم المشتركة ---------- */
 function listStateBox(name, retry, emptyTitle, emptyText) {
  const list = lists[name];
  if (list.state === "loading") return emptyBox("◷", "جارٍ التحميل…");
- if (list.state === "signedout") return emptyBox("♙", "سجّل الدخول للمتابعة", "تظهر بياناتك بعد تسجيل الدخول.", { label: "تسجيل الدخول", run: () => openAuth("home") });
+ if (list.state === "signedout") return emptyBox("♙", "سجّل الدخول للمتابعة", "تظهر بياناتك بعد تسجيل الدخول.", { label: "تسجيل الدخول", run: () => showLogin() });
  if (list.state === "error") return emptyBox("⚠", "تعذر تحميل البيانات", list.message, { label: "إعادة المحاولة", run: retry });
  if (list.state === "idle") return emptyBox("◷", "جارٍ التحضير…");
  if (!list.items.length) return emptyBox("▦", emptyTitle, emptyText);
@@ -135,12 +195,12 @@ function numberCard(item, source) {
 }
 function renderHomeNumbers() {
  const host = $("my-numbers"); host.replaceChildren();
- const box = listStateBox("numbers", refreshNumbers, "لا توجد أرقام مرتبطة بحسابك", "ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.");
+ const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام مرتبطة بحسابك", "ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.");
  if (box) host.append(box); else lists.numbers.items.slice(0, 3).forEach(n => host.append(numberCard(n, "home")));
 }
 function renderNumbers() {
  const host = $("numbers-list"); host.replaceChildren();
- const box = listStateBox("numbers", refreshNumbers, "لا توجد أرقام بعد", "تظهر هنا الأرقام بعد اعتماد طلب الاشتراك. البحث عن رقم لا يضيفه إلى قائمتك.");
+ const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام بعد", "تظهر هنا الأرقام بعد اعتماد طلب الاشتراك. البحث عن رقم لا يضيفه إلى قائمتك.");
  if (box) { host.append(box); updateCompanyFilter(); return; }
  const query = normalizePhone($("numbers-search").value), company = $("numbers-company-filter").value, status = $("numbers-status-filter").value;
  const filtered = lists.numbers.items.filter(i => (!query || normalizePhone(i.phone).includes(query)) && (!company || i.company_id === company) && (!status || i.status === status));
@@ -195,32 +255,29 @@ function openNumberDetails(number, source = "numbers") {
 /* ---------- البحث (C-01) ---------- */
 $("phone-search").addEventListener("input", event => {
  event.target.value = normalizeDigits(event.target.value).replace(/[^0-9]/g, "");
- $("search-message").textContent = ""; $("search-login").hidden = true;
+ $("search-message").textContent = "";
 });
-$("search-login").addEventListener("click", () => openAuth("home"));
 $("search-form").addEventListener("submit", async event => {
  event.preventDefault();
  const input = $("phone-search"), message = $("search-message"), submit = event.currentTarget.querySelector('button[type="submit"]');
- $("search-login").hidden = true;
  const phone = normalizePhone(input.value);
  if (!phone) { setMessage(message, "أدخل رقم الهاتف بصيغته المحلية."); input.focus(); return; }
  if (phone.length < 7 || phone.length > 15) { setMessage(message, "تحقق من طول الرقم المدخل."); input.focus(); return; }
  if (!runtime().isConfigured()) { setMessage(message, runtime().notConfiguredMessage); return; }
- if (!session) { setMessage(message, "سجّل الدخول للبحث عن حالة الرقم."); $("search-login").hidden = false; return; }
+ if (!session) { showLogin("سجّل الدخول للبحث عن حالة الرقم."); return; }
  const token = ++searchToken;
  submit.disabled = true; setMessage(message, "جارٍ التحقق من الرقم…", "info");
  const result = await svc().lookupNumber({ phone });
  submit.disabled = false;
- if (token !== searchToken) return;
+ if (token !== searchToken || !session) return;
  if (result.success === true && result.number) { message.textContent = ""; message.className = ""; openNumberDetails(result.number, "home"); return; }
  setMessage(message, serviceProblem(result));
- if (result.code === "auth_required") $("search-login").hidden = false;
 });
 
 /* ---------- العمليات (C-04/C-05) ---------- */
 function renderOperations() {
  const host = $("operations-list"); host.replaceChildren();
- const box = listStateBox("operations", refreshOperations, "لا توجد عمليات حتى الآن", "ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.");
+ const box = listStateBox("operations", () => refreshOperations(), "لا توجد عمليات حتى الآن", "ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.");
  if (box) { host.append(box); return; }
  const query = normalizeDigits($("operations-search").value).trim(), status = $("operations-status-filter").value;
  const filtered = lists.operations.items.filter(i => (!query || normalizeDigits(i.phone).includes(query) || String(i.request_number || i.id || "").includes(query)) && (!status || i.status === status));
@@ -260,7 +317,7 @@ function openOperationDetails(item) {
 function allowedOperation(number) { return ({ not_subscribed: "activation", protected: "extension", inactive: "reactivation" })[number.status] || null; }
 async function openProtection(number, type) {
  if (!number || allowedOperation(number) !== type) return false;
- if (!session) { openAuth(currentScreen); return false; }
+ if (!session) { showLogin(); return false; }
  protectionContext = { phone: number.phone, company: number.company, company_id: number.company_id, type, number };
  $("protection-phone").textContent = number.phone;
  $("protection-company").textContent = number.company || "";
@@ -315,11 +372,12 @@ $("protection-form").addEventListener("submit", event => {
  navigate("review");
 });
 $("confirm-protection").addEventListener("click", async () => {
- if (protectionSubmitting) return;
+ if (protectionSubmitting || !protectionContext || !protectionContext.package) return;
  const button = $("confirm-protection"), c = protectionContext;
  protectionSubmitting = true; button.disabled = true; button.textContent = "جارٍ الإرسال…";
  const result = await svc().submitProtectionRequest({ phone: c.phone, company_id: c.company_id, operation_type: c.type, package_id: c.package.id, payment_method_id: c.paymentMethod.id, payment_reference: c.paymentReference });
  protectionSubmitting = false; button.disabled = false; button.textContent = "تأكيد وإرسال الطلب";
+ if (!session) return;
  const confirmed = result.success === true && Boolean(result.request_id);
  const content = $("result-content"); content.replaceChildren();
  $("result-title").textContent = confirmed ? "تم إرسال الطلب" : "تعذر تأكيد إرسال الطلب";
@@ -347,7 +405,7 @@ async function openNumberAlerts(number) {
  host.replaceChildren(); setMessage(msg, "جارٍ تحميل التنبيهات…", "info");
  navigate("number-alerts");
  const result = await svc().listNumberAlerts({ phone: number.phone });
- if (token !== alertsToken) return true;
+ if (token !== alertsToken || !session) return true;
  if (result.success !== true) { setMessage(msg, serviceProblem(result)); const retry = el("button", "btn btn-outline", "إعادة المحاولة"); retry.type = "button"; retry.addEventListener("click", () => openNumberAlerts(number)); host.append(retry); return true; }
  msg.textContent = ""; msg.className = "";
  const items = result.items || [];
@@ -357,7 +415,6 @@ async function openNumberAlerts(number) {
 }
 
 /* ---------- تقديم بلاغ (C-12): من «محمي لدى عميل آخر» فقط ---------- */
-let reportNumber = null, reportSubmitting = false;
 function openReport(number) {
  if (!number || number.status !== "other_protected") return false;
  reportNumber = number;
@@ -377,46 +434,46 @@ $("report-form").addEventListener("submit", async event => {
  reportSubmitting = true; button.disabled = true; button.textContent = "جارٍ الإرسال…";
  const result = await svc().submitReport({ phone: reportNumber.phone, reason_code: reason, reason_text: reason === "other" ? text : "" });
  reportSubmitting = false; button.disabled = false; button.textContent = "إرسال البلاغ";
+ if (!session) return;
  if (result.success === true && result.report_id) { setMessage(msg, "تم استلام البلاغ. رقم البلاغ: " + result.report_id, "success"); $("report-form").reset(); $("report-text-wrap").hidden = true; }
  else setMessage(msg, "لم يتم تأكيد استلام البلاغ. " + serviceProblem(result));
 });
 
-/* ---------- المصادقة ---------- */
-function openAuth(returnTo) {
- authReturn = returnTo && returnTo !== "auth" ? returnTo : "home";
- setAuthMode("signin");
- const foot = $("auth-foot"), st = runtime().status();
- foot.textContent = !st.configured ? runtime().notConfiguredMessage : st.simulation ? "وضع المحاكاة: لا تُدخل بياناتك الحقيقية." : "";
- setMessage($("auth-message"), "", "info");
- navigate("auth");
+/* ---------- المصادقة (D3): شاشتا تسجيل الدخول وإنشاء الحساب ---------- */
+$("login-to-signup").addEventListener("click", () => { setMessage($("signup-message"), "", "info"); navigate("signup"); });
+$("signup-to-login").addEventListener("click", () => { setMessage($("login-message"), "", "info"); navigate("login"); });
+/* بعد نجاح الدخول أو الإنشاء: نؤكد الجلسة من الخدمة ثم نفتح الرئيسية؛ إن لم تتأكد نبقى على الشاشة الحالية برسالة. */
+async function afterAuth(messageNode) {
+ ["login-password", "signup-password", "signup-confirm"].forEach(id => { $(id).value = ""; });
+ await loadSession();
+ if (!session) { setMessage(messageNode, "تعذر تأكيد الجلسة بعد الدخول. حاول مرة أخرى."); return; }
+ messageNode.textContent = "";
+ navigate("home");
 }
-function setAuthMode(mode) {
- authMode = mode;
- const signup = mode === "signup";
- $("auth-title").textContent = signup ? "إنشاء حساب جديد" : "تسجيل الدخول";
- $("auth-description").textContent = signup ? "أدخل بريدك الإلكتروني وكلمة المرور لإنشاء حساب." : "أدخل بريدك الإلكتروني للمتابعة إلى حسابك.";
- $("auth-submit").textContent = signup ? "إنشاء الحساب" : "دخول";
- $("auth-switch").textContent = signup ? "لديك حساب بالفعل؟ تسجيل الدخول" : "إنشاء حساب جديد";
- $("auth-password").autocomplete = signup ? "new-password" : "current-password";
-}
-$("open-login").addEventListener("click", () => openAuth("account"));
-$("auth-switch").addEventListener("click", () => setAuthMode(authMode === "signin" ? "signup" : "signin"));
-$("auth-form").addEventListener("submit", async event => {
+$("login-form").addEventListener("submit", async event => {
  event.preventDefault();
- const msg = $("auth-message"), button = $("auth-submit");
- const email = $("auth-email").value.trim(), password = $("auth-password").value;
+ const msg = $("login-message"), button = $("login-submit");
+ const email = $("login-email").value.trim(), password = $("login-password").value;
  button.disabled = true; setMessage(msg, "جارٍ التحقق…", "info");
- const result = await (authMode === "signup" ? svc().signUp({ email, password }) : svc().signIn({ email, password }));
+ const result = await svc().signIn({ email, password });
  button.disabled = false;
  if (result.success !== true) { setMessage(msg, serviceProblem(result)); return; }
- $("auth-password").value = ""; msg.textContent = "";
- await loadSession();
- navigate(authReturn === "account" ? "account" : authReturn || "home");
+ await afterAuth(msg);
+});
+$("signup-form").addEventListener("submit", async event => {
+ event.preventDefault();
+ const msg = $("signup-message"), button = $("signup-submit");
+ const email = $("signup-email").value.trim(), password = $("signup-password").value, confirm = $("signup-confirm").value;
+ if (password !== confirm) { setMessage(msg, "كلمتا المرور غير متطابقتين."); return; }
+ button.disabled = true; setMessage(msg, "جارٍ إنشاء الحساب…", "info");
+ const result = await svc().signUp({ email, password });
+ button.disabled = false;
+ if (result.success !== true) { setMessage(msg, serviceProblem(result)); return; }
+ await afterAuth(msg);
 });
 
 /* ---------- الحساب (C-09) ---------- */
 function renderAccount() {
- $("account-auth-entry").hidden = Boolean(session);
  $("account-signed-in").hidden = !session;
  if (!session) return;
  $("account-email").textContent = session.email || "";
@@ -426,6 +483,7 @@ function renderAccount() {
 $("profile-form").addEventListener("submit", async event => {
  event.preventDefault();
  const msg = $("profile-message"), result = await svc().updateProfile({ full_name: $("profile-name").value.trim() });
+ if (!session) return;
  if (result.success === true) { setMessage(msg, "تم تحديث البيانات.", "success"); await loadSession(); } else setMessage(msg, serviceProblem(result));
 });
 $("password-form").addEventListener("submit", async event => {
@@ -434,6 +492,7 @@ $("password-form").addEventListener("submit", async event => {
  const current_password = $("current-password").value, new_password = $("new-password").value;
  if (new_password.length < 4) { setMessage(msg, "كلمة المرور الجديدة يجب ألا تقل عن 4 أحرف."); return; }
  const result = await svc().changePassword({ current_password, new_password });
+ if (!session) return;
  if (result.success === true) { form.reset(); setMessage(msg, "تم تحديث كلمة المرور.", "success"); } else setMessage(msg, serviceProblem(result));
 });
 $("account-signout").addEventListener("click", () => { $("signout-confirm").hidden = false; $("account-signout").hidden = true; });
@@ -441,14 +500,15 @@ $("signout-confirm-no").addEventListener("click", () => { $("signout-confirm").h
 $("signout-confirm-yes").addEventListener("click", async () => {
  const msg = $("signout-message"), result = await svc().signOut();
  $("signout-confirm").hidden = true; $("account-signout").hidden = false;
- if (result.success === true) { setMessage(msg, "تم تسجيل الخروج.", "success"); await loadSession(); navigate("home"); } else setMessage(msg, serviceProblem(result));
+ if (result.success === true || result.code === "auth_required") { msg.textContent = ""; await loadSession(); showLogin("تم تسجيل الخروج.", "success"); }
+ else setMessage(msg, serviceProblem(result));
 });
 
 /* ---------- الإشعارات (C-10) ---------- */
 function renderNotifications() {
  const host = $("notifications-list"), filter = $("notification-filter").value;
  host.replaceChildren();
- const box = listStateBox("notifications", refreshNotifications, "لا توجد إشعارات", "ستظهر هنا إشعارات حسابك عند وصولها.");
+ const box = listStateBox("notifications", () => refreshNotifications(), "لا توجد إشعارات", "ستظهر هنا إشعارات حسابك عند وصولها.");
  $("notifications-dot").hidden = !lists.notifications.items.some(n => !n.read_at);
  if (box) { host.append(box); return; }
  const items = lists.notifications.items.filter(n => filter === "all" || (filter === "unread" && !n.read_at) || (filter === "read" && n.read_at));
@@ -463,15 +523,24 @@ function renderNotifications() {
 }
 async function markRead(id) {
  const result = await svc().markNotificationRead({ notification_id: id });
- if (result.success === true) await refreshNotifications(); else setMessage($("notifications-message"), serviceProblem(result));
+ if (!session) return;
+ if (result.success === true) await refreshNotifications(true); else setMessage($("notifications-message"), serviceProblem(result));
 }
 $("notification-filter").addEventListener("change", renderNotifications);
-$("notifications-refresh").addEventListener("click", refreshNotifications);
+$("notifications-refresh").addEventListener("click", () => refreshNotifications());
 
 function renderAll() { renderHomeNumbers(); renderNumbers(); renderOperations(); renderNotifications(); }
 
-/* ---------- الإقلاع ---------- */
+/* ---------- الإقلاع: لا شاشة داخلية قبل تأكيد الجلسة ---------- */
 renderAll();
-navigate("home", { scroll: false, remember: false });
-loadSession();
+navigate("boot", { scroll: false, remember: false });
+(async () => {
+ const result = await loadSession();
+ if (session) { navigate("home", { scroll: false, remember: false }); return; }
+ /* بلا جلسة: تسجيل الدخول. فشل غير «الخدمة غير مهيأة» (مثل تعذر الاتصال) يُعرض برسالته. */
+ const problem = result.success !== true && result.code !== "service_not_configured" ? serviceProblem(result) : "";
+ clearPrivateState();
+ setMessage($("login-message"), problem, "error");
+ navigate("login", { scroll: false, remember: false });
+})();
 })();
