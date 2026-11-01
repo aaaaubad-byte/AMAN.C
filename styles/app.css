@@ -54,3 +54,4 @@
 #protection-message,#review-message{font-size:11px;line-height:1.9;margin:10px 0}
 #protection-package,#protection-payment{appearance:auto}
 @media(max-width:380px){.detail-actions{grid-template-columns:1fr}.review-row{gap:8px}.review-row span{flex-basis:32%}}
+\n/* Phase 2 — C9 to C12 account, notifications, alerts and reports */\n.check-row{display:flex;align-items:center;gap:11px;padding:14px 2px;border-bottom:1px solid var(--line);font-size:12px;color:var(--text)}.check-row input{width:19px;height:19px;accent-color:var(--green)}.notification-card{margin-bottom:10px}.notification-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.notification-card p{font-size:12px;line-height:1.9;color:var(--muted)}.notification-card>small{font-size:10px;color:var(--muted)}#report-description{height:auto;min-height:120px;resize:vertical;padding-top:12px}\n
