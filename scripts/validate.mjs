@@ -4,7 +4,7 @@ import { resolve, dirname } from "node:path";
 
 const required = [
   "index.html", "client/index.html", "client/app.js",
-  "admin/index.html", "admin/app.js", "styles/app.css"
+  "admin/index.html", "admin/app.js", "admin/phase3-a5-a8.js", "styles/app.css"
 ];
 const failures = [];
 for (const file of required) {
@@ -24,7 +24,7 @@ for (const file of htmlFiles) {
     if (!existsSync(target)) failures.push(file + " يشير إلى ملف غير موجود: " + ref);
   }
 }
-for (const file of ["client/app.js", "admin/app.js"]) {
+for (const file of ["client/app.js", "admin/app.js", "admin/phase3-a5-a8.js"]) {
   const check = spawnSync(process.execPath, ["--check", file], { encoding: "utf8" });
   if (check.status !== 0) failures.push("خطأ صياغة JavaScript في " + file + ": " + check.stderr);
 }
