@@ -129,10 +129,13 @@ test("الطلبات: اعتماد من القائمة إلى التفاصيل �
   await t.page.click(".admin-request-card");
   await t.page.waitForSelector("text=مراجعة أثر الاعتماد", T);
   await t.page.click("text=مراجعة أثر الاعتماد");
-  await t.page.waitForSelector("text=تأكيد الاعتماد", T);
+  await t.page.waitForSelector("dialog button:has-text('تأكيد الاعتماد')", T);
   assert.equal((await t.page.evaluate(() => window.AMANAdminServices.listRequests({ status: "pending" }))).requests.length, 1, "لا اعتماد قبل التأكيد");
-  await t.page.click("button:has-text('تأكيد الاعتماد')");
-  await t.page.waitForSelector("text=تم اعتماد الطلب", T);
+  await t.page.click("dialog button:has-text('تأكيد الاعتماد')");
+  await t.page.waitForSelector("dialog >> text=أكد الخادم اعتماد الطلب", T);
+  await t.page.click("dialog button:has-text('إغلاق')");
+  assert.equal(await t.page.locator("dialog[open]").count(), 0, "النافذة تُغلق بعد النجاح");
+  await t.page.waitForFunction(() => /معتمد/.test(document.getElementById("request-detail-content").innerText), null, T);
   const after = await t.page.evaluate(id => window.AMANAdminServices.getRequestDetails({ request_id: id }), id);
   assert.equal(after.request.status, "approved");
   assert.match(await t.page.locator("#request-detail-content").innerText(), /معتمد/);
@@ -149,11 +152,11 @@ test("الطلبات: فشل الاعتماد لا يُظهر نجاحًا وي�
   await t.page.waitForSelector(".admin-request-card", T);
   await t.page.click(".admin-request-card");
   await t.page.click("text=مراجعة أثر الاعتماد");
-  await t.page.waitForSelector("button:has-text('تأكيد الاعتماد')", T);
+  await t.page.waitForSelector("dialog button:has-text('تأكيد الاعتماد')", T);
   await breakService(t.page, "approveRequest");
-  await t.page.click("button:has-text('تأكيد الاعتماد')");
-  await t.page.waitForSelector("text=لم يصل تأكيد موثوق", T);
-  assert.doesNotMatch(await t.page.locator("#request-detail-content").innerText(), /تم اعتماد الطلب/);
+  await t.page.click("dialog button:has-text('تأكيد الاعتماد')");
+  await t.page.waitForSelector("dialog >> text=لم يصل تأكيد موثوق", T);
+  assert.doesNotMatch(await t.page.locator("dialog").innerText(), /أكد الخادم/);
   assert.equal((await t.page.evaluate(id => window.AMANAdminServices.getRequestDetails({ request_id: id }), id)).request.status, "pending");
   await t.done();
 });
@@ -166,13 +169,13 @@ test("الطلبات: رفض بسبب معتمد ثم ظهور الحالة، و
   await t.page.waitForSelector(".admin-request-card", T);
   await t.page.click(".admin-request-card");
   await t.page.click("text=رفض الطلب");
-  await t.page.waitForSelector("button:has-text('تأكيد الرفض')", T);
-  await t.page.click("button:has-text('تأكيد الرفض')");
-  await t.page.waitForSelector("text=اختر سبب الرفض أولًا");
+  await t.page.waitForSelector("dialog button:has-text('تأكيد الرفض')", T);
+  await t.page.click("dialog button:has-text('تأكيد الرفض')"); // التحقق الأصلي للمتصفح يمنع الإرسال دون سبب
+  assert.equal(await t.page.locator("dialog select").evaluate(s => s.validity.valueMissing), true);
   assert.equal((await t.page.evaluate(id => window.AMANAdminServices.getRequestDetails({ request_id: id }), id)).request.status, "pending");
-  await t.page.locator("#request-detail-content select").selectOption("amount_short");
-  await t.page.click("button:has-text('تأكيد الرفض')");
-  await t.page.waitForSelector("text=تم رفض الطلب", T);
+  await t.page.locator("dialog select").selectOption("amount_short");
+  await t.page.click("dialog button:has-text('تأكيد الرفض')");
+  await t.page.waitForSelector("dialog >> text=أكد الخادم رفض الطلب", T);
   const d = (await t.page.evaluate(id => window.AMANAdminServices.getRequestDetails({ request_id: id }), id)).request;
   assert.equal(d.status, "rejected");
   assert.equal(d.reject_reason, "amount_short");
@@ -187,7 +190,7 @@ test("الأرقام والتقارير: رقم معتمد يظهر بحالته
   await go(t.page, "numbers");
   await t.page.waitForSelector("text=711234567", T);
   await t.page.click("text=711234567");
-  await t.page.waitForSelector("text=محمي", T);
+  await t.page.getByText("محمي", { exact: true }).first().waitFor(T);
   await go(t.page, "reports");
   await t.page.waitForSelector("text=ملخص الإيرادات المعتمدة", T);
   assert.match(await view(t.page).innerText(), /1 عملية|عدد العمليات/);
@@ -305,7 +308,9 @@ test("البلاغات: فراغ ← قرار بسبب إلزامي ← تحدي
   await seed(t.page);
   await approve(t.page, await submitRequest(t.page));
   await t.page.evaluate(async () => {
-    await window.AMANClientServices.submitReport({ phone: "711234567", reason_code: "other", reason_text: "بلاغ اختبار" });
+    await window.AMANClientServices.signUp({ email: "other@test.local", password: "1234" });
+    const r = await window.AMANClientServices.submitReport({ phone: "711234567", reason_code: "unauthorized", reason_text: "بلاغ اختبار" });
+    if (!r.success) throw new Error(JSON.stringify(r));
   });
   await go(t.page, "complaints");
   await t.page.waitForSelector("text=711234567", T);
@@ -329,7 +334,7 @@ test("الإشعارات والتنبيهات: إنشاء يدوي بمعاين�
   await seed(t.page);
   await approve(t.page, await submitRequest(t.page));
   await go(t.page, "notifications");
-  await t.page.click("text=إنشاء إشعار يدوي");
+  await t.page.getByRole("button", { name: "إنشاء إشعار يدوي" }).click();
   await t.page.getByLabel("عنوان الإشعار").fill("عنوان الاختبار");
   await t.page.getByLabel("نص الإشعار").fill("نص الاختبار");
   assert.equal(await t.page.locator("button:has-text('تأكيد وإرسال الإشعار')").isHidden(), true);
@@ -339,7 +344,7 @@ test("الإشعارات والتنبيهات: إنشاء يدوي بمعاين�
   await t.page.waitForSelector("text=عنوان الاختبار", T);
   assert.ok((await t.page.evaluate(() => window.AMANAdminServices.listAdminNotifications())).items.some(n => n.title === "عنوان الاختبار"));
   await go(t.page, "alerts");
-  await t.page.click("text=إنشاء تنبيه يدوي");
+  await t.page.getByRole("button", { name: "إنشاء تنبيه يدوي" }).click();
   await t.page.getByLabel("عنوان التنبيه").fill("تنبيه الاختبار");
   await t.page.getByLabel("نص التنبيه").fill("نص التنبيه");
   await t.page.click("button:has-text('إنشاء التنبيه')");
@@ -353,8 +358,8 @@ test("المحتوى والتدقيق والحساب: حفظ نص، ظهور ا�
   const t = await start();
   await go(t.page, "content");
   await t.page.waitForSelector("text=الشروط والأحكام");
-  await t.page.locator("section", { hasText: "الشروط والأحكام" }).locator("textarea").fill("نص الشروط");
-  await t.page.locator("section", { hasText: "الشروط والأحكام" }).getByRole("button", { name: "حفظ النص" }).click();
+  await t.page.getByLabel("الشروط والأحكام").fill("نص الشروط");
+  await t.page.getByRole("button", { name: "حفظ النص" }).first().click();
   await t.page.waitForSelector("text=تم حفظ الشروط والأحكام", T);
   assert.equal((await t.page.evaluate(() => window.AMANAdminServices.getAppContent())).items.terms, "نص الشروط");
   await go(t.page, "audit");

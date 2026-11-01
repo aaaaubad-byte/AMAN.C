@@ -15,6 +15,7 @@ export async function open(browser, path, { simulation = true, viewport } = {}) 
   const context = await browser.newContext(viewport ? { viewport } : {});
   await context.route(url => !/^http:\/\/127\.0\.0\.1[:/]/.test(url.href), route => route.abort());
   const page = await context.newPage();
+  page.setDefaultTimeout(8000);
   const errors = [];
   page.on("pageerror", e => errors.push(e.message));
   page.on("dialog", d => d.accept()); // confirm() الأصلية في الإدارة
