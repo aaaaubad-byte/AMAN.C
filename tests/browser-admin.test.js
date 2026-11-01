@@ -151,9 +151,9 @@ test("الطلبات: فشل الاعتماد لا يُظهر نجاحًا وي�
   await go(t.page, "requests");
   await t.page.waitForSelector(".admin-request-card", T);
   await t.page.click(".admin-request-card");
+  await breakService(t.page, "approveRequest"); // النافذة تلتقط الخدمة عند فتحها، فنكسر قبل الفتح
   await t.page.click("text=مراجعة أثر الاعتماد");
   await t.page.waitForSelector("dialog button:has-text('تأكيد الاعتماد')", T);
-  await breakService(t.page, "approveRequest");
   await t.page.click("dialog button:has-text('تأكيد الاعتماد')");
   await t.page.waitForSelector("dialog >> text=لم يصل تأكيد موثوق", T);
   assert.doesNotMatch(await t.page.locator("dialog").innerText(), /أكد الخادم/);
@@ -295,7 +295,7 @@ test("المهام: فشل التنفيذ لا يُظهر نجاحًا", { skip 
   await t.page.click("button:has-text('تنفيذ المهمة')");
   await breakService(t.page, "executeTask");
   await t.page.click("button:has-text('تأكيد التنفيذ')");
-  await t.page.waitForSelector("dialog >> text=تعذر الوصول إلى الخدمة", T);
+  await t.page.waitForSelector("dialog >> text=لم يصل تأكيد موثوق", T);
   assert.doesNotMatch(await view(t.page).innerText(), /تم تسجيل تنفيذ المهمة/);
   assert.equal((await t.page.evaluate(() => window.AMANAdminServices.listTasks())).tasks.filter(x => x.status === "executed").length, 0);
   await t.done();
@@ -321,7 +321,7 @@ test("البلاغات: فراغ ← قرار بسبب إلزامي ← تحدي
   assert.equal((await t.page.evaluate(() => window.AMANAdminServices.listComplaints())).reports[0].status, "open");
   await t.page.locator("#admin-generic-view textarea").fill("لا مخالفة");
   await t.page.click("button:has-text('حفظ القرار')");
-  await t.page.waitForSelector("text=تمت المعالجة", T);
+  await t.page.locator(".admin-request-card", { hasText: "تمت المعالجة" }).waitFor(T);
   assert.equal((await t.page.evaluate(() => window.AMANAdminServices.listComplaints())).reports[0].status, "resolved");
   await t.page.locator("#complaints-filter").selectOption("open");
   await t.page.waitForSelector("text=لا توجد بيانات لعرضها");
@@ -368,7 +368,7 @@ test("المحتوى والتدقيق والحساب: حفظ نص، ظهور ا�
   await t.page.waitForSelector("text=لا توجد سجلات مطابقة");
   await go(t.page, "account");
   await t.page.waitForSelector("text=مدير المحاكاة", T);
-  await t.page.click("button:has-text('تسجيل الخروج')");
+  await t.page.getByRole("button", { name: "تسجيل الخروج", exact: true }).click();
   await t.page.waitForSelector("#admin-login:not([hidden])", T);
   assert.equal(await t.page.locator("#dashboard-screen").isHidden(), true);
   assert.deepEqual(t.errors, []);
