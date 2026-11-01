@@ -21,18 +21,21 @@ test("GitHub Pages deployment includes the Demo assets",()=>{
  assert.ok(deploy.includes("cp -R client admin styles demo dist/"));
 });
 
-test("Demo scripts load in deterministic order before app scripts",()=>{
+
+test("Demo services load before the original client and admin scripts",()=>{
  for(const html of [client,admin]){
-  assert.match(html,/demo-services\\.js"><\\/script><script defer src="\\.\\/app\\.js"/);
-  assert.doesNotMatch(html,/document\\.write/);
+  assert.ok(html.includes('<script defer src="../demo/demo-services.js"></script><script defer src="./app.js"></script>'));
+  assert.ok(!html.includes("document.write"));
  }
 });
 test("Customer and admin demo sessions are independent",()=>{
- assert.match(demo,/customer_session/);
- assert.match(demo,/admin_session/);
- assert.doesNotMatch(demo,/db\\.session/);
+ assert.ok(demo.includes("customer_session"));
+ assert.ok(demo.includes("admin_session"));
+ assert.ok(!demo.includes("db.session"));
+ assert.ok(demo.includes("function customer(){return db.users.find(x=>x.id===db.customer_session"));
+ assert.ok(demo.includes("function admin(){return db.users.find(x=>x.id===db.admin_session"));
 });
-test("Customer login entry exists and matches the app handler",()=>{
- assert.match(client,/id="open-login"/);
- assert.match(readFileSync("client/app.js","utf8"),/getElementById\\("open-login"\\)/);
+test("Customer login entry exists and matches the original app handler",()=>{
+ assert.ok(client.includes('id="open-login"'));
+ assert.ok(readFileSync("client/app.js","utf8").includes('getElementById("open-login")'));
 });
