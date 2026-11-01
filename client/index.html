@@ -36,7 +36,7 @@
 <section id="home-screen" data-screen="home">
 <div class="page-head"><p class="eyebrow">مرحبًا بك في أمان</p><h1 class="page-title">حافظ على رقمك،<br>واطمئن على حمايته.</h1><p class="page-desc">ابحث عن حالة الرقم وتابع خدمات الحماية من مكان واحد.</p></div>
 <section class="surface"><h2 class="surface-title">البحث عن حالة الرقم في أمان</h2><p class="surface-desc">أدخل رقم الهاتف للتحقق من حالته.</p>
-<form id="search-form"><div class="field-row"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="رقم الهاتف" aria-label="رقم الهاتف" required><button class="btn" type="submit">بحث</button></div></form><p id="search-message" class="notice-error" aria-live="polite"></p></section>
+<form id="search-form"><div class="field-row"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="رقم الهاتف" aria-label="رقم الهاتف" required><button class="btn" type="submit">بحث</button></div></form><p id="search-message" class="notice-error" aria-live="polite"></p><button id="search-login" class="btn btn-outline" type="button" hidden>تسجيل الدخول</button></section>
 <div class="section-head"><h2>أرقامي</h2><button class="quiet-link" id="show-all-numbers" type="button">عرض الكل</button></div>
 <div id="my-numbers"><div class="soft-surface empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/></svg></div><strong>لا توجد أرقام مرتبطة بحسابك</strong><p>ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.</p></div></div>
 <div class="section-head"><h2>خدماتك</h2></div>
@@ -78,7 +78,7 @@
 <section id="result-screen" data-screen="result" hidden>
 <div class="page-head"><p class="eyebrow">حالة الإرسال</p><h1 class="page-title" id="result-title">نتيجة العملية</h1><p class="page-desc" id="result-description">ستظهر نتيجة الخادم بعد إرسال الطلب.</p></div>
 <div class="surface" id="result-content"><div class="empty-state"><div class="empty-icon">◷</div><strong>لم يتم إرسال طلب بعد</strong><p>لن نعرض نجاحًا إلا بعد تأكيد استلام الطلب من الخادم.</p></div></div>
-<div class="sheet-actions"><button class="btn btn-block" id="result-to-operations" type="button">الانتقال إلى العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">العودة إلى تفاصيل الرقم</button></div>
+<div class="sheet-actions"><button class="btn btn-block" id="result-retry" type="button" hidden>إعادة المحاولة</button><button class="btn btn-block" id="result-to-operations" type="button">الانتقال إلى العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">العودة إلى تفاصيل الرقم</button></div>
 </section>
 <section id="account-screen" data-screen="account" hidden>
 <div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">إدارة بياناتك وإعدادات أمان حسابك.</p></div>

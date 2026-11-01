@@ -3,9 +3,9 @@
 const $=id=>document.getElementById(id),S=()=>window.AMANAdminServices||{};
 const el=(tag,cls="",value)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n;};
 const button=(label,fn,cls="btn btn-outline")=>{const b=el("button",cls,label);b.type="button";b.addEventListener("click",fn);return b;};
-const field=(label,type="text",value="")=>{const w=el("div"),l=el("label","field-label",label),i=el("input","field");i.type=type;i.value=value;w.append(l,i);return {wrap:w,input:i};};
+let fieldSeq=0;const field=(label,type="text",value="")=>{const w=el("div"),l=el("label","field-label",label),i=el("input","field");i.type=type;i.value=value;i.id="f"+(++fieldSeq);l.htmlFor=i.id;w.append(l,i);return {wrap:w,input:i};};
 const area=(label,value="")=>{const w=el("div"),l=el("label","field-label",label),i=el("textarea","field");i.rows=5;i.maxLength=20000;i.value=value;w.append(l,i);return {wrap:w,input:i};};
-const select=(label,opts,value)=>{const w=el("div"),l=el("label","field-label",label),i=el("select","field");opts.forEach(([v,t])=>i.add(new Option(t,v)));i.value=value??opts[0]?.[0];w.append(l,i);return {wrap:w,input:i};};
+const select=(label,opts,value)=>{const w=el("div"),l=el("label","field-label",label),i=el("select","field");opts.forEach(([v,t])=>i.add(new Option(t,v)));i.value=value??opts[0]?.[0];i.id="s"+(++fieldSeq);l.htmlFor=i.id;w.append(l,i);return {wrap:w,input:i};};
 const panel=(title,children)=>{const p=el("section","surface"),h=el("h2","surface-title",title);p.append(h,...children);return p;};
 const host=()=>{const h=$("admin-generic-view");h.replaceChildren();return h;};
 const msg=(h,t,bad=false)=>h.append(el("p",bad?"notice-error":"notice-info",t));
