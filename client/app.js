@@ -164,18 +164,18 @@ function openOperationDetails(item){
   ["مرجع الدفع",text(item.payment_reference)],["تاريخ الطلب",text(item.created_at)],["حالة الطلب",requestStatusLabels[item.status]||"—"]
  ];
  if(item.status==="rejected"&&item.rejection_reason)rows.push(["سبب الرفض",item.rejection_reason]);
- document.getElementById("operation-sheet-content").innerHTML=rows.map(([label,value])=>'<div class="detail-block"><div class="detail-label">'+escapeHtml(label)+'</div><div class="detail-value">'+escapeHtml(value)+'</div></div>').join("");
- operationSheet.hidden=false;
- const extra=document.createElement("div");extra.className="sheet-actions";
+ const content=document.getElementById("operation-detail-content");
+ content.innerHTML=rows.map(([label,value])=>'<div class="detail-block"><div class="detail-label">'+escapeHtml(label)+'</div><div class="detail-value">'+escapeHtml(value)+'</div></div>').join("");
+ const actions=document.createElement("div");actions.className="detail-actions";
  [["نسخ رقم الطلب",item.id],["نسخ مرجع الدفع",item.payment_reference]].filter(pair=>pair[1]).forEach(([label,value])=>{
-  const copy=document.createElement("button");copy.className="btn btn-outline";copy.type="button";copy.textContent=label;
-  copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(String(value));copy.textContent="تم النسخ";}catch{copy.textContent="تعذر النسخ";}});
-  extra.append(copy);
+  const button=document.createElement("button");button.className="btn btn-outline";button.type="button";button.textContent=label;
+  button.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(String(value));button.textContent="تم النسخ";}catch{button.textContent="تعذر النسخ";}});
+  actions.append(button);
  });
- document.getElementById("operation-sheet-content").append(extra);
+ content.append(actions);
+ navigate("operation-detail");
  return true;
 }
-
 
 function allowedOperationForNumber(number){
  if(number.status==="protected")return "extension";
@@ -198,8 +198,8 @@ function openProtection(number,type){
 }
 function populateProtectionCatalog(){
  const ps=document.getElementById("protection-package"),ms=document.getElementById("protection-payment");
- const packages=protectionCatalog.packages.filter(p=>p&&p.active!==false&&String(p.company_id)===String(protectionContext?.company_id)&&p.operation_type===protectionContext?.type);
- const methods=protectionCatalog.paymentMethods.filter(p=>p&&p.active!==false);
+ const packages=protectionCatalog.packages.filter(p=>p&&p.active!==false&&p.id&&p.name&&Number.isFinite(Number(p.duration_days))&&Number(p.duration_days)>0&&Number.isFinite(Number(p.price_yer))&&String(p.company_id)===String(protectionContext?.company_id)&&p.operation_type===protectionContext?.type);
+ const methods=protectionCatalog.paymentMethods.filter(p=>p&&p.active!==false&&p.id&&p.name);
  ps.innerHTML='<option value="">اختر الباقة المتاحة</option>'+packages.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+' — '+escapeHtml(p.duration_days)+' يوم — '+escapeHtml(Number(p.price_yer).toLocaleString("ar"))+' ر.ي</option>').join("");
  ms.innerHTML='<option value="">اختر وسيلة الدفع</option>'+methods.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join("");
  document.getElementById("package-summary").textContent=packages.length?"اختر باقة معتمدة لهذه الشركة ونوع العملية.":"لا توجد باقات معتمدة متاحة حاليًا لهذه الشركة ونوع العملية.";
