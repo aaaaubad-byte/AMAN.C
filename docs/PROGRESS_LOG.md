@@ -3,7 +3,7 @@
 آخر تحديث: 2026-11-01 (الجلسة 3، بعد إصلاح عيبي اختبار المتصفح) — الفرع: `feature/aman-c-complete-development` (لا دمج ولا دفع إلى main ولا نشر دون تصريح صريح).
 
 ## نقطة الاستئناف (ابدأ من هنا)
-0. التوجيه الجاهز للصقه في الجلسة التالية: `docs/CONTINUATION_DIRECTIVE_3.md`. اقرأ `docs/DECISIONS.md` و`docs/CONTINUATION_DIRECTIVE.md`. أُجيبت D1–D12؛ D13 (قاعدة البيانات) مؤجل. ردود صاحب المشروع أدناه وتوضيحات المهام لم تُنقل بعد إلى DECISIONS.md؛ انقلها حرفيًا.
+0. التوجيه الجاهز للصقه في الجلسة التالية: `docs/CONTINUATION_DIRECTIVE_4.md` (خطة جلستين مع حصر كامل للمتبقي؛ يملأ صاحب المشروع قراراته في رأسه قبل اللصق)، ويحل ترتيبه محل `docs/CONTINUATION_DIRECTIVE_3.md` مع بقاء قرارات الأخير سارية. اقرأ `docs/DECISIONS.md` و`docs/CONTINUATION_DIRECTIVE.md`. أُجيبت D1–D12؛ D13 (قاعدة البيانات) مؤجل. ردود صاحب المشروع أدناه وتوضيحات المهام لم تُنقل بعد إلى DECISIONS.md؛ انقلها حرفيًا.
 1. **نتائج التشغيل الفعلي في الجلسة 3 (Node 22، آخر تشغيل بعد الإصلاحات):**
    - `node scripts/validate.mjs` ← نجح.
    - `node --test tests/isolation.test.js tests/task-rules.test.mjs` ← نجح 21/21.
