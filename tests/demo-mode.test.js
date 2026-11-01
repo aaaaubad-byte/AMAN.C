@@ -167,6 +167,17 @@ test("A30-A31 show the authenticated admin and require explicit confirmation bef
  assert.match(demo,/signOutAdmin:async/);
 });
 
+test("A29 audit log supports text search and opening full event details",()=>{
+ assert.match(adminA26A31,/بحث في السجلات/);
+ assert.match(adminA26A31,/عرض التفاصيل/);
+ assert.match(adminA26A31,/showDetail/);
+});
+test("A20, A22, A23 and A18 administrative actions are recorded in the audit log",()=>{
+ for(const action of ["admin_notification_created","admin_alert_created","company_settings_updated","company_created","complaint_"]) assert.ok(demo.includes('action:"'+action));
+ assert.match(demo,/actor_name:admin\\(\\)\\.full_name/);
+});
+
+
 const catalogClient=readFileSync("client/app.js","utf8");
 test("Client catalog supports activation packages and legacy multi-operation demo packages",()=>{
  assert.match(catalogClient,/Array\.isArray\(p\.operation_types\)/);
