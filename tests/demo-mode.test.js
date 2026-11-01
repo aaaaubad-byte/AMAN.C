@@ -91,3 +91,21 @@ test("Manual number alerts validate the selected number-to-customer relationship
  assert.match(demo,/n\.customer_id/);
  assert.match(demo,/createAdminAlert/);
 });
+
+test("A18 exposes the terminate-protection decision only when the number has active protection",()=>{
+ assert.match(demo,/protection_active:db\.numbers\.find\(n=>n\.phone===r\.phone\)\?\.status==="protected"/);
+ assert.match(adminA18A25,/if\(r\.protection_active===true\)choices\.push/);
+});
+test("A19-A20 preview recipient count and require explicit confirmation before sending",()=>{
+ assert.match(adminA18A25,/معاينة المستلمين/);
+ assert.match(adminA18A25,/تأكيد وإرسال الإشعار/);
+});
+test("A21-A22 alert picker includes only numbers linked to valid customers and displays the customer",()=>{
+ assert.match(adminA18A25,/filter\(x=>x\.customer_id&&valid\.has\(x\.customer_id\)\)/);
+ assert.match(adminA18A25,/linked_customer_name/);
+});
+test("A23-A25 company settings preview schedule impact and reject conflicting prefixes",()=>{
+ assert.match(demo,/previewCompanySettings:async/);
+ assert.match(demo,/توجد بادئة مستخدمة بالفعل لدى شركة أخرى/);
+ assert.match(demo,/t\.status!=="executed"/);
+});
