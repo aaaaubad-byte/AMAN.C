@@ -65,3 +65,10 @@
 
 /* Phase 3 — A5-A8 decision dialogs and number registry */
 .admin-decision-dialog{width:min(560px,calc(100% - 28px));max-width:560px;max-height:min(86vh,760px);padding:0;border:0;border-radius:22px;background:transparent;color:var(--text)}.admin-decision-dialog::backdrop{background:rgba(12,24,38,.48);backdrop-filter:blur(3px)}.admin-decision-dialog>.surface{max-height:86vh;overflow:auto;padding:20px}.admin-decision-dialog .decision-body{display:grid;gap:12px}.admin-decision-dialog .field{width:100%;margin:6px 0 12px}.admin-decision-dialog .btn{margin-top:8px}.admin-numbers-view{display:grid;gap:12px}.admin-numbers-view .field-row{margin:0}
+
+
+/* UI redesign: number-detail sheet actions and accessible interaction states */
+.sheet-primary-close{margin-top:14px}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid rgba(19,169,130,.42);outline-offset:2px}
+.sheet-close:focus-visible{border-radius:12px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
