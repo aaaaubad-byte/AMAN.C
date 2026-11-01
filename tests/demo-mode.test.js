@@ -15,3 +15,8 @@ test("Demo services do not reference production backends or secrets",()=>{
 test("Demo approval only changes pending requests",()=>{
  assert.match(demo,/r\.status!=="pending"/);
 });
+
+const deploy = readFileSync(".github/workflows/deploy.yml","utf8");
+test("GitHub Pages deployment includes the Demo assets",()=>{
+ assert.match(deploy,/cp -R client admin styles demo dist\\//);
+});
