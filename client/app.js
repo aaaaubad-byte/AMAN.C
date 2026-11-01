@@ -245,6 +245,8 @@ document.getElementById("confirm-protection").addEventListener("click",async()=>
   navigate("result");
  }finally{protectionSubmitting=false;button.disabled=false;button.textContent="تأكيد وإرسال الطلب";}
 });
+document.getElementById("protection-back").addEventListener("click",()=>{if(protectionContext?.number)openNumberDetails(protectionContext.number,protectionReturnScreen);else navigate(protectionReturnScreen||"home");});
+document.getElementById("review-back").addEventListener("click",()=>navigate("protection"));
 document.getElementById("result-to-operations").addEventListener("click",()=>navigate("operations"));
 document.getElementById("result-to-number").addEventListener("click",()=>{if(protectionContext?.number)openNumberDetails(protectionContext.number,protectionReturnScreen);else navigate(protectionReturnScreen||"home");});
 
