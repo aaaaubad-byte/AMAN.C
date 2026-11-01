@@ -1,4 +1,4 @@
-name: Validate and deploy AMAN.C production shell
+name: Validate and deploy AMAN.C with isolated simulation preview
 
 on:
   push:
@@ -49,13 +49,40 @@ jobs:
         uses: actions/checkout@v6
       - name: Configure Pages
         uses: actions/configure-pages@v5
-      - name: Prepare production shell without simulation
+      - name: Prepare production site and isolated simulation preview
         run: |
           mkdir -p dist
           cp index.html dist/
           cp -R client admin styles services dist/
+          # Keep the production root free of simulation files and activation flags.
           test ! -e dist/simulation
           ! grep -R '__AMAN_SIMULATION__\|simulation-adapter.js' dist/client dist/admin
+          # Build a separate manual-test copy using the same application source.
+          mkdir -p dist/test/simulation
+          cp -R client admin styles services dist/test/
+          cp simulation/* dist/test/simulation/
+          cat > dist/test/index.html <<'HTML'
+          <!doctype html>
+          <html lang="ar" dir="rtl">
+          <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>أمان — المعاينة التجريبية</title>
+          <body style="font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:20px;line-height:2">
+          <h1>أمان — المعاينة التجريبية</h1>
+          <p>هذه نسخة محاكاة للاختبار اليدوي فقط. البيانات تجريبية ولا يوجد اتصال بقاعدة بيانات أو دفع حقيقي.</p>
+          <p><a href="./client/">فتح واجهة العميل</a></p>
+          <p><a href="./admin/">فتح واجهة الإدارة</a></p>
+          </body></html>
+          HTML
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          for (const file of ['dist/test/client/index.html', 'dist/test/admin/index.html']) {
+            let html = readFileSync(file, 'utf8');
+            const tag = '<script defer src="../services/runtime.js"></script>';
+            if (!html.includes(tag)) throw new Error('Missing services runtime in ' + file);
+            html = html.replace(tag, '<script>window.__AMAN_SIMULATION__={enabled:true,source:"public-test-preview"};</script>' + tag + '<script defer src="../simulation/simulation-adapter.js"></script>');
+            writeFileSync(file, html);
+          }
+          NODE
           touch dist/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
