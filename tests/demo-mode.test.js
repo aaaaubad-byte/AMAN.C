@@ -122,8 +122,8 @@ test("A23 company cards show the enabled or disabled state",()=>{
  assert.match(adminA18A25,/حالة الشركة:/);
 });
 
-test("Company prefix validation accepts digits and rejects non-digit prefixes",()=>{
- assert.ok(demo.includes(String.raw`!/ ^\\d+$/.test(x)`.replace("!/ ^","!/")));
+test("Company prefix validation uses an anchored digits-only expression",()=>{
+ assert.ok(demo.includes(String.raw`!/ ^\\d+$/.test(x)`.replace("!/ ^","!/^").replace("\\\\d","\\d")));
 });
 
 
