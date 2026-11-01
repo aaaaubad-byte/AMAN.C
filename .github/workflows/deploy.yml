@@ -1,4 +1,4 @@
-name: Validate and deploy AMAN.C simulation preview
+name: Validate and deploy AMAN.C preview
 
 on:
   push:
@@ -41,17 +41,31 @@ jobs:
         uses: actions/checkout@v6
       - name: Configure Pages
         uses: actions/configure-pages@v5
-      - name: Prepare public simulation preview
+      - name: Prepare production site and isolated simulation preview
         run: |
           mkdir -p dist
           cp index.html dist/
-          cp -R client admin styles services simulation dist/
+          cp -R client admin styles services dist/
+          mkdir -p dist/test/simulation
+          cp -R client admin styles services dist/test/
+          cp simulation/* dist/test/simulation/
+          cat > dist/test/index.html <<'HTML'
+          <!doctype html>
+          <html lang="ar" dir="rtl">
+          <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>أمان — المعاينة التجريبية</title>
+          <body style="font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:20px;line-height:2">
+          <h1>أمان — المعاينة التجريبية</h1>
+          <p>هذه نسخة محاكاة للاختبار اليدوي فقط. البيانات تجريبية ولا يوجد اتصال بقاعدة بيانات أو دفع حقيقي.</p>
+          <p><a href="./client/">فتح واجهة العميل</a></p>
+          <p><a href="./admin/">فتح واجهة الإدارة</a></p>
+          </body></html>
+          HTML
           node --input-type=module <<'NODE'
           import { readFileSync, writeFileSync } from 'node:fs';
-          for (const file of ['dist/client/index.html', 'dist/admin/index.html']) {
+          for (const file of ['dist/test/client/index.html', 'dist/test/admin/index.html']) {
             let html = readFileSync(file, 'utf8');
-            const runtime = file.includes('/client/') ? '../services/runtime.js' : '../services/runtime.js';
-            const tag = '<script defer src="' + runtime + '"></script>';
+            const tag = '<script defer src="../services/runtime.js"></script>';
             if (!html.includes(tag)) throw new Error('Missing services runtime in ' + file);
             html = html.replace(tag, '<script>window.__AMAN_SIMULATION__={enabled:true,source:"public-test-preview"};</script>' + tag + '<script defer src="../simulation/simulation-adapter.js"></script>');
             writeFileSync(file, html);
