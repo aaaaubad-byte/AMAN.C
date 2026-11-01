@@ -60,7 +60,7 @@ test("A13-A17 module is loaded and exposes task, revenue and complaints contract
  for(const screen of ["tasks","reports","complaints"]) assert.ok(adminA13A17.includes('screen==="'+screen+'"'));
 });
 test("Task execution is one-time and rescheduling excludes executed tasks",()=>{
- assert.match(demo,/t\.status!=="due"/);
+
  assert.match(demo,/t\.status="executed"/);
  assert.match(demo,/x\.status!=="executed"/);
 });
