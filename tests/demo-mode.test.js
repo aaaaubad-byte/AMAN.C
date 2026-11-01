@@ -109,3 +109,15 @@ test("A23-A25 company settings preview schedule impact and reject conflicting pr
  assert.match(demo,/توجد بادئة مستخدمة بالفعل لدى شركة أخرى/);
  assert.match(demo,/t\.status!=="executed"/);
 });
+
+test("A19 notification history distinguishes automatic and manual notifications and shows read state",()=>{
+ assert.match(demo,/source_label:n\.source==="manual"\?"يدوي":"آلي"/);
+ assert.match(adminA18A25,/القراءة:/);
+});
+test("A24 requires a fresh impact preview after changing the interval",()=>{
+ assert.match(adminA18A25,/interval\.input\.addEventListener\("input"/);
+ assert.match(adminA18A25,/feedback\.dataset\.preview="no"/);
+});
+test("A23 company cards show the enabled or disabled state",()=>{
+ assert.match(adminA18A25,/حالة الشركة:/);
+});
