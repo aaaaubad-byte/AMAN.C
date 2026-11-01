@@ -7,16 +7,16 @@ const now = () => new Date().toISOString();
 const id = prefix => prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,7);
 const seed = () => ({
  users:[{id:"demo-customer",full_name:"عميل تجريبي",email:"customer@aman.demo",password:"1234",status:"active",customer_type:"customer"},{id:"demo-admin",full_name:"مدير تجريبي",email:"admin@aman.demo",password:"1234",status:"active",is_admin:true}],
- session:null, requests:[], numbers:[{id:"demo-number-1",customer_id:"demo-customer",phone:"7770000001",company_id:"yemen-mobile",company:"يمن موبايل",company_name:"يمن موبايل",status:"protected",protection_status:"protected",protection_status_label:"محمي",created_at:new Date().toISOString(),protection_start:new Date().toISOString(),protection_end:new Date(Date.now()+365*86400000).toISOString(),current_protection:{starts_at:new Date().toISOString(),ends_at:new Date(Date.now()+365*86400000).toISOString(),package_name:"حماية سنوية",total_days:365}}], notifications:[], alerts:[], reports:[], tasks:[],
+ customer_session:null,admin_session:null, requests:[], numbers:[{id:"demo-number-1",customer_id:"demo-customer",phone:"7770000001",company_id:"yemen-mobile",company:"يمن موبايل",company_name:"يمن موبايل",status:"protected",protection_status:"protected",protection_status_label:"محمي",created_at:new Date().toISOString(),protection_start:new Date().toISOString(),protection_end:new Date(Date.now()+365*86400000).toISOString(),current_protection:{starts_at:new Date().toISOString(),ends_at:new Date(Date.now()+365*86400000).toISOString(),package_name:"حماية سنوية",total_days:365}}], notifications:[], alerts:[], reports:[], tasks:[],
  companies:[{id:"yemen-mobile",name:"يمن موبايل"},{id:"you",name:"يو"},{id:"sabafon",name:"سبأفون"},{id:"aden-net",name:"عدن نت"}],
  packages:[{id:"annual",name:"حماية سنوية",duration_days:365,price_yer:1000,company_id:"yemen-mobile",operation_types:["subscription","extension","reactivation"]}],
  payments:[{id:"mobile-money",name:"موبايل موني",instructions:"أرسل المبلغ إلى وسيلة الدفع التجريبية ثم أدخل مرجعًا تجريبيًا."}]
 });
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.users)&&Array.isArray(x.requests))return x;}catch{}return seed();}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.users)&&Array.isArray(x.requests)){if(!("customer_session" in x))x.customer_session=x.session&&x.users.some(u=>u.id===x.session&&!u.is_admin)?x.session:null;if(!("admin_session" in x))x.admin_session=x.session&&x.users.some(u=>u.id===x.session&&u.is_admin)?x.session:null;delete x.session;return x;}}catch{}return seed();}
 let db=load();function save(){localStorage.setItem(KEY,JSON.stringify(db));}
-function current(){return db.users.find(x=>x.id===db.session)||null;}
-function customer(){const u=current();return u&&!u.is_admin?u:null;}
-function admin(){const u=current();return u&&u.is_admin?u:null;}
+
+function customer(){return db.users.find(x=>x.id===db.customer_session&&!x.is_admin)||null;}
+function admin(){return db.users.find(x=>x.id===db.admin_session&&x.is_admin===true)||null;}
 function ok(x={}){return {success:true,...x};}
 function fail(message){return {success:false,message};}
 function ownsRequest(r){return !!customer()&&r.customer_id===customer().id;}
@@ -35,7 +35,7 @@ function installClient(){
   submitProtectionRequest:async p=>{const u=customer();if(!u)return fail("سجّل الدخول بحساب العميل التجريبي أولًا.");if(!p?.phone||!p?.payment_reference)return fail("بيانات الطلب غير مكتملة.");const company=db.companies.find(x=>x.id===p.company_id)||db.companies[0],pack=db.packages.find(x=>x.id===p.package_id)||db.packages[0],pay=db.payments.find(x=>x.id===p.payment_method_id)||db.payments[0];if(!pack||!pay)return fail("لا توجد باقة أو وسيلة دفع تجريبية.");const r={id:id("REQ"),request_number:"DEMO-"+String(db.requests.length+1).padStart(4,"0"),customer_id:u.id,customer_name:u.full_name,customer_type:u.customer_type,customer_status:u.status,phone:p.phone,company_id:company.id,company_name:company.name,operation_type:p.operation_type||"subscription",package_id:pack.id,package_name:pack.name,duration_days:pack.duration_days,price_yer:pack.price_yer,payment_method_id:pay.id,payment_method_name:pay.name,payment_reference:p.payment_reference,status:"pending",created_at:now(),warnings:[]};db.requests.unshift(r);save();return ok({request_id:r.id});},
   updateProfile:async p=>{const u=customer();if(!u)return fail();u.full_name=String(p.full_name||u.full_name);save();return ok();},
   changePassword:async p=>{const u=customer();if(!u||u.password!==p.current_password)return fail("كلمة المرور الحالية غير صحيحة.");u.password=String(p.new_password);save();return ok();},
-  signOut:async()=>{if(!customer())return fail();db.session=null;save();return ok();},
+  signOut:async()=>{if(!customer())return fail();db.customer_session=null;save();return ok();},
   getNotifications:async()=>ok({items:db.notifications.filter(n=>n.customer_id===customer()?.id)}),
   markNotificationRead:async p=>{const n=db.notifications.find(x=>x.id===p.notification_id&&x.customer_id===customer()?.id);if(!n)return fail();n.read_at=now();save();return ok();},
   getNumberAlertPreferences:async p=>db.alerts.find(x=>x.customer_id===customer()?.id&&x.phone===p.phone)||{before_due:false,protection_expiry:true,status_change:true,channel:"in_app"},
@@ -45,7 +45,7 @@ function installClient(){
  document.addEventListener("DOMContentLoaded",()=>{if(window.AMANClientData){window.AMANClientData.setProtectionCatalog(db.packages,db.payments);if(customer()){window.AMANClientData.setNumbers(numbersFor(customer().id));window.AMANClientData.setOperations(customerRequests());}}});
  function sync(){const u=customer();if(!u)return;window.AMANClientData.setNumbers(numbersFor(u.id));window.AMANClientData.setOperations(customerRequests());}
  document.addEventListener("submit",e=>{
-  if(e.target.id==="auth-form"){e.preventDefault();e.stopImmediatePropagation();const email=document.getElementById("auth-email").value.trim().toLowerCase(),password=document.getElementById("auth-password").value;let u=db.users.find(x=>x.email.toLowerCase()===email&&x.password===password&&!x.is_admin);if(!u&&document.getElementById("auth-title")?.textContent.includes("إنشاء")){if(db.users.some(x=>x.email.toLowerCase()===email)){alert("البريد مستخدم بالفعل.");return;}u={id:id("CUS"),full_name:email.split("@")[0],email,password,status:"active",customer_type:"user"};db.users.push(u);}if(!u){alert("بيانات الدخول غير صحيحة. استخدم customer@aman.demo / 1234");return;}db.session=u.id;save();sync();location.reload();}
+  if(e.target.id==="auth-form"){e.preventDefault();e.stopImmediatePropagation();const email=document.getElementById("auth-email").value.trim().toLowerCase(),password=document.getElementById("auth-password").value;let u=db.users.find(x=>x.email.toLowerCase()===email&&x.password===password&&!x.is_admin);if(!u&&document.getElementById("auth-title")?.textContent.includes("إنشاء")){if(db.users.some(x=>x.email.toLowerCase()===email)){alert("البريد مستخدم بالفعل.");return;}u={id:id("CUS"),full_name:email.split("@")[0],email,password,status:"active",customer_type:"user"};db.users.push(u);}if(!u){alert("بيانات الدخول غير صحيحة. استخدم customer@aman.demo / 1234");return;}db.customer_session=u.id;save();sync();location.reload();}
   if(e.target.id==="search-form"){e.preventDefault();e.stopImmediatePropagation();const phone=document.getElementById("phone-search").value.replace(/\D/g,"");const n=db.numbers.find(x=>x.phone===phone);const msg=document.getElementById("search-message");if(n&&customer()&&n.customer_id===customer().id){window.AMANClientData.showSearchResult(n);msg.textContent="هذا الرقم مرتبط بحسابك في البيئة التجريبية.";}else{msg.textContent="الرقم غير محمي في بيانات التجربة. يمكنك تقديم طلب حماية بعد تسجيل الدخول وإضافة الرقم من مسار العميل المتاح.";} }
  },true);
  document.addEventListener("DOMContentLoaded",()=>{if(customer()){sync();const name=document.getElementById("profile-name");if(name)name.value=customer().full_name;}});
@@ -53,8 +53,8 @@ function installClient(){
 function installAdmin(){
  window.AMANAdminServices={
   getCurrentAdmin:async()=>admin()?ok({admin:{...admin(),is_admin:true}}):fail(),
-  signInAdmin:async p=>{const u=db.users.find(x=>x.email===p.email&&x.password===p.password&&x.is_admin===true);if(!u)return fail("بيانات المدير التجريبي غير صحيحة.");db.session=u.id;save();return ok({admin:{...u,is_admin:true}});},
-  signOutAdmin:async()=>{if(!admin())return fail();db.session=null;save();return ok();},
+  signInAdmin:async p=>{const u=db.users.find(x=>x.email===p.email&&x.password===p.password&&x.is_admin===true);if(!u)return fail("بيانات المدير التجريبي غير صحيحة.");db.admin_session=u.id;save();return ok({admin:{...u,is_admin:true}});},
+  signOutAdmin:async()=>{if(!admin())return fail();db.admin_session=null;save();return ok();},
   getDashboardSummary:async()=>ok({summary:{pending_requests:db.requests.filter(x=>x.status==="pending").length,protected_numbers:db.numbers.length,open_reports:db.reports.filter(x=>x.status==="open").length,due_tasks:db.tasks.filter(x=>x.status==="due").length,customers:db.users.filter(x=>!x.is_admin&&x.customer_type==="customer").length,approved_revenue_yer:db.requests.filter(x=>x.status==="approved").reduce((a,x)=>a+Number(x.price_yer||0),0)}}),
   listRequests:async f=>{if(!admin())return fail();let a=[...db.requests];if(f?.status&&f.status!=="all")a=a.filter(x=>x.status===f.status);if(f?.operation_type&&f.operation_type!=="all")a=a.filter(x=>x.operation_type===f.operation_type);if(f?.company_id&&f.company_id!=="all")a=a.filter(x=>x.company_id===f.company_id);if(f?.search)a=a.filter(x=>(x.phone+x.request_number+x.customer_name).includes(f.search));return ok({requests:a,companies:db.companies});},
   getRequestDetails:async p=>{if(!admin())return fail();const r=db.requests.find(x=>x.id===p.request_id);return r?ok({request:{...r,number_status:"غير محمي"}}):fail();},

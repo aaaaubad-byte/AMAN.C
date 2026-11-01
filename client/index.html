@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4f7f8"><meta name="description" content="أمان لحماية أرقام الاتصالات من الفقدان بسبب الإهمال وعدم التجديد.">
-<title>أمان | العميل</title><link rel="stylesheet" href="../styles/app.css"><script>if(new URLSearchParams(location.search).get("demo")==="1"){document.write('<script src="../demo/demo-services.js"><\/script>');}</script><script defer src="./app.js"></script>
+<title>أمان | العميل</title><link rel="stylesheet" href="../styles/app.css"><script defer src="../demo/demo-services.js"></script><script defer src="./app.js"></script>
 </head>
 <body>
 <main class="app" id="client-app">
@@ -72,7 +72,7 @@
 <div class="surface" id="result-content"><div class="empty-state"><div class="empty-icon">◷</div><strong>لم يتم إرسال طلب بعد</strong><p>لن نعرض نجاحًا إلا بعد تأكيد استلام الطلب من الخادم.</p></div></div>
 <div class="sheet-actions"><button class="btn btn-block" id="result-to-operations" type="button">الانتقال إلى العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">العودة إلى تفاصيل الرقم</button></div>
 </section>
-<section id="account-screen" data-screen="account" hidden>
+<section id="account-screen" data-screen="account" hidden><div class="surface" id="account-auth-entry"><h2 class="surface-title">الوصول إلى حسابك</h2><p class="surface-desc">سجّل الدخول لمتابعة أرقامك وطلبات الحماية.</p><button class="btn btn-block" id="open-login" type="button">تسجيل الدخول / إنشاء حساب</button></div>
 <div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">إدارة بياناتك وإعدادات أمان حسابك.</p></div>
 <div class="surface"><h2 class="surface-title">البيانات الشخصية</h2><form id="profile-form"><label class="field-label" for="profile-name">الاسم</label><input class="field" id="profile-name" name="full_name" autocomplete="name" maxlength="120" placeholder="الاسم المسجل"><div class="field-wrap"><label class="field-label" for="profile-email">البريد الإلكتروني</label><input class="field" id="profile-email" name="email" type="email" autocomplete="email" disabled placeholder="يظهر بعد تسجيل الدخول"></div><p id="profile-message" aria-live="polite"></p><button class="btn btn-block" type="submit">حفظ البيانات</button></form></div>
 <div class="surface"><h2 class="surface-title">تغيير كلمة المرور</h2><form id="password-form"><label class="field-label" for="current-password">كلمة المرور الحالية</label><input class="field" id="current-password" type="password" autocomplete="current-password" minlength="4" required><div class="field-wrap"><label class="field-label" for="new-password">كلمة المرور الجديدة</label><input class="field" id="new-password" type="password" autocomplete="new-password" minlength="4" required></div><p id="password-message" aria-live="polite"></p><button class="btn btn-outline btn-block" type="submit">تحديث كلمة المرور</button></form></div>
