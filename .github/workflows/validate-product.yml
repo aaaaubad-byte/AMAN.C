@@ -1,7 +1,7 @@
 name: Validate AMAN product branch
 on:
   push:
-    branches: [feature/real-product-foundation, feature/phase-1-app-shell]
+    branches: [feature/real-product-foundation, feature/phase-1-app-shell, feature/phase-3-admin-a1-a4]
   pull_request:
     branches: [main]
 permissions:
