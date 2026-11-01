@@ -51,7 +51,8 @@ async function audit(){
     button("عرض التفاصيل",()=>showDetail(x))
    ])));
   };
-  [action.input,entity.input].forEach(x=>x.addEventListener("change",render));
+  action.input.addEventListener("change",render);
+  entity.input.addEventListener("change",render);
   search.input.addEventListener("input",render);
   h.append(panel("بحث ومرشحات سجل التدقيق",[search.wrap,action.wrap,entity.wrap]),detail,rows);
   render();
