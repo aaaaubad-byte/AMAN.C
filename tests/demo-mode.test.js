@@ -177,5 +177,5 @@ test("Demo submission rejects unavailable or mismatched packages and disabled pa
  assert.match(demo,/db\.packages\.find\(x=>x\.id===p\.package_id\)/);
  assert.match(demo,/db\.payments\.find\(x=>x\.id===p\.payment_method_id\)/);
  assert.match(demo,/pack\.active===false\|\|pay\.active===false/);
- assert.match(demo,/pack\.company_id\)===String\(company\.id\)/);
+ assert.match(demo,/String\(pack\.company_id\)!==String\(company\.id\)/);
 });
