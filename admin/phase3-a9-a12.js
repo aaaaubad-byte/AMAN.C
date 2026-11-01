@@ -71,7 +71,7 @@ function renderTaskRows(f){
 async function loadTasks(){
  const host=$("tasks-message"),s=service();tasks=[];if(host)host.textContent="جارٍ تحميل المهام…";renderTaskRows({status:"all",company_id:"all",search:""});
  if(!s||typeof s.listTasks!=="function"){if(host)host.textContent="خدمة مهام السداد غير مربوطة. لم تُعرض بيانات بديلة.";return;}
- try{const r=await s.listTasks();if(r?.success!==true||!Array.isArray(r.tasks))throw Error();tasks=r.tasks;window.AMANAdminTaskCompanies=r.companies||[];renderTaskRows({status:"all",company_id:"all",search:""});if(host)host.textContent="تم تحديث مهام السداد.";}
+ try{const r=await s.listTasks();if(r?.success!==true||!Array.isArray(r.tasks))throw Error();tasks=r.tasks;window.AMANAdminTaskCompanies=r.companies||[];const companySelect=$("tasks-message")?.parentElement?.querySelector("select:nth-of-type(2)");if(companySelect){companySelect.replaceChildren(new Option("كل الشركات","all"));window.AMANAdminTaskCompanies.forEach(c=>companySelect.add(new Option(c.name,c.id)));}renderTaskRows({status:"all",company_id:"all",search:""});if(host)host.textContent="تم تحديث مهام السداد.";}
  catch{if(host)host.textContent="تعذر تحميل مهام السداد.";}
 }
 document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen;if(screen==="customers"){renderCustomerScreen();loadCustomers();}if(screen==="tasks"){const host=shell();renderTasks(host);loadTasks();}});
