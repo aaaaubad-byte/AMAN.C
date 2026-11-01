@@ -305,3 +305,30 @@ test("إعادة الجدولة: تاريخ غير صالح مرفوض", () => {
   assert.equal(res.success, false);
   assert.equal(res.code, "invalid_request");
 });
+
+// ---- وسائل الدفع (D9): الاسم، رقم الحساب، التعليمات، اشتراط المرجع ----
+test("D9: رقم الحساب يُحفظ ويُعاد للإدارة والعميل، ويُقصّ، ويرفض الطويل جدًا", () => {
+  const s = setup();
+  s.must(s.admin.savePaymentMethod({ name: "تحويل بنكي", account_number: "  123-456-789  ", instructions: "حوّل ثم أدخل المرجع", reference_required: false, active: true }), "حفظ");
+  const saved = s.admin.listPaymentMethods().items.find(i => i.name === "تحويل بنكي");
+  assert.equal(saved.account_number, "123-456-789");
+  assert.equal(saved.reference_required, false);
+  const catalog = s.client.getProtectionCatalog({ company_id: s.company.id, operation_type: "activation" });
+  const m = catalog.payment_methods.find(i => i.name === "تحويل بنكي");
+  assert.equal(m.account_number, "123-456-789");
+  assert.equal(m.reference_required, false);
+  s.must(s.admin.savePaymentMethod({ id: saved.id, name: "تحويل بنكي", instructions: "حوّل ثم أدخل المرجع", reference_required: false, active: true }), "تعديل بلا رقم حساب يمسحه");
+  assert.equal(s.admin.listPaymentMethods().items.find(i => i.id === saved.id).account_number, "");
+  const bad = s.admin.savePaymentMethod({ name: "س", account_number: "x".repeat(101), instructions: "ت", reference_required: true, active: true });
+  assert.equal(bad.success, false);
+  assert.equal(bad.code, "validation_failed");
+});
+
+test("D9: وسيلة بلا اشتراط مرجع تقبل طلبًا بلا مرجع، وبالاشتراط يُرفض", () => {
+  const s = setup();
+  s.must(s.admin.savePaymentMethod({ name: "بلا مرجع", instructions: "ت", reference_required: false, active: true }), "حفظ");
+  const free = s.admin.listPaymentMethods().items.find(i => i.name === "بلا مرجع");
+  const mk = (pay, ref) => s.client.submitProtectionRequest({ phone: "711234567", operation_type: "activation", company_id: s.company.id, package_id: s.admin.listPackages().items.find(p => p.name === "act365").id, payment_method_id: pay, payment_reference: ref });
+  assert.equal(mk(s.admin.listPaymentMethods().items.find(i => i.name === "وسيلة اختبار").id, "").code, "reference_required");
+  s.must(mk(free.id, ""), "طلب بلا مرجع");
+});

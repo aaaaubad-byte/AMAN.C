@@ -293,7 +293,7 @@ $("protection-package").addEventListener("change", event => {
 });
 $("protection-payment").addEventListener("change", event => {
  const m = protectionCatalog.payment_methods.find(x => x.id === event.target.value);
- $("payment-instructions").textContent = m ? (m.instructions || "لا توجد تعليمات إضافية.") : "تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
+ $("payment-instructions").textContent = m ? ((m.account_number ? "رقم الحساب: " + m.account_number + "\n" : "") + (m.instructions || "لا توجد تعليمات إضافية.")) : "تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
  const ref = $("payment-reference"); ref.required = Boolean(m ? m.reference_required !== false : true);
  ref.placeholder = ref.required ? "أدخل مرجع عملية الدفع" : "مرجع الدفع غير مطلوب لهذه الوسيلة.";
 });

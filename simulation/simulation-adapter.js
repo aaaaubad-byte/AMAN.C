@@ -222,7 +222,7 @@ const client = {
   return ok({
    packages: db.packages.filter(x => x.active !== false && (!p.company_id || x.company_id === p.company_id) && (!p.operation_type || x.operation_type === p.operation_type))
     .map(x => ({ id: x.id, name: x.name, company_id: x.company_id, operation_type: x.operation_type, duration_days: x.days, price_yer: x.price_yer })),
-   payment_methods: db.payments.filter(x => x.active !== false).map(x => ({ id: x.id, name: x.name, instructions: x.instructions, reference_required: x.reference_required !== false, reference_pattern: x.reference_pattern || null }))
+   payment_methods: db.payments.filter(x => x.active !== false).map(x => ({ id: x.id, name: x.name, account_number: x.account_number || "", instructions: x.instructions, reference_required: x.reference_required !== false, reference_pattern: x.reference_pattern || null }))
   });
  },
  submitProtectionRequest: p => {
@@ -628,15 +628,17 @@ const admin = {
   audit(x ? "package_updated" : "package_created", "package", target.id, x ? "تعديل بيانات باقة حماية" : "إضافة باقة حماية");
   save(); return ok();
  },
- listPaymentMethods: () => adminUser() ? ok({ items: db.payments.map(p => ({ ...p, summary: p.summary || "", reference_required: p.reference_required !== false, active: p.active !== false })) }) : AUTH(),
+ listPaymentMethods: () => adminUser() ? ok({ items: db.payments.map(p => ({ ...p, summary: p.summary || "", account_number: p.account_number || "", reference_required: p.reference_required !== false, active: p.active !== false })) }) : AUTH(),
  savePaymentMethod: p => {
   if (!adminUser()) return AUTH();
   if (!String(p.name || "").trim() || !String(p.instructions || "").trim()) return fail("الاسم والتعليمات مطلوبان.", "validation_failed");
+  if (p.account_number !== undefined && p.account_number !== null && typeof p.account_number !== "string") return fail("رقم الحساب يجب أن يكون نصًا.", "validation_failed");
+  if (String(p.account_number || "").length > 100) return fail("رقم الحساب أطول من 100 حرف.", "validation_failed");
   if (p.reference_pattern) { try { new RegExp(p.reference_pattern); } catch { return fail("صيغة مرجع الدفع غير صالحة.", "reference_pattern_invalid"); } }
   const x = p.id ? db.payments.find(v => v.id === p.id) : null;
   if (p.id && !x) return fail("وسيلة الدفع غير موجودة.", "not_found");
   const target = x || { id: uid("PAY") };
-  Object.assign(target, { name: p.name.trim(), summary: String(p.summary || "").trim(), instructions: p.instructions.trim(), reference_required: p.reference_required !== false, reference_pattern: p.reference_pattern || null, active: p.active !== false });
+  Object.assign(target, { name: p.name.trim(), summary: String(p.summary || "").trim(), account_number: String(p.account_number || "").trim(), instructions: p.instructions.trim(), reference_required: p.reference_required !== false, reference_pattern: p.reference_pattern || null, active: p.active !== false });
   if (!x) db.payments.push(target);
   audit(x ? "payment_method_updated" : "payment_method_created", "payment_method", target.id, x ? "تعديل وسيلة دفع" : "إضافة وسيلة دفع");
   save(); return ok();
