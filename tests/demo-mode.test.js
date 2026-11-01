@@ -52,3 +52,20 @@ test("Demo customer administration excludes admin accounts and protects manager 
  assert.match(demo,/!u\.is_admin/);
  assert.match(adminPhase3,/if\(!c\.is_admin\)/);
 });
+
+const adminA13A17=readFileSync("admin/phase3-a13-a17.js","utf8");
+test("A13-A17 module is loaded and exposes task, revenue and complaints contracts",()=>{
+ assert.ok(admin.includes('phase3-a13-a17.js'));
+ for(const name of ["getTaskDetails","executeTask","previewTaskReschedule","rescheduleTask","getRevenueReport","listComplaints"]) assert.ok(demo.includes(name));
+ for(const screen of ["tasks","reports","complaints"]) assert.ok(adminA13A17.includes('screen==="'+screen+'"'));
+});
+test("Task execution is one-time and rescheduling excludes executed tasks",()=>{
+ assert.match(demo,/t\.status!=="executed"/);
+ assert.match(demo,/t\.status="executed"/);
+ assert.match(demo,/x\.status!=="executed"/);
+});
+test("Revenue report includes approved requests only and complaints are read-only in A17",()=>{
+ assert.match(demo,/x\.status==="approved"/);
+ assert.match(adminA13A17,/function complaintDetail/);
+ assert.doesNotMatch(adminA13A17,/resolveComplaint|deleteComplaint/);
+});
