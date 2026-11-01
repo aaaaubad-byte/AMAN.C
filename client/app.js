@@ -1,7 +1,7 @@
 (() => {
 "use strict";
 
-const screenIds=["home","numbers","operations","account","notifications","auth"];
+const screenIds=["home","numbers","operations","operation-detail","protection","review","result","account","notifications","auth"];
 const screens=Object.fromEntries(screenIds.map(id=>[id,document.getElementById(id+"-screen")]));
 const tabs=[...document.querySelectorAll("[data-tab]")];
 const numberSheet=document.getElementById("number-sheet");
@@ -12,6 +12,10 @@ let numbers=[];
 let operations=[];
 let currentNumber=null;
 let currentOperation=null;
+let protectionContext=null;
+let protectionCatalog={packages:[],paymentMethods:[]};
+let protectionSubmitting=false;
+let protectionReturnScreen="home";
 const tabForScreen={home:"home",numbers:"numbers",operations:"operations"};
 const numberStatusLabels={protected:"محمي",inactive:"غير نشط",confiscated:"منتهي-مصادر"};
 const requestStatusLabels={pending:"قيد المراجعة",approved:"معتمد",rejected:"مرفوض"};
@@ -38,6 +42,7 @@ function backToPrevious(){navigate(previousScreen||"home",{remember:false});}
 window.AMANClientNavigation=Object.freeze({navigate,back:backToPrevious,get current(){return currentScreen;},get previous(){return previousScreen;}});
 tabs.forEach(node=>node.addEventListener("click",()=>navigate(node.dataset.tab)));
 document.querySelectorAll("[data-navigate]").forEach(node=>node.addEventListener("click",()=>navigate(node.dataset.navigate)));
+document.querySelectorAll("[data-back]").forEach(node=>node.addEventListener("click",()=>backToPrevious()));
 document.getElementById("show-all-numbers").addEventListener("click",()=>navigate("numbers"));
 document.getElementById("account-button").addEventListener("click",()=>navigate("account"));
 document.getElementById("notifications-button").addEventListener("click",()=>navigate("notifications"));
@@ -92,7 +97,7 @@ function renderNumberDetails(number){
   if(actionType){
    const action=document.createElement("button");action.className="btn btn-block";action.type="button";
    action.textContent=operationTypeLabels[actionType];
-   action.addEventListener("click",()=>setMessage(privacy,"إنشاء طلب الحماية غير متاح حتى ربط الخدمة الخلفية والبيانات المعتمدة.","info"));
+   action.addEventListener("click",()=>openProtection(number,actionType));
    actions.append(action);
   }
  }
@@ -161,8 +166,87 @@ function openOperationDetails(item){
  if(item.status==="rejected"&&item.rejection_reason)rows.push(["سبب الرفض",item.rejection_reason]);
  document.getElementById("operation-sheet-content").innerHTML=rows.map(([label,value])=>'<div class="detail-block"><div class="detail-label">'+escapeHtml(label)+'</div><div class="detail-value">'+escapeHtml(value)+'</div></div>').join("");
  operationSheet.hidden=false;
+ const extra=document.createElement("div");extra.className="sheet-actions";
+ [["نسخ رقم الطلب",item.id],["نسخ مرجع الدفع",item.payment_reference]].filter(pair=>pair[1]).forEach(([label,value])=>{
+  const copy=document.createElement("button");copy.className="btn btn-outline";copy.type="button";copy.textContent=label;
+  copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(String(value));copy.textContent="تم النسخ";}catch{copy.textContent="تعذر النسخ";}});
+  extra.append(copy);
+ });
+ document.getElementById("operation-sheet-content").append(extra);
  return true;
 }
+
+
+function allowedOperationForNumber(number){
+ if(number.status==="protected")return "extension";
+ if(number.status==="inactive")return "reactivation";
+ if(number.status==="not_subscribed")return "activation";
+ return null;
+}
+function openProtection(number,type){
+ if(!number||allowedOperationForNumber(number)!==type)return false;
+ protectionContext={phone:number.phone,company:number.company,company_id:number.company_id,type,number};
+ protectionReturnScreen=currentScreen;
+ document.getElementById("protection-phone").textContent=number.phone;
+ document.getElementById("protection-company").textContent=text(number.company);
+ document.getElementById("protection-type").textContent=operationTypeLabels[type];
+ populateProtectionCatalog();
+ document.getElementById("protection-message").textContent="";
+ document.getElementById("payment-reference").value="";
+ navigate("protection");
+ return true;
+}
+function populateProtectionCatalog(){
+ const ps=document.getElementById("protection-package"),ms=document.getElementById("protection-payment");
+ const packages=protectionCatalog.packages.filter(p=>p&&p.active!==false&&String(p.company_id)===String(protectionContext?.company_id)&&p.operation_type===protectionContext?.type);
+ const methods=protectionCatalog.paymentMethods.filter(p=>p&&p.active!==false);
+ ps.innerHTML='<option value="">اختر الباقة المتاحة</option>'+packages.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+' — '+escapeHtml(p.duration_days)+' يوم — '+escapeHtml(Number(p.price_yer).toLocaleString("ar"))+' ر.ي</option>').join("");
+ ms.innerHTML='<option value="">اختر وسيلة الدفع</option>'+methods.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join("");
+ document.getElementById("package-summary").textContent=packages.length?"اختر باقة معتمدة لهذه الشركة ونوع العملية.":"لا توجد باقات معتمدة متاحة حاليًا لهذه الشركة ونوع العملية.";
+ document.getElementById("payment-instructions").textContent="تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
+}
+document.getElementById("protection-package").addEventListener("change",event=>{
+ const p=protectionCatalog.packages.find(x=>String(x.id)===event.target.value);
+ document.getElementById("package-summary").textContent=p?("المدة: "+p.duration_days+" يوم — السعر: "+Number(p.price_yer).toLocaleString("ar")+" ر.ي"):"اختر الباقة المعتمدة.";
+});
+document.getElementById("protection-payment").addEventListener("change",event=>{
+ const p=protectionCatalog.paymentMethods.find(x=>String(x.id)===event.target.value);
+ document.getElementById("payment-instructions").textContent=p?text(p.instructions,"لا توجد تعليمات إضافية."):"تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
+});
+document.getElementById("protection-form").addEventListener("submit",event=>{
+ event.preventDefault();
+ const p=protectionCatalog.packages.find(x=>String(x.id)===document.getElementById("protection-package").value);
+ const m=protectionCatalog.paymentMethods.find(x=>String(x.id)===document.getElementById("protection-payment").value);
+ const ref=document.getElementById("payment-reference").value.trim();
+ if(!p||!m||!ref){setMessage(document.getElementById("protection-message"),"أكمل اختيار الباقة ووسيلة الدفع وأدخل مرجع الدفع.");return;}
+ protectionContext={...protectionContext,package:p,paymentMethod:m,paymentReference:ref};
+ const rows=[["الرقم",protectionContext.phone],["الشركة",protectionContext.company],["نوع العملية",operationTypeLabels[protectionContext.type]],["الباقة",p.name],["المدة",p.duration_days+" يوم"],["السعر",Number(p.price_yer).toLocaleString("ar")+" ر.ي"],["وسيلة الدفع",m.name],["مرجع الدفع",ref]];
+ document.getElementById("review-details").innerHTML=rows.map(([a,b])=>'<div class="review-row"><span>'+escapeHtml(a)+'</span><strong>'+escapeHtml(b)+'</strong></div>').join("");
+ document.getElementById("review-message").textContent="";
+ navigate("review");
+});
+document.getElementById("confirm-protection").addEventListener("click",async()=>{
+ const button=document.getElementById("confirm-protection"),message=document.getElementById("review-message");
+ if(protectionSubmitting)return;
+ const service=window.AMANClientServices;
+ if(!service||typeof service.submitProtectionRequest!=="function"){setMessage(message,"إرسال الطلب غير متاح بعد؛ خدمة الطلبات الآمنة غير مربوطة. لم تُرسل أي بيانات.");return;}
+ protectionSubmitting=true;button.disabled=true;button.textContent="جارٍ الإرسال…";
+ try{
+  const result=await service.submitProtectionRequest({phone:protectionContext.phone,company_id:protectionContext.company_id,operation_type:protectionContext.type,package_id:protectionContext.package.id,payment_method_id:protectionContext.paymentMethod.id,payment_reference:protectionContext.paymentReference});
+  const ok=Boolean(result&&result.success===true&&result.request_id);
+  document.getElementById("result-title").textContent=ok?"تم إرسال الطلب":"تعذر تأكيد إرسال الطلب";
+  document.getElementById("result-description").textContent=ok?"استلمت أمان طلبك وهو قيد المراجعة. لا تبدأ الحماية إلا بعد اعتماد الإدارة.":"لم يصل تأكيد موثوق من الخادم. تحقق من قائمة العمليات قبل إعادة المحاولة.";
+  document.getElementById("result-content").innerHTML=ok?'<div class="result-success"><strong>طلبك قيد المراجعة</strong><div class="detail-label">رقم الطلب</div><div class="detail-value" dir="ltr">'+escapeHtml(result.request_id)+'</div></div>':'<div class="alert-note">'+escapeHtml(text(result?.message,"لم يتم تأكيد النتيجة."))+'</div>';
+  navigate("result");
+ }catch(error){
+  document.getElementById("result-title").textContent="تعذر تأكيد النتيجة";
+  document.getElementById("result-description").textContent="انقطع الاتصال أو تعذر تأكيد استلام الطلب. تحقق من قائمة العمليات قبل إعادة المحاولة.";
+  document.getElementById("result-content").innerHTML='<div class="alert-note">لم نتلق تأكيدًا موثوقًا من الخادم. لا نؤكد إنشاء الطلب.</div>';
+  navigate("result");
+ }finally{protectionSubmitting=false;button.disabled=false;button.textContent="تأكيد وإرسال الطلب";}
+});
+document.getElementById("result-to-operations").addEventListener("click",()=>navigate("operations"));
+document.getElementById("result-to-number").addEventListener("click",()=>{if(protectionContext?.number)openNumberDetails(protectionContext.number,protectionReturnScreen);else navigate(protectionReturnScreen||"home");});
 
 function setNumbers(items){
  numbers=Array.isArray(items)?items.filter(item=>item&&item.phone&&numberStatusLabels[item.status]):[];
@@ -174,7 +258,7 @@ function setOperations(items){
  renderOperations();
  document.dispatchEvent(new CustomEvent("aman:operations-updated",{detail:{count:operations.length}}));
 }
-window.AMANClientData=Object.freeze({setNumbers,setOperations,openNumberDetails,openOperationDetails,showSearchResult:number=>openNumberDetails(number,"home")});
+window.AMANClientData=Object.freeze({setNumbers,setOperations,openNumberDetails,openOperationDetails,showSearchResult:number=>openNumberDetails(number,"home"),setProtectionCatalog:(packages,paymentMethods)=>{protectionCatalog={packages:Array.isArray(packages)?packages:[],paymentMethods:Array.isArray(paymentMethods)?paymentMethods:[]};if(protectionContext)populateProtectionCatalog();}});
 
 const normalizePhone=value=>normalizeDigits(value).replace(/[^0-9]/g,"");
 document.getElementById("search-form").addEventListener("submit",event=>{
