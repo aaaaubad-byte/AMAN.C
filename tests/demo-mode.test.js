@@ -39,3 +39,33 @@ test("Customer login entry exists and matches the original app handler",()=>{
  assert.ok(client.includes('id="open-login"'));
  assert.ok(readFileSync("client/app.js","utf8").includes('getElementById("open-login")'));
 });
+
+const adminPhase3 = readFileSync("admin/phase3-a9-a12.js","utf8");
+test("A9-A12 customer and task screens are loaded and use service contracts",()=>{
+ assert.ok(admin.includes('phase3-a9-a12.js'));
+ for(const name of ["listCustomers","getCustomerDetails","updateCustomerStatus","listTasks"]) assert.ok(demo.includes(name));
+ for(const name of ["customers","tasks"]) assert.ok(adminPhase3.includes('screen==="'+name+'"'));
+ assert.match(adminPhase3,/status==="active"\?"disabled":"active"/);
+});
+test("Demo customer administration excludes admin accounts and protects manager accounts",()=>{
+ assert.match(demo,/filter\(x=>!x\.is_admin\)/);
+ assert.match(demo,/!u\.is_admin/);
+ assert.match(adminPhase3,/if\(!c\.is_admin\)/);
+});
+
+const adminA13A17=readFileSync("admin/phase3-a13-a17.js","utf8");
+test("A13-A17 module is loaded and exposes task, revenue and complaints contracts",()=>{
+ assert.ok(admin.includes('phase3-a13-a17.js'));
+ for(const name of ["getTaskDetails","executeTask","previewTaskReschedule","rescheduleTask","getRevenueReport","listComplaints"]) assert.ok(demo.includes(name));
+ for(const screen of ["tasks","reports","complaints"]) assert.ok(adminA13A17.includes('screen==="'+screen+'"'));
+});
+test("Task execution is one-time and rescheduling excludes executed tasks",()=>{
+
+ assert.match(demo,/t\.status="executed"/);
+ assert.match(demo,/x\.status!=="executed"/);
+});
+test("Revenue report includes approved requests only and complaints are read-only in A17",()=>{
+ assert.match(demo,/x\.status==="approved"/);
+ assert.match(adminA13A17,/function complaintDetail/);
+ assert.doesNotMatch(adminA13A17,/resolveComplaint|deleteComplaint/);
+});
