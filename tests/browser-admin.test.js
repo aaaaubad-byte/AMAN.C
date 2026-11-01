@@ -395,3 +395,22 @@ test("الشركة: نافذة الظهور فارغة ومطلوبة بلا ا�
   assert.deepEqual(t.errors, []);
   await t.done();
 });
+
+test("حالة الفشل لكل شاشة: تعذّر الخدمة يعرض رسالة خطأ لا بيانات ولا تحميلًا معلّقًا ولا أخطاء JavaScript", { skip }, async () => {
+  const t = await start("/admin/", { viewport: { width: 360, height: 740 } });
+  await seed(t.page);
+  await approve(t.page, await submitRequest(t.page)); // بيانات موجودة فعلًا: يجب ألا تظهر عند فشل الخدمة
+  const methods = { requests: "listRequests", numbers: "listNumbers", customers: "listCustomers", tasks: "listTasks", followup: "listTasks", complaints: "listComplaints", reports: "getRevenueReport", settings: "listCompanies", notifications: "listAdminNotifications", alerts: "listAdminAlerts", packages: "listPackages", payments: "listPaymentMethods", content: "getAppContent", audit: "listAuditLog" };
+  for (const [screen, method] of Object.entries(methods)) {
+    await breakService(t.page, method);
+    await go(t.page, screen);
+    await t.page.waitForTimeout(400);
+    const box = screen === "requests" ? "#requests-message" : "#admin-generic-view";
+    const text = await t.page.locator(box).innerText();
+    assert.match(text, /تعذر|غير مربوط|لم يصل/, "لا رسالة خطأ في " + screen);
+    assert.doesNotMatch(text, /جارٍ تحميل/, "تحميل معلّق في " + screen);
+    assert.doesNotMatch(text, /711234567|شركة اختبار|اشتراك سنوي|وسيلة اختبار/, "بيانات ظهرت رغم فشل الخدمة في " + screen);
+  }
+  assert.deepEqual(t.errors, []);
+  await t.done();
+});
