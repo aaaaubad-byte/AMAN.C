@@ -11,6 +11,14 @@
  *  4) يبدأ فارغًا: لا شركات ولا باقات ولا وسائل دفع ولا طلبات. الاستثناء الوحيد حساب مدير المحاكاة
  *     (يلزم لتسجيل الدخول) وهو معلن في شريط المحاكاة. بيانات العيّنة اختيارية بزر صريح.
  *  5) مفتاح التخزين مستقل (aman_c_simulation_v2) ولا تلمسه صفحات الإنتاج.
+ *
+ * قاعدة المصادرة والمهام (docs/DECISIONS.md: D2/D4/D5/D6):
+ *  - الفاصل الدوري للشركة هو مهلة المصادرة نفسها.
+ *  - يوجد لكل رقم مهمة معلّقة واحدة على الأكثر؛ موعدها هو تاريخ المصادرة (آخر يوم في الفاصل).
+ *  - تنفيذ المهمة يكسر الخمول: تُنشأ المهمة التالية بموعد = يوم التنفيذ + الفاصل. المهام القادمة محسوبة ديناميكيًا ولا تُخزَّن.
+ *  - إعادة الجدولة تغيّر موعد المهمة المعلّقة وحدها، وبالتالي تُزاح القادمة بالمقدار نفسه.
+ *  - التنشيط يستكمل المخطط إذا لم يتجاوز يوم التنشيط تاريخ المصادرة؛ وبعده يصبح الرقم مصادرًا.
+ *  - التقويم ميلادي وتوقيت Asia/Aden (UTC+3 ثابت، بلا توقيت صيفي).
  */
 (() => {
 "use strict";
@@ -21,6 +29,7 @@ if (!["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname)) { c
 
 const STORAGE_KEY = "aman_c_simulation_v2";
 const DAY = 86400000;
+const ADEN_OFFSET = 3 * 3600000; /* Asia/Aden = UTC+3 */
 const SIM_ADMIN = Object.freeze({ id: "sim-admin", email: "admin@simulation.local", password: "simulation-1234", full_name: "مدير المحاكاة" });
 
 /* قوائم معتمدة من مرجع الإدارة (14.1 و14.2) ومرجع العميل (13). لا تُضاف قيم من عندنا. */
@@ -58,6 +67,9 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
 /* ---------- أدوات ---------- */
 const now = () => new Date().toISOString();
 const addDays = (date, days) => new Date(new Date(date).getTime() + days * DAY).toISOString();
+/* بداية اليوم الميلادي بتوقيت عدن، ونهايته (آخر ميلي ثانية فيه). */
+const dayStart = date => new Date(Math.floor((new Date(date).getTime() + ADEN_OFFSET) / DAY) * DAY - ADEN_OFFSET).toISOString();
+const endOfDay = date => new Date(Date.parse(dayStart(date)) + DAY - 1).toISOString();
 const uid = prefix => prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
 const ok = (extra = {}) => ({ success: true, ...extra });
 const fail = (message, code = "request_failed") => ({ success: false, code, message });
@@ -81,19 +93,29 @@ function notify(customerId, title, body, extra = {}) {
  db.notifications.unshift({ id: uid("NTF"), customer_id: customerId, title, body, created_at: now(), read_at: null, source: "auto", ...extra });
 }
 
-/* حالة الرقم المشتقة زمنيًا. تقريب خاص بالمحاكاة (D-15): انتهاء الحماية ← غير نشط ← مصادَر بعد مهلة التنشيط للشركة.
-   خوارزمية D-18 التفصيلية ما زالت بنودها مفتوحة في المرجع، فلا تُعتبر المحاكاة مرجعًا لها. */
+/* ---------- المهام وتاريخ المصادرة (D2/D4/D5/D6) ---------- */
+/* المهمة المعلّقة الوحيدة للرقم: موعدها هو تاريخ المصادرة. */
+function pendingTask(n) { return db.tasks.find(t => t.number_id === n.id && t.status !== "executed") || null; }
+/* آخر لحظة يجوز فيها التنفيذ/التنشيط قبل المصادرة. دون مهمة معلّقة (create_first_task=false) نعود إلى مهلة التنشيط في إعدادات الشركة (مفتوح: راجع PROGRESS_LOG). */
+function confiscationDeadline(n) {
+ const t = pendingTask(n);
+ if (t) return endOfDay(t.due_at);
+ const c = companyById(n.company_id);
+ const grace = c && c.reactivation_enabled ? Number(c.reactivation_days || 0) : 0;
+ return addDays(n.ends_at, grace);
+}
+/* حالة الرقم المشتقة زمنيًا: محمي ← غير نشط بعد انتهاء الاشتراك ← مصادَر بعد تجاوز تاريخ المصادرة (حتى أثناء الحماية إن لم تُنفَّذ المهمة). */
 function liveStatus(n) {
  let s = n.status;
  if (s === "protected" && Date.parse(n.ends_at) <= Date.now()) s = "inactive";
- if (s === "inactive") {
-  const c = companyById(n.company_id);
-  const grace = c && c.reactivation_enabled ? Number(c.reactivation_days || 0) : 0;
-  if (Date.now() > Date.parse(n.ends_at) + grace * DAY) s = "confiscated";
+ if (s === "protected" || s === "inactive") {
+  if (Date.now() > Date.parse(confiscationDeadline(n))) s = "confiscated";
  }
  return s;
 }
 function reactivationDeadline(n) {
+ const t = pendingTask(n);
+ if (t) return endOfDay(t.due_at);
  const c = companyById(n.company_id);
  return c && c.reactivation_enabled ? addDays(n.ends_at, Number(c.reactivation_days || 0)) : null;
 }
@@ -125,7 +147,7 @@ function eligibility(op, phone, customerId) {
  const status = n ? liveStatus(n) : null;
  if (op === "activation") return (!n || (n.owner_id !== customerId && status !== "protected")) ? null : "الاشتراك غير متاح لحالة الرقم الحالية.";
  if (op === "extension") return (n && n.owner_id === customerId && status === "protected") ? null : "تمديد الاشتراك متاح للرقم المحمي لدى حسابك فقط.";
- if (op === "reactivation") return (n && n.owner_id === customerId && status === "inactive") ? null : "التنشيط متاح للرقم غير النشط لدى حسابك ضمن مهلة التنشيط فقط.";
+ if (op === "reactivation") return (n && n.owner_id === customerId && status === "inactive") ? null : "التنشيط متاح للرقم غير النشط لدى حسابك قبل تجاوز تاريخ المصادرة فقط.";
  return "نوع العملية غير معروف.";
 }
 
@@ -260,16 +282,20 @@ function requestView(r) {
  return { id: r.id, request_number: r.request_number, phone: r.phone, operation_type: r.operation_type, company_id: r.company_id, company_name: r.company_name, customer_name: r.customer_name, status: r.status, created_at: r.created_at };
 }
 function protectionStatusOf(n) { const s = liveStatus(n); return s === "confiscated" ? "expired_confiscated" : s; }
-function taskStatus(t) { return t.status === "executed" ? "executed" : (Date.parse(t.due_at) <= Date.now() ? "due" : "planned"); }
+/* حالة المهمة: منفذة، أو مستحقة ابتداءً من يوم موعدها (بتوقيت عدن)، أو مخططة. */
+function taskStatus(t) { return t.status === "executed" ? "executed" : (Date.now() >= Date.parse(dayStart(t.due_at)) ? "due" : "planned"); }
+function taskNumberStatus(t) { const n = numberFor(t.phone); return n ? liveStatus(n) : null; }
 function taskView(t) {
  const n = numberFor(t.phone), c = companyById(t.company_id);
- return { ...t, status: taskStatus(t), company_name: c ? c.name : null, protection_id: n ? n.id : null };
+ const v = { ...t, status: taskStatus(t), company_name: c ? c.name : null, protection_id: n ? n.id : null };
+ if (t.status !== "executed") v.confiscation_date = endOfDay(t.due_at);
+ return v;
 }
 function approvalEffect(r) {
  const n = numberFor(r.phone), start = now();
  if (r.operation_type === "extension" && n) return { starts_at: n.ends_at, ends_at: addDays(n.ends_at, r.duration_days), effect_description: "تمديد نهاية الحماية الحالية بمدة الباقة؛ تبقى بداية الحماية كما هي." };
  const first = r.operation_type === "activation";
- return { starts_at: start, ends_at: addDays(start, r.duration_days), effect_description: first ? "تبدأ الحماية لحظة الاعتماد، ويدخل الرقم قائمة العميل، وتنشأ مهام السداد وفق إعدادات الشركة." : "تبدأ فترة حماية جديدة لحظة الاعتماد." };
+ return { starts_at: start, ends_at: addDays(start, r.duration_days), effect_description: first ? "تبدأ الحماية لحظة الاعتماد، ويدخل الرقم قائمة العميل، وتنشأ مهام السداد وفق إعدادات الشركة." : "تبدأ فترة حماية جديدة لحظة الاعتماد، ويستكمل مخطط المهام القائم." };
 }
 function blockReason(r) {
  const u = userById(r.customer_id);
@@ -291,6 +317,16 @@ function validCompany(p) {
  if (["is_active", "create_first_task", "reactivation_enabled"].some(k => typeof p[k] !== "boolean")) return "إعدادات الشركة غير مكتملة.";
  return null;
 }
+/* تحقق إعادة الجدولة: مهمة معلّقة لرقم محمي، وتاريخ جديد صالح غير سابق لليوم. يعيد { t, n, nextDue } أو { error }. */
+function rescheduleTarget(p) {
+ const t = db.tasks.find(x => x.id === p.task_id), next = new Date(p.new_due_at);
+ if (!t || t.status === "executed" || Number.isNaN(next.getTime())) return { error: fail("تعذرت إعادة الجدولة.", "invalid_request") };
+ const n = numberFor(t.phone);
+ if (!n || liveStatus(n) !== "protected") return { error: fail("إعادة الجدولة متاحة لمهام الأرقام المحمية فقط.", "task_not_reschedulable") };
+ const nextDue = dayStart(next);
+ if (Date.parse(nextDue) < Date.parse(dayStart(now()))) return { error: fail("لا يمكن جدولة المهمة في تاريخ سابق لليوم.", "invalid_date") };
+ return { t, n, nextDue };
+}
 
 const admin = {
  getCurrentAdmin: () => { const a = adminUser(); return a ? ok({ admin: { id: a.id, full_name: a.full_name, email: a.email, is_admin: true } }) : AUTH(); },
@@ -307,7 +343,7 @@ const admin = {
    pending_requests: db.requests.filter(x => x.status === "pending").length,
    protected_numbers: db.numbers.filter(n => liveStatus(n) === "protected").length,
    open_reports: db.reports.filter(x => !x.decision).length,
-   due_tasks: db.tasks.filter(t => taskStatus(t) === "due").length,
+   due_tasks: db.tasks.filter(t => taskStatus(t) === "due" && taskNumberStatus(t) === "protected").length,
    customers: customers().filter(u => customerType(u.id) === "customer").length,
    approved_revenue_yer: db.requests.filter(x => x.status === "approved").reduce((a, x) => a + Number(x.price_yer || 0), 0)
   } });
@@ -354,8 +390,10 @@ const admin = {
   let n = numberFor(r.phone);
   if (r.operation_type === "activation") {
    if (!n) { n = { id: uid("NUM"), phone: r.phone, company_id: r.company_id, created_at: now(), events: [] }; db.numbers.push(n); }
+   /* اشتراك جديد = مخطط جديد: تُسقط أي مهمة معلّقة قديمة للرقم. المنفذة تبقى سجلًا. */
+   db.tasks = db.tasks.filter(t => t.number_id !== n.id || t.status === "executed");
    n.owner_id = r.customer_id;
-   if (c && c.create_first_task) db.tasks.push({ id: uid("TSK"), number_id: n.id, phone: n.phone, company_id: c.id, customer_id: r.customer_id, status: "planned", due_at: addDays(effect.starts_at, c.task_interval_days), created_at: now() });
+   if (c && c.create_first_task) db.tasks.push({ id: uid("TSK"), number_id: n.id, phone: n.phone, company_id: c.id, customer_id: r.customer_id, status: "planned", due_at: addDays(dayStart(effect.starts_at), c.task_interval_days), created_at: now() });
   }
   if (r.operation_type !== "extension") n.starts_at = effect.starts_at;
   n.status = "protected"; n.ends_at = effect.ends_at; n.package_name = r.package_name; n.duration_days = r.duration_days;
@@ -422,7 +460,8 @@ const admin = {
   audit(p.status === "disabled" ? "customer_disabled" : "customer_enabled", "customer", u.id, (p.status === "disabled" ? "تعطيل" : "إعادة تفعيل") + " حساب " + (u.full_name || u.email), { reason: u.disabled_reason });
   save(); return ok();
  },
- listTasks: () => adminUser() ? ok({ tasks: db.tasks.map(taskView), companies: db.companies.map(c => ({ id: c.id, name: c.name })) }) : AUTH(),
+ /* المهام المصادَرة أرقامها لا تُعرض كمهام قابلة للتنفيذ؛ المنفذة تبقى سجلًا. */
+ listTasks: () => adminUser() ? ok({ tasks: db.tasks.filter(t => t.status === "executed" || taskNumberStatus(t) !== "confiscated").map(taskView), companies: db.companies.map(c => ({ id: c.id, name: c.name })) }) : AUTH(),
  getTaskDetails: p => {
   if (!adminUser()) return AUTH();
   const t = db.tasks.find(x => x.id === p.task_id); if (!t) return fail("المهمة غير موجودة.", "not_found");
@@ -433,24 +472,34 @@ const admin = {
   if (!adminUser()) return AUTH();
   const t = db.tasks.find(x => x.id === p.task_id);
   if (!t || taskStatus(t) !== "due") return fail("المهمة غير متاحة للتنفيذ أو سبق تنفيذها.", "task_not_due");
+  /* D5: تُنفَّذ المهام طوال فترة الاشتراك فقط؛ بعد انتهائه لا تنفيذ، ويبقى موعدها تاريخ المصادرة. */
+  const n = numberFor(t.phone);
+  if (!n || liveStatus(n) !== "protected") return fail("لا تُنفَّذ المهمة إلا والرقم محمي (ضمن فترة الاشتراك).", "task_not_executable");
   t.status = "executed"; t.executed_at = now();
+  /* تنفيذ المهمة يكسر الخمول: موعد المهمة التالية (وهو تاريخ المصادرة الجديد) = يوم التنفيذ + الفاصل الدوري. */
+  const c = companyById(t.company_id), interval = Number(c && c.task_interval_days);
+  if (isInt(interval) && interval >= 1) {
+   db.tasks.push({ id: uid("TSK"), number_id: t.number_id, phone: t.phone, company_id: t.company_id, customer_id: t.customer_id, status: "planned", due_at: addDays(dayStart(t.executed_at), interval), created_at: now() });
+  }
   audit("task_executed", "task", t.id, "تسجيل تنفيذ مهمة سداد للرقم " + t.phone);
   save(); return ok();
  },
  previewTaskReschedule: p => {
   if (!adminUser()) return AUTH();
-  const t = db.tasks.find(x => x.id === p.task_id), next = new Date(p.new_due_at);
-  if (!t || t.status === "executed" || Number.isNaN(next.getTime())) return fail("تعذرت المعاينة.", "invalid_request");
-  return ok({ affected_count: db.tasks.filter(x => x.phone === t.phone && x.status !== "executed" && new Date(x.due_at) >= new Date(t.due_at)).length });
+  const r = rescheduleTarget(p); if (r.error) return r.error;
+  /* المتأثر: المهمة المستحقة نفسها + المهام القادمة المحسوبة (موعد جديد + k × الفاصل) داخل فترة الاشتراك. */
+  const c = companyById(r.t.company_id), interval = Number(c && c.task_interval_days), endsAt = Date.parse(r.n.ends_at);
+  let count = 1;
+  if (isInt(interval) && interval >= 1) { for (let d = Date.parse(r.nextDue) + interval * DAY; d <= endsAt && count < 1000; d += interval * DAY) count++; }
+  return ok({ affected_count: count, new_due_at: r.nextDue, confiscation_date: endOfDay(r.nextDue) });
  },
  rescheduleTask: p => {
   if (!adminUser()) return AUTH();
-  const t = db.tasks.find(x => x.id === p.task_id), next = new Date(p.new_due_at);
-  if (!t || t.status === "executed" || Number.isNaN(next.getTime())) return fail("تعذرت إعادة الجدولة.", "invalid_request");
-  const delta = next.getTime() - new Date(t.due_at).getTime();
-  db.tasks.filter(x => x.phone === t.phone && x.status !== "executed" && new Date(x.due_at) >= new Date(t.due_at)).forEach(x => { x.due_at = new Date(new Date(x.due_at).getTime() + delta).toISOString(); });
-  audit("task_rescheduled", "task", t.id, "إعادة جدولة مهام الرقم " + t.phone);
-  save(); return ok();
+  const r = rescheduleTarget(p); if (r.error) return r.error;
+  /* تُعاد جدولة المهمة المعلّقة وحدها؛ القادمة محسوبة منها فتُزاح تلقائيًا بالمقدار نفسه. */
+  r.t.due_at = r.nextDue;
+  audit("task_rescheduled", "task", r.t.id, "إعادة جدولة مهمة الرقم " + r.t.phone);
+  save(); return ok({ due_at: r.t.due_at, confiscation_date: endOfDay(r.t.due_at) });
  },
  getRevenueReport: p => {
   if (!adminUser()) return AUTH();
