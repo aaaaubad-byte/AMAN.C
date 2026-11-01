@@ -7,7 +7,13 @@
 </head>
 <body>
 <main class="app" id="client-app">
-<header class="topbar"><button class="icon-btn" id="menu-button" aria-label="القائمة"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="brand" href="./"><span class="brand-symbol">أ</span><span class="brand-copy"><strong>أمان</strong><small>حماية وضمان</small></span></a></header>
+<header class="topbar">
+<div class="topbar-actions">
+<button class="icon-btn" id="account-button" type="button" aria-label="الحساب"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+<button class="icon-btn" id="notifications-button" type="button" aria-label="الإشعارات"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+</div>
+<a class="brand" href="./" aria-label="أمان - الرئيسية"><span class="brand-symbol">أ</span><span class="brand-copy"><strong>أمان</strong><small>حماية وضمان</small></span></a>
+</header>
 
 <section id="auth-screen" hidden>
 <div class="auth-wrap"><div class="auth-brand"><div class="brand-symbol">أ</div><h1>أمان</h1><p>حماية وضمان</p></div>
@@ -18,38 +24,35 @@
 <button class="quiet-link" id="auth-switch" type="button" style="width:100%;margin-top:13px">إنشاء حساب جديد</button></div>
 <p class="auth-foot">لن يتم إنشاء جلسة دخول فعلية قبل ربط نظام المصادقة الآمن.</p></div></section>
 
-<section id="home-screen">
+<section id="home-screen" data-screen="home">
 <div class="page-head"><p class="eyebrow">مرحبًا بك في أمان</p><h1 class="page-title">حافظ على رقمك،<br>واطمئن على حمايته.</h1><p class="page-desc">ابحث عن حالة الرقم وتابع خدمات الحماية من مكان واحد.</p></div>
 <section class="surface"><h2 class="surface-title">البحث عن حالة الرقم في أمان</h2><p class="surface-desc">أدخل رقم الهاتف للتحقق من حالته.</p>
 <form id="search-form"><div class="field-row"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="رقم الهاتف" aria-label="رقم الهاتف" required><button class="btn" type="submit">بحث</button></div></form><p id="search-message" class="notice-error" aria-live="polite"></p></section>
 <div class="section-head"><h2>أرقامي</h2><button class="quiet-link" id="show-all-numbers" type="button">عرض الكل</button></div>
 <div id="my-numbers"><div class="soft-surface empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/></svg></div><strong>لا توجد أرقام مرتبطة بحسابك</strong><p>ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.</p></div></div>
 <div class="section-head"><h2>خدماتك</h2></div>
-<a class="quick-link" href="#operations" data-view="operations"><span class="quick-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg></span><span class="quick-text"><strong>العمليات</strong><small>تابع طلبات الاشتراك والتمديد والتنشيط</small></span><span class="chevron">‹</span></a>
-<a class="quick-link" href="#notifications" data-view="notifications"><span class="quick-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span><span class="quick-text"><strong>الإشعارات</strong><small>التحديثات والتنبيهات الخاصة بأرقامك</small></span><span class="chevron">‹</span></a>
+<button class="quick-link" type="button" data-navigate="operations"><span class="quick-icon">▤</span><span class="quick-text"><strong>العمليات</strong><small>تابع طلبات الاشتراك والتمديد والتنشيط</small></span><span class="chevron">‹</span></button>
+<button class="quick-link" type="button" data-navigate="notifications"><span class="quick-icon">♧</span><span class="quick-text"><strong>الإشعارات</strong><small>التحديثات والتنبيهات الخاصة بأرقامك</small></span><span class="chevron">‹</span></button>
 </section>
 
-<section id="numbers-screen" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام التي أصبحت مرتبطة بحسابك بعد اعتماد طلباتها.</p></div><div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام بعد</strong><p>ستظهر الأرقام المعتمدة في هذا القسم.</p></div></section>
-<section id="operations-screen" hidden><div class="page-head"><p class="eyebrow">متابعة الخدمة</p><h1 class="page-title">العمليات</h1><p class="page-desc">طلبات الاشتراك والتمديد والتنشيط وحالات مراجعتها.</p></div><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات لعرضها</strong><p>ستظهر عملياتك هنا بعد تقديم طلبات الخدمة.</p></div></section>
-<section id="account-screen" hidden><div class="page-head"><p class="eyebrow">إعداداتك</p><h1 class="page-title">الحساب</h1><p class="page-desc">بيانات الحساب وإعدادات الأمان.</p></div><div class="surface"><div class="empty-state"><div class="empty-icon">♙</div><strong>بيانات الحساب</strong><p>ستظهر بيانات حسابك بعد تسجيل الدخول وربط المصادقة.</p></div><button class="btn btn-outline btn-block" id="open-login" type="button">تسجيل الدخول</button></div></section>
-<section id="notifications-screen" hidden><div class="page-head"><p class="eyebrow">ابقَ على اطلاع</p><h1 class="page-title">الإشعارات</h1><p class="page-desc">تنبيهات حالة الحماية ومواعيد التجديد وتحديثات الطلبات.</p></div><div class="soft-surface empty-state"><div class="empty-icon">♧</div><strong>لا توجد إشعارات</strong><p>ستظهر إشعاراتك هنا عند توفرها.</p></div></section>
+<section id="numbers-screen" data-screen="numbers" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام المرتبطة بحسابك بعد اعتماد طلبات الاشتراك.</p></div><div class="soft-surface empty-state"><div class="empty-icon">▦</div><strong>لا توجد أرقام بعد</strong><p>ستظهر الأرقام المعتمدة في هذا القسم.</p></div></section>
+<section id="operations-screen" data-screen="operations" hidden><div class="page-head"><p class="eyebrow">متابعة الخدمة</p><h1 class="page-title">العمليات</h1><p class="page-desc">طلبات الاشتراك والتمديد والتنشيط وحالات مراجعتها.</p></div><div class="soft-surface empty-state"><div class="empty-icon">◷</div><strong>لا توجد عمليات لعرضها</strong><p>ستظهر عملياتك هنا بعد تقديم طلبات الخدمة.</p></div></section>
+<section id="account-screen" data-screen="account" hidden><div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">بيانات الحساب وإعدادات الأمان.</p></div><div class="surface"><div class="empty-state"><div class="empty-icon">♙</div><strong>بيانات الحساب</strong><p>ستظهر بيانات حسابك بعد تسجيل الدخول وربط المصادقة.</p></div><button class="btn btn-outline btn-block" id="open-login" type="button">تسجيل الدخول</button></div></section>
+<section id="notifications-screen" data-screen="notifications" hidden><div class="page-head"><p class="eyebrow">ابقَ على اطلاع</p><h1 class="page-title">الإشعارات</h1><p class="page-desc">تنبيهات حالة الحماية ومواعيد التجديد وتحديثات الطلبات.</p></div><div class="soft-surface empty-state"><div class="empty-icon">♧</div><strong>لا توجد إشعارات</strong><p>ستظهر إشعاراتك هنا عند توفرها.</p></div></section>
 </main>
 <nav class="bottom-nav" aria-label="التنقل الرئيسي">
-<button class="nav-item" data-tab="numbers"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h2m3 0h1M9 15h2m3 0h1"/></svg><span>أرقامي</span></button>
-<button class="nav-item active" data-tab="home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></button>
-<button class="nav-item" data-tab="operations"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg><span>العمليات</span></button>
-<button class="nav-item" data-tab="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>حسابي</span></button>
+<button class="nav-item" data-tab="numbers" type="button"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h2m3 0h1M9 15h2m3 0h1"/></svg><span>الأرقام</span></button>
+<button class="nav-item active" data-tab="home" type="button"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>الرئيسية</span></button>
+<button class="nav-item" data-tab="operations" type="button"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg><span>العمليات</span></button>
 </nav>
 <div class="overlay" id="number-sheet" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
 <div class="sheet-handle"></div><div class="sheet-top"><button class="sheet-close" id="close-sheet" aria-label="إغلاق">×</button><span></span></div>
-<div class="sheet-hero"><div class="sheet-hero-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m3 0h3M8 14h2m3 0h3M8 18h2"/><path d="m16 17 2 2 4-5"/></svg></div><h2 id="sheet-title">تفاصيل الرقم</h2></div>
+<div class="sheet-hero"><div class="sheet-hero-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m3 0h3M8 14h2m3 0h3M8 18h2"/></svg></div><h2 id="sheet-title">تفاصيل الرقم</h2></div>
 <div class="detail-block"><div class="detail-line"><div><div class="detail-label">رقم الهاتف</div><div class="detail-value" id="sheet-phone" dir="ltr">—</div></div><span class="state state-off">غير متحقق</span><span class="detail-icon">♧</span></div></div>
 <div class="detail-block"><div class="detail-line"><div><div class="detail-label">شركة الاتصالات</div><div class="detail-value">تُحدد بعد التحقق</div></div><span class="detail-icon">▦</span></div></div>
 <div class="detail-block"><div class="detail-split"><div><div class="detail-label">تاريخ البداية</div><div class="detail-value">—</div></div><div><div class="detail-label">تاريخ الانتهاء</div><div class="detail-value">—</div></div></div></div>
-<div class="detail-block"><div class="detail-line"><div><div class="detail-label">مدة الحماية المتبقية</div><div class="remaining">— <small>يومًا</small></div></div><span class="detail-icon">◷</span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
-<div class="detail-block"><div class="detail-line"><div><strong style="font-size:13px">إشعارات الرقم</strong><div class="surface-desc">متابعة التحديثات والتنبيهات الخاصة بالرقم.</div></div><span class="detail-icon">♧</span></div></div>
-<div class="alert-note">ستظهر بيانات الحماية والإجراءات المتاحة بعد التحقق من الرقم وربط الخدمة.</div>
+<div class="alert-note">سيتم استكمال تفاصيل الرقم وإجراءات حالته في دفعة العميل.</div>
 <button class="btn btn-block" style="margin-top:14px" id="sheet-done">إغلاق</button>
 </section></div>
-<script type="application/json" id="screen-contract">{"status":"ui-foundation","data_source":"not-connected","mock_data":false}</script>
+<script type="application/json" id="screen-contract">{"status":"phase-1-navigation-foundation","data_source":"not-connected","mock_data":false}</script>
 </body></html>
