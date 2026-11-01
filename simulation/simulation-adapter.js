@@ -19,7 +19,9 @@
  *    موعد المهمة التالية = يوم التنفيذ + الفاصل. المهام القادمة الأبعد محسوبة ديناميكيًا ولا تُخزَّن.
  *  - لا يجوز تجاوز الموعد دون تنفيذ إلا بإعادة جدولة يدوية من المدير (بالزيادة أو النقصان) للمهمة القادمة وحدها.
  *  - نافذة الظهور (task_due_window_days) إعداد للشركة: تظهر المهمة «مستحقة» قبل موعدها بهذا العدد من الأيام ليتسع وقت المدير.
- *  - التنشيط يستكمل المخطط إذا لم يتجاوز يوم التنشيط تاريخ المصادرة؛ وبعده يصبح الرقم مصادرًا.
+ *  - التنشيط يستكمل المخطط. آخر يوم مسموح للتنشيط = تاريخ المصادرة − مهلة التنشيط (reactivation_days؛ 0 = حتى يوم المصادرة نفسه)؛
+ *    وبعده يُرفض التنشيط برمز reactivation_window_closed، وبعد تجاوز تاريخ المصادرة يصبح الرقم مصادرًا. مفتاح reactivation_enabled يمنع التنشيط كليًا.
+ *  - نافذة الظهور تُدخَل لكل شركة جديدة دون قيمة افتراضية (مطلوبة، عدد صحيح غير سالب).
  *  - التقويم ميلادي وتوقيت Asia/Aden (UTC+3 ثابت، بلا توقيت صيفي).
  */
 (() => {
@@ -115,11 +117,14 @@ function liveStatus(n) {
  }
  return s;
 }
+/* آخر لحظة يجوز فيها التنشيط = نهاية اليوم (تاريخ المصادرة − مهلة التنشيط) بتوقيت عدن. null إن كان التنشيط غير مسموح للشركة.
+ * دون مهمة قادمة لا يوجد تاريخ مصادرة مخطط، فنُبقي السلوك السابق (نهاية الاشتراك + المهلة) — قرار مفتوح موثق في PROGRESS_LOG ولم نخترع بديلًا. */
 function reactivationDeadline(n) {
- const t = pendingTask(n);
- if (t) return endOfDay(t.due_at);
  const c = companyById(n.company_id);
- return c && c.reactivation_enabled ? addDays(n.ends_at, Number(c.reactivation_days || 0)) : null;
+ if (!c || !c.reactivation_enabled) return null;
+ const t = pendingTask(n);
+ if (t) return endOfDay(addDays(dayStart(t.due_at), -Number(c.reactivation_days || 0)));
+ return addDays(n.ends_at, Number(c.reactivation_days || 0));
 }
 function remainingLabel(n) {
  const ms = Date.parse(n.ends_at) - Date.now();
@@ -144,14 +149,22 @@ function matchCompany(phone) {
 function numberFor(phone) { return db.numbers.find(n => n.phone === phone) || null; }
 
 /* أهلية العملية (D-03): تُفحص عند الإرسال وعند الاعتماد. */
-function eligibility(op, phone, customerId) {
+function eligibilityIssue(op, phone, customerId) {
  const n = numberFor(phone);
  const status = n ? liveStatus(n) : null;
- if (op === "activation") return (!n || (n.owner_id !== customerId && status !== "protected")) ? null : "الاشتراك غير متاح لحالة الرقم الحالية.";
- if (op === "extension") return (n && n.owner_id === customerId && status === "protected") ? null : "تمديد الاشتراك متاح للرقم المحمي لدى حسابك فقط.";
- if (op === "reactivation") return (n && n.owner_id === customerId && status === "inactive") ? null : "التنشيط متاح للرقم غير النشط لدى حسابك قبل تجاوز تاريخ المصادرة فقط.";
- return "نوع العملية غير معروف.";
+ const issue = message => ({ message, code: "operation_not_allowed" });
+ if (op === "activation") return (!n || (n.owner_id !== customerId && status !== "protected")) ? null : issue("الاشتراك غير متاح لحالة الرقم الحالية.");
+ if (op === "extension") return (n && n.owner_id === customerId && status === "protected") ? null : issue("تمديد الاشتراك متاح للرقم المحمي لدى حسابك فقط.");
+ if (op === "reactivation") {
+  if (!(n && n.owner_id === customerId && status === "inactive")) return issue("التنشيط متاح للرقم غير النشط لدى حسابك قبل تجاوز تاريخ المصادرة فقط.");
+  const last = reactivationDeadline(n);
+  if (last === null) return { message: "التنشيط غير مسموح لهذه الشركة.", code: "reactivation_disabled" };
+  if (Date.now() > Date.parse(last)) return { message: "انتهت مهلة التنشيط لهذا الرقم قبل تاريخ المصادرة.", code: "reactivation_window_closed" };
+  return null;
+ }
+ return issue("نوع العملية غير معروف.");
 }
+const eligibility = (op, phone, customerId) => { const i = eligibilityIssue(op, phone, customerId); return i ? i.message : null; };
 
 /* ---------- عقود العميل ---------- */
 const client = {
@@ -223,8 +236,8 @@ const client = {
   const ref = String(p.payment_reference || "").trim();
   if ((pay.reference_required !== false) && !ref) return fail("أدخل مرجع الدفع.", "reference_required");
   if (ref && pay.reference_pattern) { try { if (!new RegExp(pay.reference_pattern).test(ref)) return fail("صيغة مرجع الدفع غير مطابقة.", "reference_format"); } catch { return fail("صيغة مرجع الدفع غير صالحة في إعدادات الوسيلة.", "reference_pattern_invalid"); } }
-  const blocked = eligibility(op, phone, u.id);
-  if (blocked) return fail(blocked, "operation_not_allowed");
+  const blocked = eligibilityIssue(op, phone, u.id);
+  if (blocked) return fail(blocked.message, blocked.code);
   const n = numberFor(phone);
   const r = {
    id: uid("REQ"), request_number: "SIM-" + String(++db.seq).padStart(4, "0"),
@@ -320,8 +333,8 @@ function validCompany(p) {
  if (new Set(p.prefixes).size !== p.prefixes.length) return "البادئات مكررة.";
  if (!Array.isArray(p.number_lengths) || !p.number_lengths.length || p.number_lengths.some(x => !isInt(x) || x < 1)) return "أطوال الأرقام مطلوبة ويجب أن تكون أعدادًا صحيحة موجبة.";
  if (!isInt(p.task_interval_days) || p.task_interval_days < 1) return "الفاصل الدوري يجب أن يكون عددًا صحيحًا موجبًا.";
- if (p.task_due_window_days !== undefined && (!isInt(p.task_due_window_days) || p.task_due_window_days < 0)) return "نافذة ظهور المهام المستحقة يجب أن تكون عددًا صحيحًا غير سالب.";
- if (!isInt(p.reactivation_days) || p.reactivation_days < 0) return "مهلة التنشيط يجب أن تكون عددًا صحيحًا غير سالب.";
+ if ((p.task_due_window_days !== undefined || !p.id) && (!isInt(p.task_due_window_days) || p.task_due_window_days < 0)) return "نافذة ظهور المهام المستحقة مطلوبة ويجب أن تكون عددًا صحيحًا غير سالب.";
+ if (!isInt(p.reactivation_days) || p.reactivation_days < 0) return "مهلة التنشيط قبل المصادرة يجب أن تكون عددًا صحيحًا غير سالب.";
  if (["is_active", "create_first_task", "reactivation_enabled"].some(k => typeof p[k] !== "boolean")) return "إعدادات الشركة غير مكتملة.";
  return null;
 }
@@ -596,7 +609,7 @@ const admin = {
    const delta = p.task_interval_days - Number(c.task_interval_days);
    if (delta !== 0) db.tasks.filter(t => t.company_id === c.id && t.status !== "executed").forEach(t => { t.due_at = addDays(t.due_at, delta); });
   }
-  /* إن لم تُرسل الواجهة نافذة الظهور نُبقي القيمة الحالية (أو 0 لشركة جديدة). */
+  /* الشركة الجديدة تُرسل النافذة وجوبًا (تحقّق أعلاه)؛ في التعديل إن غابت نُبقي القيمة الحالية. */
   const windowDays = p.task_due_window_days !== undefined ? p.task_due_window_days : (c && isInt(c.task_due_window_days) ? c.task_due_window_days : 0);
   Object.assign(target, { name, prefixes: p.prefixes, number_lengths: p.number_lengths, task_interval_days: p.task_interval_days, task_due_window_days: windowDays, is_active: p.is_active, create_first_task: p.create_first_task, reactivation_enabled: p.reactivation_enabled, reactivation_days: p.reactivation_days });
   if (!c) db.companies.push(target);

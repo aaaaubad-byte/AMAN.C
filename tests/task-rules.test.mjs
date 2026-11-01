@@ -9,7 +9,8 @@ import vm from "node:vm";
 const CODE = fs.readFileSync(new URL("../simulation/simulation-adapter.js", import.meta.url), "utf8");
 const ADMIN = { email: "admin@simulation.local", password: "simulation-1234" };
 
-function setup(startIso = "2026-01-01T09:00:00+03:00", { windowDays } = {}) {
+// نافذة الظهور مطلوبة صراحةً لكل شركة جديدة (قرار 2026-11-01: بلا قيمة افتراضية)، لذا يمرّر الاختبار 0 صراحةً ما لم يُحدَّد غيره.
+function setup(startIso = "2026-01-01T09:00:00+03:00", { windowDays = 0, reactivationDays = 5, reactivationEnabled = true } = {}) {
   let current = Date.parse(startIso);
   class FakeDate extends Date {
     constructor(...a) { if (a.length) super(...a); else super(current); }
@@ -32,9 +33,9 @@ function setup(startIso = "2026-01-01T09:00:00+03:00", { windowDays } = {}) {
   must(admin.signInAdmin(ADMIN), "دخول المدير");
   const companyInput = {
     name: "شركة اختبار", prefixes: ["71"], number_lengths: [9], task_interval_days: 90,
-    is_active: true, create_first_task: true, reactivation_enabled: true, reactivation_days: 5
+    is_active: true, create_first_task: true, reactivation_enabled: reactivationEnabled, reactivation_days: reactivationDays,
+    task_due_window_days: windowDays
   };
-  if (windowDays !== undefined) companyInput.task_due_window_days = windowDays;
   const company = must(admin.saveCompanySettings(companyInput), "إضافة شركة").company;
   const pkgs = {};
   [["act365", "activation", 365], ["act30", "activation", 30], ["react30", "reactivation", 30]].forEach(([k, op, days]) => {
@@ -202,4 +203,105 @@ test("D5: لا تنفيذ للمهمة بعد انتهاء الاشتراك (ا�
   const res = s.admin.executeTask({ task_id: s.pending().id });
   assert.equal(res.success, false);
   assert.equal(res.code, "task_not_executable");
+});
+
+// ---- قواعد معتمدة 2026-11-01 (التنشيط بمعنى «آخر موعد قبل المصادرة»، نافذة الظهور المطلوبة، قيود إعادة الجدولة) ----
+
+test("نافذة الظهور مطلوبة لشركة جديدة: الغياب أو null أو السالب أو الكسر مرفوض", () => {
+  const s = setup();
+  const base = { name: "شركة ب", prefixes: ["73"], number_lengths: [9], task_interval_days: 90, is_active: true, create_first_task: true, reactivation_enabled: true, reactivation_days: 5 };
+  for (const bad of [undefined, null, -1, 1.5, "10"]) {
+    const input = { ...base };
+    if (bad !== undefined) input.task_due_window_days = bad;
+    const res = s.admin.saveCompanySettings(input);
+    assert.equal(res.success, false, "القيمة " + String(bad));
+    assert.equal(res.code, "validation_failed");
+  }
+  s.must(s.admin.saveCompanySettings({ ...base, task_due_window_days: 0 }), "الصفر صالح");
+});
+
+test("التنشيط: آخر يوم = تاريخ المصادرة − المهلة؛ يُقبل في اليوم الأخير ويُرفض بعده بالرمز الواضح", () => {
+  const s = setup(); // المهلة 5، موعد المصادرة 04-01 ← آخر يوم للتنشيط 03-27
+  s.runOp("activation", "act30"); // الحماية حتى 01-31
+  s.setNow("2026-03-27T23:59:59+03:00");
+  assert.equal(s.numStatus(), "inactive");
+  s.must(s.request("reactivation", "react30", "711234567"), "طلب في اليوم الأخير");
+  s.setNow("2026-03-28T00:00:00+03:00");
+  assert.equal(s.numStatus(), "inactive"); // لم يُصادَر بعد
+  const res = s.request("reactivation", "react30", "711234567");
+  assert.equal(res.success, false);
+  assert.equal(res.code, "reactivation_window_closed");
+  s.setNow("2026-04-02T00:00:00+03:00");
+  assert.equal(s.numStatus(), "confiscated");
+});
+
+test("التنشيط بمهلة 0: مسموح حتى يوم المصادرة نفسه ومرفوض بعده", () => {
+  const s = setup("2026-01-01T09:00:00+03:00", { reactivationDays: 0 });
+  s.runOp("activation", "act30");
+  s.setNow("2026-04-01T23:30:00+03:00"); // يوم المصادرة نفسه
+  assert.equal(s.numStatus(), "inactive");
+  s.must(s.request("reactivation", "react30", "711234567"), "تنشيط في يوم المصادرة");
+  s.setNow("2026-04-02T00:00:00+03:00");
+  const res = s.request("reactivation", "react30", "711234567");
+  assert.equal(res.success, false);
+  assert.equal(res.code, "operation_not_allowed"); // مصادَر لا غير نشط
+});
+
+test("مفتاح السماح بالتنشيط: التنشيط مرفوض برمز reactivation_disabled عند إيقافه", () => {
+  const s = setup("2026-01-01T09:00:00+03:00", { reactivationEnabled: false });
+  s.runOp("activation", "act30");
+  s.setNow("2026-02-15T10:00:00+03:00");
+  const res = s.request("reactivation", "react30", "711234567");
+  assert.equal(res.success, false);
+  assert.equal(res.code, "reactivation_disabled");
+});
+
+test("التنشيط لا يغيّر تاريخ المصادرة ولا موعد المهمة", () => {
+  const s = setup();
+  s.runOp("activation", "act30");
+  const before = s.pending();
+  s.setNow("2026-03-20T10:00:00+03:00");
+  s.runOp("reactivation", "react30");
+  assert.equal(s.pending().due_at, before.due_at);
+  assert.equal(s.pending().confiscation_date, before.confiscation_date);
+});
+
+test("إعادة الجدولة: اليوم نفسه مسموح (التقديم حتى اليوم)", () => {
+  const s = setup();
+  s.runOp("activation", "act365");
+  s.setNow("2026-03-20T10:00:00+03:00");
+  s.must(s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "2026-03-20" }), "إعادة جدولة إلى اليوم");
+  assert.equal(s.pending().due_at, "2026-03-19T21:00:00.000Z"); // 03-20 بتوقيت عدن
+});
+
+test("إعادة الجدولة: المثال المعتمد — موعد 20 نوفمبر واليوم 1 نوفمبر يجوز نقله إلى 10 نوفمبر", () => {
+  const s = setup("2026-09-21T09:00:00+03:00");
+  s.runOp("activation", "act365"); // الموعد = 09-21 + 90 = 12-20 ؛ نضبط الموعد بإعادة جدولة أولًا
+  s.must(s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "2026-11-20" }), "ضبط الموعد 20 نوفمبر");
+  s.setNow("2026-11-01T10:00:00+03:00");
+  s.must(s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "2026-11-10" }), "تقديم إلى 10 نوفمبر");
+  assert.equal(s.pending().due_at, "2026-11-09T21:00:00.000Z");
+  const res = s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "2026-10-31" });
+  assert.equal(res.success, false);
+  assert.equal(res.code, "invalid_date");
+});
+
+test("إعادة الجدولة للأرقام المحمية فقط: رقم غير نشط مرفوض بـ task_not_reschedulable", () => {
+  const s = setup();
+  s.runOp("activation", "act30");
+  s.setNow("2026-02-15T10:00:00+03:00");
+  assert.equal(s.numStatus(), "inactive");
+  const res = s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "2026-04-20" });
+  assert.equal(res.success, false);
+  assert.equal(res.code, "task_not_reschedulable");
+  const prev = s.admin.previewTaskReschedule({ task_id: s.pending().id, new_due_at: "2026-04-20" });
+  assert.equal(prev.code, "task_not_reschedulable");
+});
+
+test("إعادة الجدولة: تاريخ غير صالح مرفوض", () => {
+  const s = setup();
+  s.runOp("activation", "act365");
+  const res = s.admin.rescheduleTask({ task_id: s.pending().id, new_due_at: "ليس تاريخًا" });
+  assert.equal(res.success, false);
+  assert.equal(res.code, "invalid_request");
 });
