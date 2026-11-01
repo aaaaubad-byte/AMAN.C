@@ -54,25 +54,5 @@ function confirmStatusChange(c){
  const cancel=node("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>{dialog.close();dialog.remove();});body.append(cancel);document.body.append(dialog);dialog.showModal();
 }
 function renderCustomerScreen(){const host=shell();customerList(host);}
-function renderTasks(host){
- const wrap=node("div","admin-tasks-view"),filtersBox=node("div","surface"),grid=node("div","admin-filter-grid"),status=node("select","field"),company=node("select","field"),search=node("input","field");
- [["all","كل الحالات"],["planned","مخططة"],["due","مستحقة"],["executed","منفذة"]].forEach(([v,t])=>status.add(new Option(t,v)));
- company.add(new Option("كل الشركات","all"));(window.AMANAdminTaskCompanies||[]).forEach(c=>company.add(new Option(c.name,c.id)));
- search.placeholder="رقم الهاتف";[[ "حالة المهمة",status],["الشركة",company],["الرقم",search]].forEach(([t,x])=>{const b=node("div",""),l=node("label","field-label",t);b.append(l,x);grid.append(b);});
- const refresh=node("button","btn btn-outline","تحديث المهام");refresh.type="button";refresh.addEventListener("click",loadTasks);const msg=node("p","notice-info","");msg.id="tasks-message";filtersBox.append(grid,refresh,msg);const list=node("div","");list.id="tasks-list";wrap.append(filtersBox,list);host.append(wrap);
- [status,company,search].forEach(x=>x.addEventListener(x===search?"input":"change",()=>renderTaskRows({status:status.value,company_id:company.value,search:search.value.trim()})));
- renderTaskRows({status:"all",company_id:"all",search:""});
-}
-function renderTaskRows(f){
- const host=$("tasks-list");if(!host)return;host.replaceChildren();const rows=tasks.filter(t=>(f.status==="all"||t.status===f.status)&&(f.company_id==="all"||t.company_id===f.company_id)&&(!f.search||String(t.phone||"").includes(f.search)));
- if(!rows.length){host.append(node("div","surface empty-state","لا توجد مهام سداد مطابقة."));return;}
- rows.forEach(t=>{const card=node("article","admin-request-card"),main=node("span","request-card-main"),phone=node("strong","",t.phone||"رقم غير محدد"),meta=node("small","",[t.company_name||"شركة غير محددة",t.due_at?"الاستحقاق: "+t.due_at:"",labels[t.status]||t.status].filter(Boolean).join(" • "));main.append(phone,meta);card.append(main,node("span","state "+(t.status==="due"?"state-wait":t.status==="executed"?"state-active":"state-off"),labels[t.status]||t.status));host.append(card);});
-}
-async function loadTasks(){
- const host=$("tasks-message"),s=service();tasks=[];if(host)host.textContent="جارٍ تحميل المهام…";renderTaskRows({status:"all",company_id:"all",search:""});
- if(!s||typeof s.listTasks!=="function"){if(host)host.textContent="خدمة مهام السداد غير مربوطة. لم تُعرض بيانات بديلة.";return;}
- try{const r=await s.listTasks();if(r?.success!==true||!Array.isArray(r.tasks))throw Error();tasks=r.tasks;window.AMANAdminTaskCompanies=r.companies||[];const companySelect=$("tasks-company-filter");if(companySelect){companySelect.replaceChildren(new Option("كل الشركات","all"));window.AMANAdminTaskCompanies.forEach(c=>companySelect.add(new Option(c.name,c.id)));}renderTaskRows({status:"all",company_id:"all",search:""});if(host)host.textContent="تم تحديث مهام السداد.";}
- catch{if(host)host.textContent="تعذر تحميل مهام السداد.";}
-}
-document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen;if(screen==="customers"){renderCustomerScreen();loadCustomers();}if(screen==="tasks"){const host=shell();renderTasks(host);loadTasks();}});
+document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen;if(screen==="customers"){renderCustomerScreen();loadCustomers();}});
 })();

@@ -4,7 +4,7 @@ import { resolve, dirname } from "node:path";
 
 const required = [
   "index.html", "client/index.html", "client/app.js",
-  "admin/index.html", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js", "styles/app.css", "demo/demo-services.js"
+  "admin/index.html", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js", "styles/app.css", "services/runtime.js", "simulation/simulation-adapter.js", "scripts/local-preview.mjs"
 ];
 const failures = [];
 for (const file of required) {
@@ -24,7 +24,7 @@ for (const file of htmlFiles) {
     if (!existsSync(target)) failures.push(file + " يشير إلى ملف غير موجود: " + ref);
   }
 }
-for (const file of ["client/app.js", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js", "demo/demo-services.js"]) {
+for (const file of ["client/app.js", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js", "services/runtime.js", "simulation/simulation-adapter.js"]) {
   const check = spawnSync(process.execPath, ["--check", file], { encoding: "utf8" });
   if (check.status !== 0) failures.push("خطأ صياغة JavaScript في " + file + ": " + check.stderr);
 }
@@ -34,8 +34,18 @@ for (const file of ["client/index.html", "admin/index.html"]) {
     failures.push("يجب ألا تعتمد واجهة المنتج على تخزين المتصفح التجريبي: " + file);
   }
 }
+for (const file of ["client/index.html", "admin/index.html", "index.html"]) {
+  const html = readFileSync(file, "utf8");
+  if (/simulation|demo-services|__AMAN_SIMULATION__|\?demo=1/i.test(html)) failures.push("صفحة إنتاج تشير إلى المحاكاة: " + file);
+}
+for (const file of ["client/index.html", "admin/index.html"]) {
+  if (!readFileSync(file, "utf8").includes("services/runtime.js")) failures.push("الصفحة لا تحمّل طبقة الخدمات: " + file);
+}
+for (const file of ["client/app.js", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js"]) {
+  if (/localStorage|sessionStorage|indexedDB/.test(readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, ""))) failures.push("الواجهة تصل إلى التخزين مباشرة بدل طبقة الخدمات: " + file);
+}
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);
 }
-console.log("نجح الفحص: ملفات المنتج وDemo موجودة، المسارات سليمة، وصياغة JavaScript صحيحة، ولا يوجد ربط بتخزين الاختبار في وضع الإنتاج.");
+console.log("نجح الفحص: ملفات المنتج وطبقة الخدمات والمحاكاة موجودة، المسارات سليمة، وصياغة JavaScript صحيحة، ولا يوجد ربط بتخزين الاختبار في وضع الإنتاج.");

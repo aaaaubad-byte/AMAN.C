@@ -1,4 +1,4 @@
-name: Validate and deploy AMAN.C preview
+name: Validate and deploy AMAN.C simulation preview
 
 on:
   push:
@@ -20,8 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run automated tests
-        run: node --test tests/*.test.js
+      - name: Run all automated tests
+        run: node --test tests/*.test.js tests/*.test.mjs
       - name: Validate site files and scripts
         run: node scripts/validate.mjs
 
@@ -41,11 +41,22 @@ jobs:
         uses: actions/checkout@v6
       - name: Configure Pages
         uses: actions/configure-pages@v5
-      - name: Prepare static preview files
+      - name: Prepare public simulation preview
         run: |
           mkdir -p dist
           cp index.html dist/
-          cp -R client admin styles demo dist/
+          cp -R client admin styles services simulation dist/
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          for (const file of ['dist/client/index.html', 'dist/admin/index.html']) {
+            let html = readFileSync(file, 'utf8');
+            const runtime = file.includes('/client/') ? '../services/runtime.js' : '../services/runtime.js';
+            const tag = '<script defer src="' + runtime + '"></script>';
+            if (!html.includes(tag)) throw new Error('Missing services runtime in ' + file);
+            html = html.replace(tag, '<script>window.__AMAN_SIMULATION__={enabled:true,source:"public-test-preview"};</script>' + tag + '<script defer src="../simulation/simulation-adapter.js"></script>');
+            writeFileSync(file, html);
+          }
+          NODE
           touch dist/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

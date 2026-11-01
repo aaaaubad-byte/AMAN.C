@@ -65,7 +65,7 @@ function dialogBase(title){
 function closeDialog(dialog){dialog.close();dialog.remove();}
 async function openApprovalDialog(){
  const record=window.AMANAdminCurrentRequest;
- const host=dialogBase("A5 — تأكيد الاعتماد"),{dialog,body}=host,s=service();
+ const host=dialogBase("تأكيد الاعتماد"),{dialog,body}=host,s=service();
  if(!record?.id){body.append(el("p","notice-error","بيانات الطلب الحالية غير متاحة. أعد فتح تفاصيل الطلب."));}
  else if(record.status!=="pending"){body.append(el("p","notice-error","لا يمكن اعتماد طلب لم يعد قيد المراجعة."));}
  else if(!s||typeof s.getApprovalPreview!=="function"){body.append(el("p","notice-error","معاينة الاعتماد غير مربوطة بالخادم."));}
@@ -73,13 +73,13 @@ async function openApprovalDialog(){
   body.append(el("p","surface-desc","جارٍ التحقق من أثر الاعتماد من الخادم…"));
   try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();body.replaceChildren();
    body.append(panel("الأثر المتوقع",[["بداية الحماية",r.preview.starts_at],["نهاية الحماية",r.preview.ends_at],["الأثر",r.preview.effect_description]]));
-   const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."));const refresh=$("request-detail-refresh");if(refresh)refresh.click();const listRefresh=$("requests-refresh");if(listRefresh)listRefresh.click();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
+   const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();const closeOk=el("button","btn btn-block","إغلاق");closeOk.type="button";closeOk.addEventListener("click",()=>closeDialog(dialog));body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."),closeOk);const refresh=$("request-detail-refresh");if(refresh)refresh.click();const listRefresh=$("requests-refresh");if(listRefresh)listRefresh.click();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
   }catch{body.replaceChildren(el("p","notice-error","تعذر جلب معاينة موثوقة؛ لم يُنفذ الاعتماد."));}
  }
  const cancel=el("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>closeDialog(dialog));body.append(cancel);dialog.showModal();
 }
 async function openRejectDialog(){
- const record=window.AMANAdminCurrentRequest,host=dialogBase("A6 — رفض الطلب"),{dialog,body}=host,s=service();
+ const record=window.AMANAdminCurrentRequest,host=dialogBase("رفض الطلب"),{dialog,body}=host,s=service();
  if(!record?.id||record.status!=="pending"){body.append(el("p","notice-error","الطلب غير متاح للرفض أو لم يعد قيد المراجعة."));}
  else if(!s||typeof s.getRejectReasons!=="function"){body.append(el("p","notice-error","قائمة أسباب الرفض غير مربوطة بالخادم."));}
  else {
