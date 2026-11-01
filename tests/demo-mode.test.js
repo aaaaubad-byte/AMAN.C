@@ -148,6 +148,8 @@ test("A27 payment methods store instructions and reference rules without receipt
  for(const field of ["summary","instructions","reference_required","reference_pattern","active"]) assert.ok(adminA26A31.includes(field));
  assert.match(adminA26A31,/لا تُرفع صور أو مرفقات إيصالات/);
  assert.match(demo,/savePaymentMethod:async p=>/);
+ assert.match(demo,/new RegExp\(p\.reference_pattern\)/);
+ assert.match(demo,/صيغة مرجع الدفع غير صالحة/);
 });
 test("A28 content editing confirms each save and retains the entered text when saving fails",()=>{
  assert.match(adminA26A31,/تأكيد حفظ نص/);
@@ -165,6 +167,7 @@ test("A30-A31 show the authenticated admin and require explicit confirmation bef
  assert.match(adminA26A31,/confirm\("هل تريد تسجيل الخروج/);
  assert.match(adminA26A31,/signOutAdmin/);
  assert.match(demo,/signOutAdmin:async/);
+ assert.match(demo,/action:"admin_signed_out"/);
 });
 
 test("A29 audit log supports text search and opening full event details",()=>{
