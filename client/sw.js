@@ -1,48 +1,56 @@
 /*
- * AMAN.C — Service Worker لتطبيق «العميل» (PWA).
- *
- * - نطاقه /client/ فقط، وله ذاكرة تخزين مؤقت باسم خاص (aman-client-<build>) لا يشاركها تطبيق الإدارة.
- * - الاستراتيجية «الشبكة أولًا»: كل طلب يمرّ على الشبكة مع تجاوز ذاكرة HTTP المؤقتة (cache: "no-cache")،
- *   ولا تُستخدم النسخة المخزّنة إلا عند انقطاع الاتصال. لذلك لا يبقى المستخدم على ملفات قديمة.
- * - لا يعترض إلا طلبات GET من النطاق نفسه داخل /client/ و/styles/ و/services/.
- *   طلبات Supabase (نطاق آخر) والمصادقة وبيانات الـ RPC لا تمرّ عليه ولا تُخزَّن إطلاقًا.
- * - لا skipWaiting تلقائي: النسخة الجديدة تنتظر حتى يختار المستخدم «تحديث الآن» (انظر pwa.js)
- *   أو حتى تُغلق كل نوافذ التطبيق، فلا تُقاطَع عملية جارية.
- * - معرّف الإصدار BUILD يُستبدل عند النشر (scripts/build-pwa.mjs) فيتغيّر هذا الملف مع كل نشر
- *   ويكتشف المتصفح الإصدار الجديد.
+ * AMAN.C — Service Worker لتطبيق العميل.
+ * يخزّن موارد التطبيق الثابتة المسموح بها فقط؛ لا يخزّن استجابات خاصة أو بيانات جلسات.
  */
 "use strict";
 const APP = "client";
 const BUILD = "__BUILD_ID__";
 const SELF_URL = self.location.href;
 const SCOPE = new URL("./", SELF_URL).href;
-/* البادئة تتضمن مسار النطاق: نسخة الإنتاج ونسخة /test/ لا تحذفان ذاكرة بعضهما. */
 const PREFIX = "aman-" + APP + "-" + new URL(SCOPE).pathname.replace(/[^a-z0-9]+/gi, "_") + "-";
 const CACHE = PREFIX + BUILD;
 const ROOT = new URL("../", SELF_URL).href;
-const SHARED = [ROOT + "styles/", ROOT + "services/"];
 const PRECACHE = [
   "./", "./app.js", "./ui-v5.js", "./pwa.js", "./manifest.webmanifest", "./icons/icon.svg",
   "../styles/app.css", "../services/runtime.js", "../services/supabase-config.js", "../services/supabase-adapter.js"
 ].map(p => new URL(p, SELF_URL).href);
-const SENSITIVE_PATH = /\/(auth|rest|functions|storage|realtime)\/v\d/i;
-
-const cacheable = res => !!res && res.ok && res.type === "basic" && !/no-store/i.test(res.headers.get("cache-control") || "");
+const SHARED_ALLOWED = new Set([
+  new URL("../styles/app.css", SELF_URL).href,
+  new URL("../services/runtime.js", SELF_URL).href,
+  new URL("../services/supabase-config.js", SELF_URL).href,
+  new URL("../services/supabase-adapter.js", SELF_URL).href
+]);
+const APP_STATIC = new Set(PRECACHE);
+const PRIVATE_HEADERS = /(?:^|,)\s*(?:private|no-store|no-cache|must-revalidate)\b/i;
 
 function handled(req) {
-  if (req.method !== "GET" || req.headers.has("range")) return false;
+  if (req.method !== "GET" || req.headers.has("range") || req.headers.has("authorization")) return false;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return false;
-  if (url.href === SELF_URL || SENSITIVE_PATH.test(url.pathname)) return false;
-  return url.href.startsWith(SCOPE) || SHARED.some(prefix => url.href.startsWith(prefix));
+  if (url.origin !== self.location.origin || url.search) return false;
+  if (url.href === SELF_URL) return false;
+  if (url.href.startsWith(SCOPE)) {
+    if (req.mode === "navigate") return true;
+    return APP_STATIC.has(url.href);
+  }
+  return SHARED_ALLOWED.has(url.href);
+}
+
+function cacheable(req, res) {
+  if (!res || !res.ok || res.type !== "basic") return false;
+  if (res.headers.has("set-cookie") || res.headers.get("vary") === "*") return false;
+  const control = res.headers.get("cache-control") || "";
+  if (PRIVATE_HEADERS.test(control)) return false;
+  if (req.headers.has("authorization")) return false;
+  return true;
 }
 
 self.addEventListener("install", event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
     const results = await Promise.allSettled(PRECACHE.map(async url => {
-      const res = await fetch(url, { cache: "reload" });
-      if (!cacheable(res)) throw new Error("not cacheable: " + url);
+      const req = new Request(url, { method: "GET", credentials: "omit", cache: "reload" });
+      const res = await fetch(req);
+      if (!cacheable(req, res)) throw new Error("not cacheable: " + url);
       await cache.put(url, res);
     }));
     if (results[0].status !== "fulfilled") throw new Error("app shell unavailable");
@@ -62,10 +70,11 @@ async function networkFirst(req) {
   const cache = await caches.open(CACHE);
   try {
     const res = await fetch(req, { cache: "no-cache" });
-    if (cacheable(res)) cache.put(req, res.clone()).catch(() => {});
+    if (cacheable(req, res)) await cache.put(req, res.clone());
+    else await cache.delete(req);
     return res;
   } catch (err) {
-    const hit = await cache.match(req, { ignoreSearch: req.mode === "navigate" });
+    const hit = await cache.match(req);
     if (hit) return hit;
     if (req.mode === "navigate") {
       const shell = await cache.match(SCOPE);
@@ -76,8 +85,7 @@ async function networkFirst(req) {
 }
 
 self.addEventListener("fetch", event => {
-  if (!handled(event.request)) return;
-  event.respondWith(networkFirst(event.request));
+  if (handled(event.request)) event.respondWith(networkFirst(event.request));
 });
 
 self.addEventListener("message", event => {
