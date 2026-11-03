@@ -72,6 +72,8 @@ jobs:
           }
           NODE
           touch dist/.nojekyll
+      - name: Stamp PWA build id into service workers
+        run: node scripts/build-pwa.mjs dist "${GITHUB_SHA::12}"
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

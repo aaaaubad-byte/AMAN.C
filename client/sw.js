@@ -14,14 +14,15 @@
 "use strict";
 const APP = "client";
 const BUILD = "__BUILD_ID__";
-const PREFIX = "aman-" + APP + "-";
-const CACHE = PREFIX + BUILD;
 const SELF_URL = self.location.href;
 const SCOPE = new URL("./", SELF_URL).href;
+/* البادئة تتضمن مسار النطاق: نسخة الإنتاج ونسخة /test/ لا تحذفان ذاكرة بعضهما. */
+const PREFIX = "aman-" + APP + "-" + new URL(SCOPE).pathname.replace(/[^a-z0-9]+/gi, "_") + "-";
+const CACHE = PREFIX + BUILD;
 const ROOT = new URL("../", SELF_URL).href;
 const SHARED = [ROOT + "styles/", ROOT + "services/"];
 const PRECACHE = [
-  "./", "./app.js", "./ui-v5.js", "./manifest.webmanifest",
+  "./", "./app.js", "./ui-v5.js", "./pwa.js", "./manifest.webmanifest", "./icons/icon.svg",
   "../styles/app.css", "../services/runtime.js", "../services/supabase-config.js", "../services/supabase-adapter.js"
 ].map(p => new URL(p, SELF_URL).href);
 const SENSITIVE_PATH = /\/(auth|rest|functions|storage|realtime)\/v\d/i;

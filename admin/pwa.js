@@ -11,7 +11,6 @@
 (() => {
 "use strict";
 if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
-if (/\/test\//.test(location.pathname)) return;
 
 const CHECK_MS = 15 * 60 * 1000;
 let reg = null, applying = false, dismissed = false, bar = null;
@@ -22,7 +21,7 @@ function button(label, primary) {
   const b = document.createElement("button");
   b.type = "button";
   b.textContent = label;
-  b.style.cssText = "min-height:36px;padding:6px 14px;border-radius:8px;font:inherit;font-weight:800;cursor:pointer;border:1px solid " + (primary ? "#09a478" : "#83a7ba") + ";background:" + (primary ? "#09a478" : "transparent") + ";color:#fff";
+  b.style.cssText = "min-height:36px;padding:6px 14px;border-radius:8px;font:inherit;font-weight:800;cursor:pointer;border:1px solid " + (primary ? "#e5edf1" : "#83a7ba") + ";background:" + (primary ? "#e5edf1" : "transparent") + ";color:" + (primary ? "#102d45" : "#fff");
   return b;
 }
 
