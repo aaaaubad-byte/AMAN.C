@@ -3,7 +3,8 @@
  *
  * - يستخدم المفتاح العام فقط (services/supabase-config.js). لا أسرار هنا.
  * - عميلان منفصلان (عميل/إدارة) بمفتاحَي تخزين مختلفين لأن الصفحتين على النطاق نفسه.
- *   جلسة المدير في sessionStorage (تنتهي بإغلاق التبويب)، وجلسة العميل في localStorage.
+ *   جلسة العميل في localStorage. جلسة المدير في sessionStorage (تنتهي بإغلاق التبويب)،
+ *   إلا إذا اختار المدير «تذكرني» عند الدخول فتُحفظ في localStorage على ذلك الجهاز حتى يسجّل الخروج.
  * - كل التحقق من الصلاحيات والعزل يتم داخل قاعدة البيانات (SECURITY DEFINER + aman.adm()/aman.cust()).
  * - لا إعادة محاولة تلقائية للعمليات المغيِّرة عند انقطاع الشبكة (تفاديًا للتكرار)،
  *   والاستثناء الوحيد محاولة واحدة بعد تجديد JWT منتهٍ لأن الطلب لم يُنفَّذ أصلًا.
@@ -36,8 +37,30 @@ const AUTH = () => fail("auth_required", MSG.session);
 
 /* ---------- العملاء ---------- */
 const clients = {};
-function sessionStore() {
- try { const s = window.sessionStorage; s.setItem("__aman_t", "1"); s.removeItem("__aman_t"); return s; } catch { return undefined; }
+const ADMIN_AUTH_KEY = "aman_c_admin_auth";
+const ADMIN_REMEMBER_KEY = "aman_c_admin_remember";
+function webStore(kind) {
+ try { const s = window[kind]; if (!s) return undefined; s.setItem("__aman_t", "1"); s.removeItem("__aman_t"); return s; } catch { return undefined; }
+}
+/* تخزين جلسة المدير: sessionStorage افتراضيًا، وlocalStorage فقط عند وجود علم «تذكرني» (يُكتب عند الدخول). */
+function adminStorage() {
+ const ls = webStore("localStorage"), ss = webStore("sessionStorage");
+ if (!ss) return undefined;
+ const remembered = () => { try { return !!ls && ls.getItem(ADMIN_REMEMBER_KEY) === "1"; } catch { return false; } };
+ const active = () => (remembered() ? ls : ss);
+ return {
+  getItem: k => active().getItem(k),
+  setItem: (k, v) => active().setItem(k, v),
+  removeItem: k => { try { ss.removeItem(k); } catch { /* تجاهل */ } try { if (ls) ls.removeItem(k); } catch { /* تجاهل */ } }
+ };
+}
+function setAdminRemember(on) {
+ const ls = webStore("localStorage");
+ if (!ls) return;
+ try {
+  if (on) ls.setItem(ADMIN_REMEMBER_KEY, "1");
+  else { ls.removeItem(ADMIN_REMEMBER_KEY); ls.removeItem(ADMIN_AUTH_KEY); }
+ } catch { /* تجاهل */ }
 }
 function getClient(scope) {
  if (clients[scope]) return clients[scope];
@@ -46,7 +69,7 @@ function getClient(scope) {
  const cfg = window.AMAN_SUPABASE_CONFIG;
  if (!cfg || !cfg.url || !cfg.publishableKey) throw new Fault("service_not_configured", MSG.config);
  const auth = { storageKey: "aman_c_" + scope + "_auth", persistSession: true, autoRefreshToken: true, detectSessionInUrl: false };
- if (scope === "admin") { const st = sessionStore(); if (st) auth.storage = st; }
+ if (scope === "admin") { const st = adminStorage(); if (st) auth.storage = st; }
  clients[scope] = lib.createClient(cfg.url, cfg.publishableKey, { auth });
  return clients[scope];
 }
@@ -224,20 +247,24 @@ const admin = {
   const sb = getClient("admin");
   const email = String(p.email || "").trim(), password = String(p.password || "");
   if (!email || !password) return fail("invalid_credentials", MSG.adminLogin);
+  /* «تذكرني»: يُحدَّد موضع حفظ الجلسة قبل الدخول (localStorage عند التفعيل وإلا sessionStorage) */
+  setAdminRemember(p.remember === true);
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) return authFailure(error, MSG.adminLogin);
   const r = await rpc("admin", "admin_get_current", {});
   if (!r.success || !r.admin || r.admin.is_admin !== true) {
    await localSignOut(sb);
+   setAdminRemember(false);
    return r.code === "service_unreachable" ? r : fail("invalid_credentials", MSG.adminLogin);
   }
   return r;
  }),
  signOutAdmin: guard(async () => {
   const sb = getClient("admin");
-  if (!(await sessionOf(sb))) return AUTH();
+  const had = await sessionOf(sb);
   await localSignOut(sb);
-  return { success: true };
+  setAdminRemember(false);
+  return had ? { success: true } : AUTH();
  })
 };
 
