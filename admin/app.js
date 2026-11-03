@@ -40,6 +40,11 @@ const definitions={
  account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
+/* حارس المصادقة في الواجهة: لا يُعرض أي قسم إداري إلا بعد تأكيد الخادم أن الحساب مدير.
+   هذا حارس عرض فقط؛ التحقق الفعلي من الصلاحية يتم في قاعدة البيانات (aman.adm()). */
+const authed=()=>!!adminSession&&adminSession.is_admin===true;
+const accountBtn=$("admin-account");
+const showAccountButton=on=>{accountBtn.style.display=on?"":"none";};
 const statusLabel={pending:"قيد المراجعة",approved:"معتمد",rejected:"مرفوض"};
 const typeLabel={subscription:"اشتراك",extension:"تمديد الاشتراك",reactivation:"تنشيط"};
 function message(node,text,kind="info"){node.textContent=text;node.className=kind==="error"?"notice-error":kind==="success"?"notice-success":"notice-info";}
@@ -48,14 +53,16 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 const primaryTabs=["dashboard","requests","numbers","customers"];
 function setActive(name){const tab=!name?"":primaryTabs.includes(name)?name:"more";tabs.forEach(t=>t.classList.toggle("active",t.dataset.adminTab===tab));}
 function renderMore(){const h=$("admin-generic-view");h.replaceChildren();const order=["tasks","followup","complaints","reports","notifications","alerts","settings","packages","payments","content","audit","account"];const wrap=document.createElement("div");wrap.className="admin-shortcuts";order.forEach(k=>{const d=definitions[k];if(!d)return;const b=document.createElement("button");b.type="button";b.className="admin-shortcut";b.dataset.moreSection=k;const i=document.createElement("span");i.className="quick-icon";i.innerHTML=ICONS[d.icon]||"";const t=document.createElement("strong");t.textContent=d.title;b.append(i,t);b.addEventListener("click",()=>navigate(k));wrap.append(b);});h.append(wrap);}
-function showLogin(){current="login";dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;setActive("");}
-function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;setActive("dashboard");loadDashboard();}
+function showLogin(){adminSession=null;current="login";historyStack=[];activeRequestId=null;detailRecord=null;dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;showAccountButton(false);setActive("");}
+function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;showAccountButton(true);setActive("dashboard");loadDashboard();}
 function navigate(name,{remember=true}={}) {
  if(name==="login"){showLogin();return true;}
+ /* لا تنقل إلى أي شاشة إدارية دون جلسة مدير مؤكدة (يشمل أيقونة الحساب وروابط الأقسام) */
+ if(!authed()){showLogin();return false;}
  if(name==="dashboard"){if(remember&&current!=="dashboard")historyStack.push(current);showDashboard();return true;}
  const item=definitions[name];if(!item)return false;
  if(remember&&current!==name)historyStack.push(current);
- current=name;login.hidden=true;dashboard.hidden=true;section.hidden=false;nav.hidden=false;
+ current=name;login.hidden=true;dashboard.hidden=true;section.hidden=false;nav.hidden=false;showAccountButton(true);
  $("section-title").textContent=item.title;$("section-description").textContent=item.description;
  $("admin-generic-view").hidden=name==="requests";$("requests-list-view").hidden=name!=="requests";$("request-detail-view").hidden=true;
  setActive(name);window.scrollTo({top:0,behavior:"smooth"});
@@ -64,7 +71,7 @@ function navigate(name,{remember=true}={}) {
  if(name==="more")renderMore();
  return true;
 }
-function back(){if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
+function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
 window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
@@ -148,15 +155,24 @@ async function refreshSession(){
  catch{showLogin();}
 }
 $("admin-login-form").addEventListener("submit",async e=>{
- e.preventDefault();const s=service(),msg=$("admin-login-message"),button=e.submitter||e.currentTarget.querySelector("button[type=submit]");
+ e.preventDefault();
+ /* يجب التقاط النموذج قبل أي await: e.currentTarget تصبح null بعد انتهاء توزيع الحدث،
+    وكان استدعاء e.currentTarget.reset() بعد نجاح الدخول يرمي TypeError فتظهر رسالة الفشل رغم نجاح المصادقة. */
+ const form=e.currentTarget,s=service(),msg=$("admin-login-message"),button=e.submitter||form.querySelector("button[type=submit]");
  if(!s||typeof s.signInAdmin!=="function"){message(msg,"تسجيل الدخول غير متاح حاليًا. لم تُرسل البيانات.","error");return;}
  button.disabled=true;message(msg,"جارٍ التحقق من بيانات الدخول…");
- try{const r=await s.signInAdmin({email:$("admin-username").value.trim(),password:$("admin-password").value});if(r?.success!==true||r.admin?.is_admin!==true)throw Error();adminSession=r.admin;e.currentTarget.reset();message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
- catch{message(msg,"تعذر تسجيل الدخول أو أن الحساب غير مخوّل للإدارة.","error");}
+ let ok=false;
+ try{const r=await s.signInAdmin({email:$("admin-username").value.trim(),password:$("admin-password").value});if(r?.success!==true||r.admin?.is_admin!==true)throw Error();adminSession=r.admin;ok=true;}
+ catch{
+  adminSession=null;message(msg,"تعذر تسجيل الدخول أو أن الحساب غير مخوّل للإدارة.","error");
+  /* لا تُبقِ جلسة سابقة صالحة بعد محاولة دخول فاشلة */
+  try{await s.signOutAdmin();}catch{/* لا جلسة لإنهائها */}
+ }
  finally{button.disabled=false;}
+ if(ok){form.reset();message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
 });
 $("dashboard-refresh").addEventListener("click",loadDashboard);
-$("admin-account").addEventListener("click",()=>navigate("account"));
+accountBtn.addEventListener("click",()=>{if(!authed()){showLogin();return;}navigate("account");});
 tabs.forEach(t=>t.addEventListener("click",()=>navigate(t.dataset.adminTab)));
 document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.section)));
 $("admin-back").addEventListener("click",back);$("request-detail-back").addEventListener("click",back);
@@ -165,6 +181,6 @@ $("requests-refresh").addEventListener("click",loadRequests);
 $("requests-reset").addEventListener("click",()=>{$("request-search").value="";$("request-status").value="pending";$("request-type").value="all";$("request-company").value="all";loadRequests();});
 ["request-status","request-type","request-company"].forEach(id=>$(id).addEventListener("change",loadRequests));
 let searchTimer=null;$("request-search").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadRequests,350);});
-$("admin-login").hidden=false;dashboard.hidden=true;section.hidden=true;nav.hidden=true;
+$("admin-login").hidden=false;dashboard.hidden=true;section.hidden=true;nav.hidden=true;showAccountButton(false);
 refreshSession();
 })();
