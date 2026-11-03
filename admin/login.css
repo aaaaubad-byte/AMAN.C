@@ -1,0 +1,116 @@
+/*
+ * AMAN.C — تنسيق شاشة تسجيل دخول الإدارة فقط.
+ * المصدر المرجعي للهوية: docs/design/ (نظام التصميم البصري) — الألوان: #102435 أساسي، #09a478 ثانوي، #8596a5 مساعد، #edf2f4 سطح، #dbe3e7 خلفية.
+ * لا يؤثر على بقية شاشات الإدارة ولا على تطبيق العميل (محصور بـ .admin-app و #admin-login).
+ */
+
+/* أثناء ظهور شاشة الدخول: لا شريط علوي (لا شعار ولا اسم ولا «إدارة النظام») ولا مساحة سفلية للتنقل */
+.admin-app:has(#admin-login:not([hidden])) .topbar { display: none; }
+.admin-app:has(#admin-login:not([hidden])) {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.login-screen { width: 100%; }
+
+.login-wrap {
+  width: 100%;
+  min-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px 0;
+}
+
+/* الهوية أعلى البطاقة */
+.login-brand {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.login-brand .brand-symbol {
+  width: 56px;
+  height: 62px;
+  border-radius: 12px 12px 28px 28px;
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+.login-brand h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.35;
+  font-weight: 800;
+  color: var(--navy-deep);
+}
+.login-brand p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* البطاقة */
+.login-card {
+  width: min(100%, 400px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px 20px 22px;
+  box-shadow: 0 10px 30px rgba(16, 36, 53, .07);
+}
+.login-card h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 800;
+  color: var(--ink);
+}
+.login-lead {
+  margin: 6px 0 22px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #627b89;
+}
+
+/* النموذج: إيقاع رأسي ثابت 16px بين المجموعات و6px بين التسمية والحقل */
+.login-form { display: grid; gap: 16px; }
+.login-field { display: grid; gap: 6px; }
+.login-field .field-label { margin: 0; font-size: 13px; font-weight: 700; color: var(--ink); }
+.login-card .field {
+  height: 48px;
+  padding: 10px 14px;
+  border: 1px solid #c3ced5;
+  border-radius: 10px;
+  font-size: 15px;
+}
+.login-card .field:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(9, 164, 120, .16); }
+.login-card .field::placeholder { color: #a7b1b8; }
+/* حقول لاتينية (بريد/كلمة مرور) داخل واجهة عربية: اتجاه يسار-يمين مع محاذاة يمنى متسقة مع باقي الشاشة */
+.login-input-ltr { direction: ltr; text-align: right; }
+.login-input-ltr::placeholder { text-align: right; }
+
+/* رسالة الحالة: يضبط app.js الصنف بنفسه، لذا التنسيق بالمعرّف. تختفي عند الفراغ فلا تترك فجوة */
+#admin-login-message { margin: 0; font-size: 13px; line-height: 1.7; }
+#admin-login-message:empty { display: none; }
+
+/* زر الدخول: الزر الأساسي في الهوية (#09a478) */
+.login-submit {
+  min-height: 48px;
+  margin-top: 4px;
+  border-radius: 10px;
+  background: var(--green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+.login-submit:hover { filter: brightness(.96); }
+
+@media (max-width: 380px) {
+  .login-wrap { gap: 22px; padding: 24px 0; }
+  .login-card { padding: 20px 16px 18px; }
+}
+@media (min-height: 760px) { .login-wrap { padding-bottom: 56px; } }
