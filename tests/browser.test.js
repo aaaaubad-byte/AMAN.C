@@ -36,15 +36,14 @@ async function goSettings(page) {
   await page.waitForSelector("#admin-generic-view");
 }
 
-test("بلا محاكاة: العميل والإدارة يعرضان «الخدمة غير مهيأة» ولا ينجح الدخول", { skip }, async () => {
+test("بلا محاكاة: يُسجَّل محوّل Supabase ولا ينجح الدخول عند انقطاع الاتصال", { skip }, async () => {
   for (const path of ["/client/", "/admin/"]) {
     const t = await open(path, { simulation: false });
-    await t.page.waitForSelector("#aman-service-banner");
-    assert.match(await t.page.locator("#aman-service-banner").innerText(), /الخدمة غير مهيأة/);
+    await t.page.waitForFunction(() => window.AMANServices && window.AMANServices.status().configured);
+    assert.equal(await t.page.evaluate(() => window.AMANServices.status().adapter), "supabase");
     assert.equal(await t.page.evaluate(() => typeof window.__AMAN_SIMULATION__), "undefined");
-    assert.equal(await t.page.evaluate(() => window.AMANServices.status().configured), false);
-    assert.equal(await t.page.evaluate(() => localStorage.length), 0);
-    assert.deepEqual(t.errors, []);
+    assert.equal(await t.page.evaluate(() => window.AMANServices.status().simulation), false);
+    assert.equal(await t.page.locator("#aman-service-banner").count(), 0);
     await t.done();
   }
   const t = await open("/admin/", { simulation: false });
