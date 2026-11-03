@@ -68,3 +68,11 @@
 
 /* Phase 3 — A5-A8 decision dialogs and number registry */
 .admin-decision-dialog{width:min(560px,calc(100% - 28px));max-width:560px;max-height:min(86vh,760px);padding:0;border:0;border-radius:20px;background:transparent;color:var(--text)}.admin-decision-dialog::backdrop{background:#10243599}.admin-decision-dialog>.surface{max-height:86vh;overflow:auto;padding:18px;border-radius:20px;background:var(--sheet);box-shadow:0 20px 55px #1424304d}.admin-decision-dialog .decision-body{display:grid;gap:12px}.admin-decision-dialog .field{width:100%;margin:6px 0 12px}.admin-decision-dialog .btn{margin-top:8px}.admin-numbers-view{display:grid;gap:12px}.admin-numbers-view .field-row{margin:0}
+
+/* v5 refinements — notification indicator, choice groups, tab strip, sheet close control and sheet size */
+.icon-btn{position:relative}
+.unread-dot{position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid #e5edf1}
+.choice-group{border:0;margin:14px 0 6px;padding:0;min-width:0}.choice-group legend{padding:0;margin-bottom:6px}.choice-group .check-row:last-child{border-bottom:0}.check-row{cursor:pointer;min-height:var(--control-height)}
+.tab-strip{display:flex;gap:4px;padding:4px;background:var(--panel-2);border-radius:var(--radius-control)}.tab-strip button{flex:1;min-height:36px;border:0;border-radius:6px;background:transparent;color:#596d79;font-size:12px;font-weight:700}.tab-strip button[aria-selected="true"]{background:#fff;color:var(--ink);font-weight:800}
+.sheet-top .sheet-close{margin-inline-start:auto;display:grid;place-items:center}.sheet-close svg{width:20px;height:20px}
+.sheet{max-height:88dvh;overscroll-behavior:contain}
