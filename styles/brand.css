@@ -1,0 +1,4 @@
+/* AMAN brand logo — dark icon for the client app, light icon for the admin app */
+.brand-logo{display:block;width:42px;height:42px;flex:0 0 42px;object-fit:contain;border-radius:12px}
+.auth-brand .brand-logo{width:72px;height:72px;flex:none;margin:0 auto 12px;border-radius:20px}
+.hero-logo{display:block;width:84px;height:84px;margin:0 auto 17px;border-radius:24px}
