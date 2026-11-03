@@ -4,23 +4,40 @@ const $=id=>document.getElementById(id);
 const dashboard=$("dashboard-screen"),section=$("admin-section"),login=$("admin-login"),nav=$("admin-bottom-nav");
 const tabs=[...document.querySelectorAll("[data-admin-tab]")];
 const service=()=>window.AMANAdminServices||null;
+/* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
+const svgWrap=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+const ICONS={
+ list:svgWrap('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
+ phone:svgWrap('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
+ users:svgWrap('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/>'),
+ user:svgWrap('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+ clock:svgWrap('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+ timer:svgWrap('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>'),
+ flag:svgWrap('<path d="M4 22V4M4 4h14l-2 4 2 4H4"/>'),
+ doc:svgWrap('<path d="M7 3h10l3 3v15H4V3zM8 10h8M8 14h8M8 18h5"/>'),
+ sliders:svgWrap('<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
+ bell:svgWrap('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>'),
+ box:svgWrap('<path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/>'),
+ wallet:svgWrap('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'),
+ dots:svgWrap('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')
+};
 const definitions={
- requests:{title:"الطلبات",description:"مراجعة طلبات الاشتراك والتمديد والتنشيط واتخاذ القرار بشأنها.",icon:"▤",emptyTitle:"لا توجد طلبات حتى الآن",emptyDescription:"ستظهر الطلبات الواردة بعد ربط خدمة الطلبات."},
- numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"▦",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"ستظهر الأرقام وحالات الحماية بعد ربط الخدمة وتسجيل طلبات معتمدة."},
- customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"♙",emptyTitle:"لا يوجد عملاء",emptyDescription:"ستظهر حسابات العملاء هنا بعد ربط الخدمة."},
- tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"◷",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
- complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"⚑",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات بعد ربط الخدمة."},
- reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"▥",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"ستظهر الإيرادات هنا بعد وجود عمليات معتمدة."},
- settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"⚙",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
- notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"♧",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
- alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"⚑",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
- packages:{title:"باقات الحماية",description:"إدارة الباقات بحسب الشركة ونوع العملية والمدة والسعر.",icon:"▣",emptyTitle:"لم تُضَف باقات بعد",emptyDescription:"أضف باقات الحماية المعتمدة لكل شركة وعملية."},
- payments:{title:"وسائل الدفع",description:"إدارة وسائل الدفع وتعليماتها واشتراط مرجع الدفع.",icon:"ر",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
- content:{title:"المحتوى الثابت",description:"تحرير الشروط والأحكام والخصوصية والتواصل والمساعدة والدعم.",icon:"▤",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص الثابتة المعتمدة."},
- audit:{title:"سجل التدقيق",description:"مراجعة أحدث إجراءات الإدارة مع مرشحات الإجراء والكيان.",icon:"◷",emptyTitle:"لا توجد سجلات",emptyDescription:"ستظهر الأحداث الإدارية المسجلة هنا."},
- followup:{title:"نافذة الظهور والمتابعة",description:"المتابعة اليومية للمهام المستحقة ضمن نافذة الظهور قبل مواعيدها: تنفيذها أو إعادة جدولتها.",icon:"◔",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"ستظهر المهام المستحقة هنا ضمن نافذة الظهور."},
- more:{title:"المزيد",description:"باقي أقسام الإدارة.",icon:"⋯",emptyTitle:"",emptyDescription:""},
- account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"♙",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
+ requests:{title:"الطلبات",description:"مراجعة طلبات الاشتراك والتمديد والتنشيط واتخاذ القرار بشأنها.",icon:"list",emptyTitle:"لا توجد طلبات حتى الآن",emptyDescription:"ستظهر الطلبات الواردة هنا."},
+ numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"phone",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"ستظهر الأرقام وحالات الحماية هنا بعد تسجيل طلبات معتمدة."},
+ customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"ستظهر حسابات العملاء هنا."},
+ tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
+ complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات هنا."},
+ reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"ستظهر الإيرادات هنا بعد وجود عمليات معتمدة."},
+ settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
+ notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
+ alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
+ packages:{title:"باقات الحماية",description:"إدارة الباقات بحسب الشركة ونوع العملية والمدة والسعر.",icon:"box",emptyTitle:"لم تُضَف باقات بعد",emptyDescription:"أضف باقات الحماية المعتمدة لكل شركة وعملية."},
+ payments:{title:"وسائل الدفع",description:"إدارة وسائل الدفع وتعليماتها واشتراط مرجع الدفع.",icon:"wallet",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
+ content:{title:"المحتوى الثابت",description:"تحرير الشروط والأحكام والخصوصية والتواصل والمساعدة والدعم.",icon:"doc",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص الثابتة المعتمدة."},
+ audit:{title:"سجل التدقيق",description:"مراجعة أحدث إجراءات الإدارة مع مرشحات الإجراء والكيان.",icon:"clock",emptyTitle:"لا توجد سجلات",emptyDescription:"ستظهر الأحداث الإدارية المسجلة هنا."},
+ followup:{title:"نافذة الظهور والمتابعة",description:"المتابعة اليومية للمهام المستحقة ضمن نافذة الظهور قبل مواعيدها: تنفيذها أو إعادة جدولتها.",icon:"timer",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"ستظهر المهام المستحقة هنا ضمن نافذة الظهور."},
+ more:{title:"المزيد",description:"باقي أقسام الإدارة.",icon:"dots",emptyTitle:"",emptyDescription:""},
+ account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
 const statusLabel={pending:"قيد المراجعة",approved:"معتمد",rejected:"مرفوض"};
@@ -30,7 +47,7 @@ function text(v,fallback="—"){return v===null||v===undefined||v===""?fallback:
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 const primaryTabs=["dashboard","requests","numbers","customers"];
 function setActive(name){const tab=!name?"":primaryTabs.includes(name)?name:"more";tabs.forEach(t=>t.classList.toggle("active",t.dataset.adminTab===tab));}
-function renderMore(){const h=$("admin-generic-view");h.replaceChildren();const order=["tasks","followup","complaints","reports","notifications","alerts","settings","packages","payments","content","audit","account"];const wrap=document.createElement("div");wrap.className="admin-shortcuts";order.forEach(k=>{const d=definitions[k];if(!d)return;const b=document.createElement("button");b.type="button";b.className="admin-shortcut";b.dataset.moreSection=k;const i=document.createElement("span");i.className="quick-icon";i.textContent=d.icon;const t=document.createElement("strong");t.textContent=d.title;b.append(i,t);b.addEventListener("click",()=>navigate(k));wrap.append(b);});h.append(wrap);}
+function renderMore(){const h=$("admin-generic-view");h.replaceChildren();const order=["tasks","followup","complaints","reports","notifications","alerts","settings","packages","payments","content","audit","account"];const wrap=document.createElement("div");wrap.className="admin-shortcuts";order.forEach(k=>{const d=definitions[k];if(!d)return;const b=document.createElement("button");b.type="button";b.className="admin-shortcut";b.dataset.moreSection=k;const i=document.createElement("span");i.className="quick-icon";i.innerHTML=ICONS[d.icon]||"";const t=document.createElement("strong");t.textContent=d.title;b.append(i,t);b.addEventListener("click",()=>navigate(k));wrap.append(b);});h.append(wrap);}
 function showLogin(){current="login";dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;setActive("");}
 function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;setActive("dashboard");loadDashboard();}
 function navigate(name,{remember=true}={}) {
@@ -73,7 +90,7 @@ function renderRequests(){
  requestRows.forEach(r=>host.append(requestCard(r)));
 }
 async function loadRequests(){
- const s=service(),msg=$("requests-message");if(!s||typeof s.listRequests!=="function"){requestRows=[];renderRequests();message(msg,"خدمة الطلبات غير مربوطة. لن تُعرض بيانات تجريبية.");return;}
+ const s=service(),msg=$("requests-message");if(!s||typeof s.listRequests!=="function"){requestRows=[];renderRequests();message(msg,"تعذر الوصول إلى الطلبات حاليًا.","error");return;}
  if(loading)return;loading=true;message(msg,"جارٍ تحميل الطلبات…");
  const filters={search:$("request-search").value.trim(),status:$("request-status").value,operation_type:$("request-type").value,company_id:$("request-company").value};
  try{const result=await s.listRequests(filters);if(result?.success!==true)throw Error("not-confirmed");requestRows=normalizeList(result);const companies=Array.isArray(result.companies)?result.companies:[];const select=$("request-company"),selected=select.value;select.replaceChildren(new Option("كل الشركات","all"));companies.forEach(c=>select.add(new Option(c.name,c.id)));if([...select.options].some(o=>o.value===selected))select.value=selected;renderRequests();message(msg,"تم تحديث قائمة الطلبات.","success");}
@@ -92,8 +109,8 @@ function openInlineActions(record,host){
 }
 async function showApprovePreview(record,host){
  const s=service(),box=document.createElement("div");box.className="soft-surface";const h=document.createElement("h3");h.textContent="تأكيد أثر الاعتماد";box.append(h);
- if(!s||typeof s.getApprovalPreview!=="function"){const p=document.createElement("p");p.textContent="معاينة أثر الاعتماد غير متاحة قبل ربط الخدمة الخلفية.";box.append(p);host.append(box);return;}
- const p=document.createElement("p");p.textContent="جارٍ تحميل الفترة والأثر من الخادم…";box.append(p);host.append(box);
+ if(!s||typeof s.getApprovalPreview!=="function"){const p=document.createElement("p");p.textContent="معاينة أثر الاعتماد غير متاحة حاليًا.";box.append(p);host.append(box);return;}
+ const p=document.createElement("p");p.textContent="جارٍ تحميل الفترة والأثر…";box.append(p);host.append(box);
  try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();p.textContent="الفترة التي ستنشأ عند التأكيد:";box.append(detailRow("بداية الحماية",r.preview.starts_at),detailRow("نهاية الحماية",r.preview.ends_at),detailRow("أثر الاعتماد",r.preview.effect_description));const confirm=document.createElement("button");confirm.className="btn btn-block";confirm.textContent="تأكيد الاعتماد";confirm.addEventListener("click",()=>performDecision("approve",record.id,{},confirm));box.append(confirm);}
  catch{p.textContent="تعذر جلب معاينة موثوقة. لم يُعتمد الطلب.";}
 }
@@ -102,12 +119,12 @@ async function showRejectForm(record,host){
  const label=document.createElement("label");label.className="field-label";label.textContent="سبب الرفض";const select=document.createElement("select");select.className="field";select.required=true;select.add(new Option("اختر سبب الرفض",""));form.append(label,select);
  const explain=document.createElement("label");explain.className="field-label";explain.style.marginTop="12px";explain.textContent="توضيح إضافي (إن لزم)";const textarea=document.createElement("textarea");textarea.className="field";textarea.rows=3;textarea.maxLength=1000;form.append(explain,textarea);
  const feedback=document.createElement("p");feedback.setAttribute("aria-live","polite");const submit=document.createElement("button");submit.className="btn btn-block";submit.textContent="تأكيد الرفض";form.append(feedback,submit);host.append(form);
- if(!s||typeof s.getRejectReasons!=="function"){message(feedback,"قائمة أسباب الرفض المعتمدة غير متاحة. لن نضيف أسبابًا من عندنا.","error");submit.disabled=true;return;}
+ if(!s||typeof s.getRejectReasons!=="function"){message(feedback,"قائمة أسباب الرفض غير متاحة حاليًا.","error");submit.disabled=true;return;}
  try{const r=await s.getRejectReasons();const items=Array.isArray(r?.items)?r.items:[];items.forEach(x=>select.add(new Option(x.label,x.code)));if(r?.success!==true||!items.length)throw Error();}catch{message(feedback,"تعذر تحميل أسباب الرفض المعتمدة.","error");submit.disabled=true;}
  form.addEventListener("submit",e=>{e.preventDefault();if(!select.value){message(feedback,"اختر سبب الرفض أولًا.","error");return;}performDecision("reject",record.id,{reason_code:select.value,explanation:textarea.value.trim()},submit,feedback);});
 }
 async function performDecision(action,id,payload,button,feedback){
- const s=service(),method=action==="approve"?"approveRequest":"rejectRequest";if(!s||typeof s[method]!=="function"){if(feedback)message(feedback,"إجراء القرار غير مربوط بالخادم.");return;}
+ const s=service(),method=action==="approve"?"approveRequest":"rejectRequest";if(!s||typeof s[method]!=="function"){if(feedback)message(feedback,"تعذر تنفيذ القرار حاليًا.","error");return;}
  button.disabled=true;button.textContent="جارٍ تنفيذ القرار…";
  try{const r=await s[method]({request_id:id,...payload});if(r?.success!==true)throw Error();if(feedback)message(feedback,action==="approve"?"تم اعتماد الطلب.":"تم رفض الطلب.","success");await openRequest(id);await loadRequests();}
  catch{if(feedback)message(feedback,"لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.","error");else window.alert("لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.");button.disabled=false;button.textContent=action==="approve"?"تأكيد الاعتماد":"تأكيد الرفض";}
@@ -115,14 +132,13 @@ async function performDecision(action,id,payload,button,feedback){
 async function openRequest(id){
  activeRequestId=id;window.AMANAdminCurrentRequest=null;$("requests-list-view").hidden=true;$("request-detail-view").hidden=false;$("request-detail-content").replaceChildren();current="request-detail";window.scrollTo({top:0,behavior:"smooth"});
  const host=$("request-detail-content"),s=service();const loadingBox=document.createElement("div");loadingBox.className="surface empty-state";loadingBox.textContent="جارٍ تحميل تفاصيل الطلب…";host.append(loadingBox);
- if(!s||typeof s.getRequestDetails!=="function"){loadingBox.textContent="تفاصيل الطلب غير متاحة حتى ربط خدمة الطلبات الآمنة.";return;}
+ if(!s||typeof s.getRequestDetails!=="function"){loadingBox.textContent="تفاصيل الطلب غير متاحة حاليًا.";return;}
  try{const r=await s.getRequestDetails({request_id:id});if(r?.success!==true||!r.request)throw Error();detailRecord=r.request;window.AMANAdminCurrentRequest=detailRecord;host.replaceChildren();const q=detailRecord;
  const status=statusLabel[q.status]||"حالة غير معروفة";
  host.append(panel("بيانات الطلب",[["رقم الطلب",q.request_number||q.id],["نوع العملية",typeLabel[q.operation_type]||q.operation_type],["الحالة",status],["تاريخ الطلب",q.created_at],["الرقم",q.phone,"ltr"],["الشركة",q.company_name],["الباقة",q.package_name],["المدة",q.duration_days? q.duration_days+" يوم":null],["السعر",q.price_yer===undefined?null:Number(q.price_yer).toLocaleString("ar")+" ر.ي"],["وسيلة الدفع",q.payment_method_name],["مرجع الدفع",q.payment_reference,"ltr"]]));
  host.append(panel("بيانات العميل",[["اسم العميل",q.customer_name],["تصنيف الحساب",q.customer_type],["حالة الحساب",q.customer_status],["معرّف العميل",q.customer_id]]));
  host.append(panel("حالة الرقم والتحقق",[["حالة الرقم الحالية",q.number_status],["بداية الحماية الحالية",q.current_protection_starts_at],["نهاية الحماية الحالية",q.current_protection_ends_at],["آخر يوم للتنشيط",q.reactivation_deadline]]));
  const warnings=Array.isArray(q.warnings)?q.warnings:[];if(warnings.length){const p=document.createElement("section");p.className="surface";const h=document.createElement("h2");h.className="surface-title";h.textContent="تنبيهات المراجعة";p.append(h);warnings.forEach(w=>{const x=document.createElement("p");x.className="notice-error";x.textContent=String(w);p.append(x);});host.append(p);}
- const links=document.createElement("div");links.className="surface";const title=document.createElement("h2");title.className="surface-title";title.textContent="الانتقال إلى السجلات المرتبطة";links.append(title);const p=document.createElement("p");p.className="surface-desc";p.textContent="تفتح تفاصيل الرقم والعميل عند توفر أقسامهما في المراحل التالية.";links.append(p);host.append(links);
  openInlineActions(q,host);
  }catch{host.replaceChildren();const err=document.createElement("div");err.className="surface empty-state";err.textContent="تعذر تحميل تفاصيل الطلب. تحقق من الاتصال والصلاحيات ثم حاول مجددًا.";host.append(err);}
 }
@@ -133,7 +149,7 @@ async function refreshSession(){
 }
 $("admin-login-form").addEventListener("submit",async e=>{
  e.preventDefault();const s=service(),msg=$("admin-login-message"),button=e.submitter||e.currentTarget.querySelector("button[type=submit]");
- if(!s||typeof s.signInAdmin!=="function"){message(msg,"تسجيل الدخول غير متاح حتى ربط خدمة المصادقة الآمنة. لم تُرسل البيانات.","error");return;}
+ if(!s||typeof s.signInAdmin!=="function"){message(msg,"تسجيل الدخول غير متاح حاليًا. لم تُرسل البيانات.","error");return;}
  button.disabled=true;message(msg,"جارٍ التحقق من بيانات الدخول…");
  try{const r=await s.signInAdmin({email:$("admin-username").value.trim(),password:$("admin-password").value});if(r?.success!==true||r.admin?.is_admin!==true)throw Error();adminSession=r.admin;e.currentTarget.reset();message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
  catch{message(msg,"تعذر تسجيل الدخول أو أن الحساب غير مخوّل للإدارة.","error");}

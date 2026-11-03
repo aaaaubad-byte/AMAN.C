@@ -40,7 +40,7 @@ function renderNumbers(){
 }
 async function loadNumbers(){
  const host=$("numbers-message"),s=service();numberRows=[];renderNumbers();
- if(!s||typeof s.listNumbers!=="function"){setNotice(host,"خدمة قائمة الأرقام غير مربوطة. لم تُعرض بيانات تجريبية.",true);return;}
+ if(!s||typeof s.listNumbers!=="function"){setNotice(host,"تعذر الوصول إلى الأرقام حاليًا.",true);return;}
  setNotice(host,"جارٍ تحميل الأرقام…");
  try{const r=await s.listNumbers({search:$("number-search").value.trim(),status:$("number-status").value});if(r?.success!==true||!Array.isArray(r.numbers))throw Error();numberRows=r.numbers;renderNumbers();setNotice(host,"تم تحديث قائمة الأرقام.");}
  catch{setNotice(host,"تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.",true);}
@@ -49,7 +49,7 @@ async function openNumber(id){
  activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();
  const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();loadNumbers();});
  generic.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل الرقم…");generic.append(loading);
- const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة قبل ربط خدمة الأرقام الآمنة.";return;}
+ const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return;}
  try{
   const r=await s.getNumberDetails({number_id:id});if(r?.success!==true||!r.number)throw Error();const n=r.number;generic.replaceChildren(back);
   generic.append(panel("بيانات الرقم", [["الرقم",n.phone||n.number,"ltr"],["الشركة",n.company_name],["حالة الحماية",n.protection_status_label||labels[n.protection_status]],["تاريخ الإضافة",n.created_at],["موعد المصادرة المتوقع",n.expected_confiscation_at],["آخر يوم للتنشيط",n.reactivation_deadline]]));
@@ -68,9 +68,9 @@ async function openApprovalDialog(){
  const host=dialogBase("تأكيد الاعتماد"),{dialog,body}=host,s=service();
  if(!record?.id){body.append(el("p","notice-error","بيانات الطلب الحالية غير متاحة. أعد فتح تفاصيل الطلب."));}
  else if(record.status!=="pending"){body.append(el("p","notice-error","لا يمكن اعتماد طلب لم يعد قيد المراجعة."));}
- else if(!s||typeof s.getApprovalPreview!=="function"){body.append(el("p","notice-error","معاينة الاعتماد غير مربوطة بالخادم."));}
+ else if(!s||typeof s.getApprovalPreview!=="function"){body.append(el("p","notice-error","تعذر عرض معاينة الاعتماد حاليًا."));}
  else {
-  body.append(el("p","surface-desc","جارٍ التحقق من أثر الاعتماد من الخادم…"));
+  body.append(el("p","surface-desc","جارٍ التحقق من أثر الاعتماد…"));
   try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();body.replaceChildren();
    body.append(panel("الأثر المتوقع",[["بداية الحماية",r.preview.starts_at],["نهاية الحماية",r.preview.ends_at],["الأثر",r.preview.effect_description]]));
    const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();const closeOk=el("button","btn btn-block","إغلاق");closeOk.type="button";closeOk.addEventListener("click",()=>closeDialog(dialog));body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."),closeOk);const refresh=$("request-detail-refresh");if(refresh)refresh.click();const listRefresh=$("requests-refresh");if(listRefresh)listRefresh.click();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
@@ -81,7 +81,7 @@ async function openApprovalDialog(){
 async function openRejectDialog(){
  const record=window.AMANAdminCurrentRequest,host=dialogBase("رفض الطلب"),{dialog,body}=host,s=service();
  if(!record?.id||record.status!=="pending"){body.append(el("p","notice-error","الطلب غير متاح للرفض أو لم يعد قيد المراجعة."));}
- else if(!s||typeof s.getRejectReasons!=="function"){body.append(el("p","notice-error","قائمة أسباب الرفض غير مربوطة بالخادم."));}
+ else if(!s||typeof s.getRejectReasons!=="function"){body.append(el("p","notice-error","تعذر عرض قائمة أسباب الرفض حاليًا."));}
  else {
   const form=el("form","");const label=el("label","field-label","سبب الرفض");const select=el("select","field");select.required=true;select.add(new Option("اختر سبب الرفض",""));const noteLabel=el("label","field-label","توضيح إضافي (اختياري)"),note=el("textarea","field");note.rows=3;note.maxLength=1000;const feedback=el("p","");const submit=el("button","btn btn-block","تأكيد الرفض");submit.type="submit";form.append(label,select,noteLabel,note,feedback,submit);body.append(form);
   try{const r=await s.getRejectReasons();if(r?.success!==true||!Array.isArray(r.items)||!r.items.length)throw Error();r.items.forEach(x=>select.add(new Option(x.label,x.code)));}catch{setNotice(feedback,"تعذر تحميل أسباب الرفض المعتمدة.",true);submit.disabled=true;}

@@ -57,12 +57,24 @@ let reportNumber = null, reportSubmitting = false;
 const normalizeDigits = value => String(value ?? "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
 const normalizePhone = value => normalizeDigits(value).replace(/[^0-9]/g, "");
 const has = value => value !== null && value !== undefined && value !== "";
+/* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
+const svgIcon = d => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>";
+const ICONS = {
+ clock: svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+ user: svgIcon('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+ alert: svgIcon('<path d="M12 3 2 20h20zM12 10v5M12 18h.01"/>'),
+ phone: svgIcon('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
+ search: svgIcon('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'),
+ bell: svgIcon('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>')
+};
 function el(tag, cls, content) { const n = document.createElement(tag); if (cls) n.className = cls; if (content !== undefined) n.textContent = content; return n; }
+function iconEl(cls, name) { const n = el("span", cls); n.innerHTML = ICONS[name] || ""; return n; }
 function setMessage(node, message, kind = "error") { if (!node) return; node.textContent = message; node.className = kind === "success" ? "notice-success" : kind === "info" ? "notice-info" : "notice-error"; }
 function detailBlock(label, value, dir) { const b = el("div", "detail-block"), l = el("div", "detail-label", label), v = el("div", "detail-value", value); if (dir) v.dir = dir; b.append(l, v); return b; }
 function emptyBox(icon, title, text, action) {
  const box = el("div", "soft-surface empty-state");
- box.append(el("div", "empty-icon", icon), el("strong", "", title));
+ const ic = el("div", "empty-icon"); ic.innerHTML = ICONS[icon] || "";
+ box.append(ic, el("strong", "", title));
  if (text) box.append(el("p", "", text));
  if (action) { const b = el("button", "btn btn-outline", action.label); b.type = "button"; b.addEventListener("click", action.run); box.append(b); }
  return box;
@@ -175,11 +187,11 @@ async function loadSession() {
 /* ---------- حالات القوائم المشتركة ---------- */
 function listStateBox(name, retry, emptyTitle, emptyText) {
  const list = lists[name];
- if (list.state === "loading") return emptyBox("◷", "جارٍ التحميل…");
- if (list.state === "signedout") return emptyBox("♙", "سجّل الدخول للمتابعة", "تظهر بياناتك بعد تسجيل الدخول.", { label: "تسجيل الدخول", run: () => showLogin() });
- if (list.state === "error") return emptyBox("⚠", "تعذر تحميل البيانات", list.message, { label: "إعادة المحاولة", run: retry });
- if (list.state === "idle") return emptyBox("◷", "جارٍ التحضير…");
- if (!list.items.length) return emptyBox("▦", emptyTitle, emptyText);
+ if (list.state === "loading") return emptyBox("clock", "جارٍ التحميل…");
+ if (list.state === "signedout") return emptyBox("user", "سجّل الدخول للمتابعة", "تظهر بياناتك بعد تسجيل الدخول.", { label: "تسجيل الدخول", run: () => showLogin() });
+ if (list.state === "error") return emptyBox("alert", "تعذر تحميل البيانات", list.message, { label: "إعادة المحاولة", run: retry });
+ if (list.state === "idle") return emptyBox("clock", "جارٍ التحضير…");
+ if (!list.items.length) return emptyBox("phone", emptyTitle, emptyText);
  return null;
 }
 
@@ -189,7 +201,7 @@ function numberCard(item, source) {
  const info = el("span", "phone-info"), phone = el("strong", "", item.phone); phone.dir = "ltr";
  const meta = [item.company, item.remaining_label || (item.ends_at ? "ينتهي " + fmt(item.ends_at) : "")].filter(Boolean).join(" · ");
  info.append(phone, el("small", "", meta));
- b.append(el("span", "phone-icon", "▦"), info, el("span", "state " + (stateClass[item.status] || "state-off"), numberStatusLabels[item.status] || "—"));
+ b.append(iconEl("phone-icon", "phone"), info, el("span", "state " + (stateClass[item.status] || "state-off"), numberStatusLabels[item.status] || "—"));
  b.addEventListener("click", () => openNumberDetails(item, source));
  return b;
 }
@@ -204,7 +216,7 @@ function renderNumbers() {
  if (box) { host.append(box); updateCompanyFilter(); return; }
  const query = normalizePhone($("numbers-search").value), company = $("numbers-company-filter").value, status = $("numbers-status-filter").value;
  const filtered = lists.numbers.items.filter(i => (!query || normalizePhone(i.phone).includes(query)) && (!company || i.company_id === company) && (!status || i.status === status));
- if (!filtered.length) { host.append(emptyBox("⌕", "لا توجد نتائج مطابقة", "غيّر عبارة البحث أو خيارات التصفية.")); updateCompanyFilter(); return; }
+ if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "غيّر عبارة البحث أو خيارات التصفية.")); updateCompanyFilter(); return; }
  filtered.forEach(n => host.append(numberCard(n, "numbers")));
  updateCompanyFilter();
 }
@@ -281,7 +293,7 @@ function renderOperations() {
  if (box) { host.append(box); return; }
  const query = normalizeDigits($("operations-search").value).trim(), status = $("operations-status-filter").value;
  const filtered = lists.operations.items.filter(i => (!query || normalizeDigits(i.phone).includes(query) || String(i.request_number || i.id || "").includes(query)) && (!status || i.status === status));
- if (!filtered.length) { host.append(emptyBox("⌕", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو حالة الطلب المحددة.")); return; }
+ if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو حالة الطلب المحددة.")); return; }
  filtered.forEach(item => {
   const b = el("button", "operation-card"); b.type = "button";
   const main = el("span", "operation-main"), phone = el("small", "", item.phone); phone.dir = "ltr";
@@ -409,7 +421,7 @@ async function openNumberAlerts(number) {
  if (result.success !== true) { setMessage(msg, serviceProblem(result)); const retry = el("button", "btn btn-outline", "إعادة المحاولة"); retry.type = "button"; retry.addEventListener("click", () => openNumberAlerts(number)); host.append(retry); return true; }
  msg.textContent = ""; msg.className = "";
  const items = result.items || [];
- if (!items.length) { host.append(emptyBox("♧", "لا توجد تنبيهات لهذا الرقم")); return true; }
+ if (!items.length) { host.append(emptyBox("bell", "لا توجد تنبيهات لهذا الرقم")); return true; }
  items.forEach(a => { const card = el("article", "surface notification-card"), head = el("div", "notification-head"); head.append(el("strong", "", a.title), el("span", "state " + (a.read_at ? "state-off" : "state-wait"), a.read_at ? "مقروء" : "جديد")); card.append(head, el("p", "", a.body), el("small", "", fmt(a.created_at))); host.append(card); });
  return true;
 }
@@ -512,7 +524,7 @@ function renderNotifications() {
  $("notifications-dot").hidden = !lists.notifications.items.some(n => !n.read_at);
  if (box) { host.append(box); return; }
  const items = lists.notifications.items.filter(n => filter === "all" || (filter === "unread" && !n.read_at) || (filter === "read" && n.read_at));
- if (!items.length) { host.append(emptyBox("♧", "لا توجد إشعارات في هذا التصنيف")); return; }
+ if (!items.length) { host.append(emptyBox("bell", "لا توجد إشعارات في هذا التصنيف")); return; }
  items.forEach(item => {
   const card = el("article", "surface notification-card"), head = el("div", "notification-head");
   head.append(el("strong", "", item.title || "إشعار من أمان"), el("span", "state " + (item.read_at ? "state-off" : "state-wait"), item.read_at ? "مقروء" : "جديد"));

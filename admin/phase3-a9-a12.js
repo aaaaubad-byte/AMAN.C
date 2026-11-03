@@ -26,7 +26,7 @@ function renderCustomers(){
 }
 async function loadCustomers(){
  const host=$("customers-message"),s=service();customers=[];renderCustomers();
- if(!s||typeof s.listCustomers!=="function"){host.textContent="خدمة العملاء غير مربوطة. لم تُعرض بيانات بديلة.";return;}
+ if(!s||typeof s.listCustomers!=="function"){host.textContent="تعذر الوصول إلى العملاء حاليًا.";return;}
  host.textContent="جارٍ تحميل العملاء…";
  try{const r=await s.listCustomers(filters);if(r?.success!==true||!Array.isArray(r.customers))throw Error();customers=r.customers;renderCustomers();host.textContent="تم تحديث قائمة العملاء.";}
  catch{host.textContent="تعذر تحميل العملاء. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.";}
@@ -34,7 +34,7 @@ async function loadCustomers(){
 async function openCustomer(id){
  selectedCustomer=id;const host=shell();const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
  const loading=node("div","surface empty-state","جارٍ تحميل تفاصيل العميل…");host.append(loading);const s=service();
- if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة قبل ربط الخدمة الآمنة.";return;}
+ if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة حاليًا.";return;}
  try{const r=await s.getCustomerDetails({customer_id:id});if(r?.success!==true||!r.customer)throw Error();const c=r.customer;host.replaceChildren(back);
  host.append(panel("بيانات الحساب",[["الاسم",c.full_name],["البريد الإلكتروني",c.email],["تصنيف الحساب",labels[c.customer_type]||c.customer_type],["حالة الحساب",labels[c.status]||c.status],["تاريخ الإنشاء",c.created_at],["سبب التعطيل",c.disabled_reason]]));
  const action=node("section","surface"),h=node("h2","surface-title","إدارة حالة الحساب"),desc=node("p","surface-desc",c.is_admin?"لا يمكن تغيير حالة حساب المدير.":c.status==="active"?"يمكن تعطيل حساب العميل بعد تأكيد الإجراء.":"يمكن إعادة تفعيل الحساب بعد تأكيد الإجراء.");
@@ -50,7 +50,7 @@ function confirmStatusChange(c){
  const s=service(),dialog=document.createElement("dialog");dialog.className="admin-decision-dialog";const box=node("div","surface"),title=node("h2","surface-title",c.status==="active"?"تأكيد تعطيل الحساب":"تأكيد إعادة تفعيل الحساب"),body=node("div","decision-body");box.append(title,body);dialog.append(box);document.body.append(dialog);
  const verb=c.status==="active"?"تعطيل":"إعادة تفعيل";body.append(node("p","surface-desc",c.status==="active"?"سيُمنع الحساب من استخدام الخدمات التي تتطلب حسابًا فعّالًا. لا يؤدي التعطيل إلى حذف بياناته أو نقل أرقامه.":"ستُعاد حالة الحساب إلى فعّال."));
  let reason=null;if(c.status==="active"){const label=node("label","field-label","سبب التعطيل (اختياري)");reason=node("textarea","field");reason.rows=3;reason.maxLength=500;body.append(label,reason);}
- const feedback=node("p","");const confirm=node("button","btn btn-block","تأكيد "+verb);confirm.type="button";confirm.addEventListener("click",async()=>{if(!s||typeof s.updateCustomerStatus!=="function"){feedback.textContent="خدمة تغيير حالة الحساب غير مربوطة.";feedback.className="notice-error";return;}confirm.disabled=true;try{const out=await s.updateCustomerStatus({customer_id:c.id,status:c.status==="active"?"disabled":"active",reason:reason?.value.trim()||""});if(out?.success!==true)throw Error();feedback.textContent="تم تحديث حالة الحساب في البيئة الحالية.";feedback.className="notice-success";setTimeout(()=>{dialog.close();dialog.remove();openCustomer(c.id);},250);}catch{feedback.textContent="لم يصل تأكيد موثوق. حدّث تفاصيل الحساب قبل إعادة المحاولة.";feedback.className="notice-error";confirm.disabled=false;}});body.append(feedback,confirm);
+ const feedback=node("p","");const confirm=node("button","btn btn-block","تأكيد "+verb);confirm.type="button";confirm.addEventListener("click",async()=>{if(!s||typeof s.updateCustomerStatus!=="function"){feedback.textContent="تعذر تغيير حالة الحساب حاليًا.";feedback.className="notice-error";return;}confirm.disabled=true;try{const out=await s.updateCustomerStatus({customer_id:c.id,status:c.status==="active"?"disabled":"active",reason:reason?.value.trim()||""});if(out?.success!==true)throw Error();feedback.textContent="تم تحديث حالة الحساب.";feedback.className="notice-success";setTimeout(()=>{dialog.close();dialog.remove();openCustomer(c.id);},250);}catch{feedback.textContent="لم يصل تأكيد موثوق. حدّث تفاصيل الحساب قبل إعادة المحاولة.";feedback.className="notice-error";confirm.disabled=false;}});body.append(feedback,confirm);
  const cancel=node("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>{dialog.close();dialog.remove();});body.append(cancel);document.body.append(dialog);dialog.showModal();
 }
 function renderCustomerScreen(){const host=shell();customerList(host);}
