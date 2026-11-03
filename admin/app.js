@@ -53,7 +53,9 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 const primaryTabs=["dashboard","requests","numbers","customers"];
 function setActive(name){const tab=!name?"":primaryTabs.includes(name)?name:"more";tabs.forEach(t=>t.classList.toggle("active",t.dataset.adminTab===tab));}
 function renderMore(){const h=$("admin-generic-view");h.replaceChildren();const order=["tasks","followup","complaints","reports","notifications","alerts","settings","packages","payments","content","audit","account"];const wrap=document.createElement("div");wrap.className="admin-shortcuts";order.forEach(k=>{const d=definitions[k];if(!d)return;const b=document.createElement("button");b.type="button";b.className="admin-shortcut";b.dataset.moreSection=k;const i=document.createElement("span");i.className="quick-icon";i.innerHTML=ICONS[d.icon]||"";const t=document.createElement("strong");t.textContent=d.title;b.append(i,t);b.addEventListener("click",()=>navigate(k));wrap.append(b);});h.append(wrap);}
-function showLogin(){adminSession=null;current="login";historyStack=[];activeRequestId=null;detailRecord=null;dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;showAccountButton(false);setActive("");}
+/* إظهار/إخفاء كلمة المرور في شاشة الدخول: تعود دائمًا إلى «مخفية» عند فتح الشاشة وبعد الدخول */
+function setPasswordVisible(show){const i=$("admin-password"),b=$("admin-password-toggle");i.type=show?"text":"password";b.setAttribute("aria-pressed",show?"true":"false");b.setAttribute("aria-label",show?"إخفاء كلمة المرور":"إظهار كلمة المرور");}
+function showLogin(){adminSession=null;current="login";historyStack=[];activeRequestId=null;detailRecord=null;dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;showAccountButton(false);setActive("");setPasswordVisible(false);}
 function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;showAccountButton(true);setActive("dashboard");loadDashboard();}
 function navigate(name,{remember=true}={}) {
  if(name==="login"){showLogin();return true;}
@@ -162,15 +164,16 @@ $("admin-login-form").addEventListener("submit",async e=>{
  if(!s||typeof s.signInAdmin!=="function"){message(msg,"تسجيل الدخول غير متاح حاليًا. لم تُرسل البيانات.","error");return;}
  button.disabled=true;message(msg,"جارٍ التحقق من بيانات الدخول…");
  let ok=false;
- try{const r=await s.signInAdmin({email:$("admin-username").value.trim(),password:$("admin-password").value});if(r?.success!==true||r.admin?.is_admin!==true)throw Error();adminSession=r.admin;ok=true;}
+ try{const r=await s.signInAdmin({email:$("admin-username").value.trim(),password:$("admin-password").value,remember:$("admin-remember").checked});if(r?.success!==true||r.admin?.is_admin!==true)throw Error();adminSession=r.admin;ok=true;}
  catch{
   adminSession=null;message(msg,"تعذر تسجيل الدخول أو أن الحساب غير مخوّل للإدارة.","error");
   /* لا تُبقِ جلسة سابقة صالحة بعد محاولة دخول فاشلة */
   try{await s.signOutAdmin();}catch{/* لا جلسة لإنهائها */}
  }
  finally{button.disabled=false;}
- if(ok){form.reset();message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
+ if(ok){form.reset();setPasswordVisible(false);message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
 });
+$("admin-password-toggle").addEventListener("click",()=>setPasswordVisible($("admin-password").type==="password"));
 $("dashboard-refresh").addEventListener("click",loadDashboard);
 accountBtn.addEventListener("click",()=>{if(!authed()){showLogin();return;}navigate("account");});
 tabs.forEach(t=>t.addEventListener("click",()=>navigate(t.dataset.adminTab)));
