@@ -3,6 +3,15 @@
 const $=id=>document.getElementById(id),S=()=>window.AMANAdminServices||{};
 const el=(tag,cls="",value)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n;};
 const button=(label,fn,cls="btn btn-outline")=>{const b=el("button",cls,label);b.type="button";b.addEventListener("click",fn);return b;};
+/* أيقونات SVG ثابتة داخلية لاختصارات الأقسام (ليست من بيانات المستخدم) */
+const svgIcon=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+const SHORTCUT_ICONS={
+ packages:svgIcon('<path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/>'),
+ payments:svgIcon('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'),
+ content:svgIcon('<path d="M7 3h10l3 3v15H4V3zM8 10h8M8 14h8M8 18h5"/>'),
+ audit:svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+ account:svgIcon('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>')
+};
 let fieldSeq=0;const field=(label,type="text",value="")=>{const w=el("div"),l=el("label","field-label",label),i=el("input","field");i.type=type;i.value=value;i.id="f"+(++fieldSeq);l.htmlFor=i.id;w.append(l,i);return {wrap:w,input:i};};
 const area=(label,value="")=>{const w=el("div"),l=el("label","field-label",label),i=el("textarea","field");i.rows=5;i.maxLength=20000;i.value=value;i.id="a"+(++fieldSeq);l.htmlFor=i.id;w.append(l,i);return {wrap:w,input:i};};
 const select=(label,opts,value)=>{const w=el("div"),l=el("label","field-label",label),i=el("select","field");opts.forEach(([v,t])=>i.add(new Option(t,v)));i.value=value??opts[0]?.[0];i.id="s"+(++fieldSeq);l.htmlFor=i.id;w.append(l,i);return {wrap:w,input:i};};
@@ -61,5 +70,5 @@ async function audit(){
 async function account(){const h=host();try{const r=await S().getCurrentAdmin();if(!r?.success)throw Error();const a=r.admin;h.append(panel("الحساب الإداري",[el("p","", "الاسم: "+(a.full_name||"—")),el("p","", "البريد: "+(a.email||"—")),el("p","", "الدور: مدير النظام"),button("تسجيل الخروج",async()=>{if(!confirm("هل تريد تسجيل الخروج من حساب الإدارة؟"))return;const q=await S().signOutAdmin();if(!q?.success){msg(h,"تعذر تأكيد تسجيل الخروج.",true);return;}location.reload();},"btn btn-block")]));}catch{msg(h,"تعذر تحميل بيانات الحساب الإداري.",true);}}
 document.addEventListener("aman:admin-screenchange",e=>{const s=e.detail?.screen;if(s==="packages")packages();if(s==="payments")payments();if(s==="content")content();if(s==="audit")audit();if(s==="account")account();});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(b&&["packages","payments","content","audit","account"].includes(b.dataset.section)){e.preventDefault();window.AMANAdminNavigation?.navigate(b.dataset.section);}});
-document.addEventListener("DOMContentLoaded",()=>{const shortcuts=document.querySelector(".admin-shortcuts");if(shortcuts){const items=[["packages","باقات الحماية","إدارة الباقات حسب الشركة والعملية"],["payments","وسائل الدفع","إدارة وسائل الدفع والتعليمات"],["content","المحتوى الثابت","الشروط والخصوصية والتواصل والدعم"],["audit","سجل التدقيق","مراجعة إجراءات الإدارة"],["account","الحساب الإداري","بيانات المدير وتسجيل الخروج"]];items.forEach(([id,title,desc])=>{const b=el("button","admin-shortcut");b.dataset.section=id;b.append(el("span","quick-icon","⚙"),el("strong","",title),el("small","",desc));shortcuts.append(b);});}});
+document.addEventListener("DOMContentLoaded",()=>{const shortcuts=document.querySelector(".admin-shortcuts");if(shortcuts){const items=[["packages","باقات الحماية","إدارة الباقات حسب الشركة والعملية"],["payments","وسائل الدفع","إدارة وسائل الدفع والتعليمات"],["content","المحتوى الثابت","الشروط والخصوصية والتواصل والدعم"],["audit","سجل التدقيق","مراجعة إجراءات الإدارة"],["account","الحساب الإداري","بيانات المدير وتسجيل الخروج"]];items.forEach(([id,title,desc])=>{const b=el("button","admin-shortcut");b.dataset.section=id;const icon=el("span","quick-icon");icon.innerHTML=SHORTCUT_ICONS[id]||"";b.append(icon,el("strong","",title),el("small","",desc));shortcuts.append(b);});}});
 })();
