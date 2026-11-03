@@ -24,7 +24,7 @@ for (const file of htmlFiles) {
     if (!existsSync(target)) failures.push(file + " يشير إلى ملف غير موجود: " + ref);
   }
 }
-for (const file of ["client/app.js", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js", "services/runtime.js", "simulation/simulation-adapter.js"]) {
+for (const file of ["client/app.js", "admin/app.js", "admin/phase3-a5-a8.js", "admin/phase3-a9-a12.js", "admin/phase3-a13-a17.js", "admin/phase4-a18-a25.js", "admin/phase5-a26-a31.js", "services/runtime.js", "services/supabase-config.js", "services/supabase-adapter.js", "simulation/simulation-adapter.js"]) {
   const check = spawnSync(process.execPath, ["--check", file], { encoding: "utf8" });
   if (check.status !== 0) failures.push("خطأ صياغة JavaScript في " + file + ": " + check.stderr);
 }
