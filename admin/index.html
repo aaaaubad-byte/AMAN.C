@@ -5,13 +5,14 @@
 <header class="topbar"><button class="icon-btn" id="admin-account" aria-label="الحساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button><a class="brand" href="../"><span class="brand-symbol">أ</span><span class="brand-copy"><strong>أمان</strong><small>إدارة النظام</small></span></a></header>
 
 <section id="admin-login" class="login-screen"><div class="login-wrap">
-<div class="login-brand"><div class="brand-symbol" aria-hidden="true">أ</div><h1>إدارة أمان</h1><p>منطقة مخصصة للمخولين فقط</p></div>
-<div class="login-card"><h2>تسجيل دخول الإدارة</h2><p class="login-lead">أدخل بيانات حساب الإدارة للوصول إلى لوحة التحكم.</p>
+<div class="login-brand"><svg class="login-logo" viewBox="0 0 96 96" role="img" aria-label="شعار أمان" xmlns="http://www.w3.org/2000/svg"><rect width="96" height="96" rx="26" fill="#102435"/><path d="M48 17 24 26v20c0 15.5 10.2 26.8 24 33 13.8-6.2 24-17.5 24-33V26Z" fill="none" stroke="#09a478" stroke-width="5" stroke-linejoin="round"/><path d="m37 47 8.5 8.5L60 40" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>تطبيق الإدارة</h1></div>
+<div class="login-card"><h2>تسجيل دخول</h2>
 <form id="admin-login-form" class="login-form">
-<div class="login-field"><label class="field-label" for="admin-username">البريد الإلكتروني</label><input class="field login-input-ltr" id="admin-username" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="name@example.com" required></div>
-<div class="login-field"><label class="field-label" for="admin-password">كلمة المرور</label><input class="field login-input-ltr" id="admin-password" type="password" autocomplete="current-password" placeholder="••••••••" required></div>
+<div class="login-field"><label class="field-label" for="admin-username">البريد الإلكتروني</label><input class="field login-input-ltr" id="admin-username" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required></div>
+<div class="login-field"><label class="field-label" for="admin-password">كلمة المرور</label><div class="password-wrap"><input class="field login-input-ltr" id="admin-password" type="password" autocomplete="current-password" required><button class="password-toggle" id="admin-password-toggle" type="button" aria-label="إظهار كلمة المرور" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="M4 4l16 16"/></svg></button></div></div>
+<label class="remember-row" for="admin-remember"><input type="checkbox" id="admin-remember"><span>تذكرني</span></label>
 <p class="notice-error" id="admin-login-message" aria-live="polite"></p>
-<button class="btn btn-block login-submit" type="submit">دخول الإدارة</button>
+<button class="btn btn-block login-submit" type="submit">دخول</button>
 </form></div>
 </div></section>
 
