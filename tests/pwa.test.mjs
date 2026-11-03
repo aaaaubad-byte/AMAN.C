@@ -44,43 +44,51 @@ for (const app of APPS) {
     assert.match(html, /<script defer src="\.\/pwa\.js"><\/script>/);
   });
 
-  test(app + ": Service Worker لا يخزّن طلبات Supabase ولا يتخطى حدود نطاقه", () => {
+  test(app + ": Service Worker يقصر التخزين على موارد ثابتة ويرفض الاستجابات الخاصة", () => {
     const sw = readFileSync(join(ROOT, app, "sw.js"), "utf8");
     assert.ok(sw.includes(PLACEHOLDER));
-    assert.match(sw, /url\.origin !== self\.location\.origin\) return false/);
-    assert.match(sw, /SENSITIVE_PATH/);
+    assert.match(sw, /req\.headers\.has\("authorization"\)/);
+    assert.match(sw, /PRIVATE_HEADERS/);
+    assert.match(sw, /res\.headers\.has\("set-cookie"\)/);
+    assert.match(sw, /res\.headers\.get\("vary"\) === "\*"/);
+    assert.match(sw, /APP_STATIC\.has\(url\.href\)/);
+    assert.match(sw, /SHARED_ALLOWED\.has\(url\.href\)/);
+    assert.match(sw, /url\.search\) return false/);
     assert.doesNotMatch(sw, /skipWaiting\(\);\s*\n\s*\}\);\s*\n/, "لا skipWaiting تلقائي عند التثبيت");
-    assert.match(sw, /PREFIX = "aman-" \+ APP \+ "-" \+ new URL\(SCOPE\)\.pathname/);
   });
 
-  test(app + ": شريط التحديث بهوية أمان بلا أخضر وبلا استثناء /test/", () => {
+  test(app + ": شريط التحديث بهوية أمان بلا أخضر", () => {
     const js = readFileSync(join(ROOT, app, "pwa.js"), "utf8");
     assert.doesNotMatch(js, /#09a478/i);
-    assert.doesNotMatch(js, /\\\/test\\\//);
     assert.match(js, /#102d45/);
   });
 }
 
-test("build-pwa يختم معرّف الإصدار في كل sw.js ويفشل بلا علامة", () => {
+test("النشر الإنتاجي لا يحتوي محاكاة أو /test/", () => {
+  const workflow = readFileSync(join(ROOT, ".github/workflows/deploy.yml"), "utf8");
+  assert.doesNotMatch(workflow, /dist\/test|simulation|preview/i);
+  assert.match(workflow, /cp -R client admin styles services dist\//);
+  assert.match(workflow, /node scripts\/build-pwa\.mjs dist/);
+});
+
+test("build-pwa يختم عاملي العميل والإدارة فقط دون الحاجة إلى /test/", () => {
   const dir = mkdtempSync(join(tmpdir(), "aman-pwa-"));
   try {
-    for (const base of ["", "test/"]) for (const app of APPS) {
-      mkdirSync(join(dir, base + app), { recursive: true });
-      cpSync(join(ROOT, app, "sw.js"), join(dir, base + app, "sw.js"));
+    for (const app of APPS) {
+      mkdirSync(join(dir, app), { recursive: true });
+      cpSync(join(ROOT, app, "sw.js"), join(dir, app, "sw.js"));
     }
     const files = stampServiceWorkers(dir, "abc123");
-    assert.equal(files.length, 4);
+    assert.equal(files.length, 2);
     for (const file of files) {
-      const text = readFileSync(file, "utf8");
-      assert.ok(!text.includes(PLACEHOLDER));
-      assert.ok(text.includes('const BUILD = "abc123";'));
+      const content = readFileSync(file, "utf8");
+      assert.ok(!content.includes(PLACEHOLDER));
+      assert.ok(content.includes('const BUILD = "abc123";'));
     }
     assert.throws(() => stampServiceWorkers(dir, "again"), /غير موجودة/);
     const empty = join(dir, "empty");
     mkdirSync(empty);
-    assert.throws(() => stampServiceWorkers(empty, "x"), /sw\.js/);
-    writeFileSync(join(empty, "sw.js"), "no placeholder");
-    assert.throws(() => stampServiceWorkers(empty, "x"), /غير موجودة/);
+    assert.throws(() => stampServiceWorkers(empty, "x"), /مفقود/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
