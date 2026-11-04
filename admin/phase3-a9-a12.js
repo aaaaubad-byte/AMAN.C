@@ -16,7 +16,7 @@ function customerList(host){
  const msg=node("p","notice-info","");msg.id="customers-message";filtersBox.append(grid,msg);
  const list=node("div","");list.id="customers-list";wrap.append(filtersBox,list);host.append(wrap);
  [search,type,status].forEach(input=>input.addEventListener(input===search?"input":"change",()=>{filters={search:search.value.trim(),type:type.value,status:status.value};renderCustomers();}));
- window.AMANPullRefresh?.attach(wrap,loadCustomers);
+
 }
 function renderCustomers(){
  const host=$("customers-list");if(!host)return;host.replaceChildren();
@@ -32,7 +32,7 @@ async function loadCustomers(){
  catch{host.textContent="تعذر تحميل العملاء. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.";}
 }
 async function openCustomer(id){
- selectedCustomer=id;const host=shell();const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
+ selectedCustomer=id;window.AMANPullRefresh?.attach($("admin-section"),()=>openCustomer(id));const host=shell();const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
  const loading=node("div","surface empty-state","جارٍ تحميل تفاصيل العميل…");host.append(loading);const s=service();
  if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة حاليًا.";return;}
  try{const r=await s.getCustomerDetails({customer_id:id});if(r?.success!==true||!r.customer)throw Error();const c=r.customer;host.replaceChildren(back);
@@ -54,5 +54,5 @@ function confirmStatusChange(c){
  const cancel=node("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>{dialog.close();dialog.remove();});body.append(cancel);document.body.append(dialog);dialog.showModal();
 }
 function renderCustomerScreen(){const host=shell();customerList(host);}
-document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen;if(screen==="customers"){renderCustomerScreen();loadCustomers();}});
+document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen;if(screen==="customers"){renderCustomerScreen();window.AMANPullRefresh?.attach($("admin-section"),loadCustomers);loadCustomers();}});
 })();
