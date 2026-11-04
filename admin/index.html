@@ -46,13 +46,11 @@
 <div id="requests-list-view" hidden>
 <div class="surface">
 <div class="admin-filter-grid">
-<div><label class="field-label" for="request-search">بحث</label><input class="field" id="request-search" placeholder="رقم الطلب أو الهاتف أو العميل"></div>
+<div class="toolbar-search"><label class="field-label" for="request-search">بحث</label><div class="toolbar-search-control"><input class="field" id="request-search" placeholder="رقم الطلب أو الهاتف أو العميل"><button class="icon-btn toolbar-clear requests-reset-icon" id="requests-reset" type="button" aria-label="مسح البحث والتصفية" title="مسح التصفية" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg></button></div></div>
 <div><label class="field-label" for="request-status">حالة الطلب</label><select class="field" id="request-status"><option value="pending">قيد المراجعة</option><option value="all">كل الحالات</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div>
 <div><label class="field-label" for="request-type">نوع العملية</label><select class="field" id="request-type"><option value="all">كل العمليات</option><option value="subscription">اشتراك</option><option value="extension">تمديد الاشتراك</option><option value="reactivation">تنشيط</option></select></div>
 <div><label class="field-label" for="request-company">الشركة</label><select class="field" id="request-company"><option value="all">كل الشركات</option></select></div>
 </div>
-<div class="field-row"><button class="btn btn-soft" id="requests-reset" type="button">مسح التصفية</button></div>
-<p id="requests-message" aria-live="polite"></p>
 </div>
 <div id="requests-list" aria-live="polite"><div class="surface empty-state"><strong>سجّل الدخول لعرض الطلبات</strong></div></div>
 </div>

@@ -826,6 +826,12 @@ html[data-theme="dark"] .admin-app .surface:has(>.admin-filter-grid){
 @media(min-width:650px){
  .admin-filter-grid.compact-filter-row{max-width:100%}
 }
+/* Compact conditional reset control inside the request search row. */
+.requests-reset-icon{flex:0 0 38px!important;width:38px!important;min-width:38px!important;height:40px!important;padding:8px!important;border:1px solid var(--search-border)!important;border-radius:8px!important;background:var(--search-surface)!important;color:var(--blue)!important}
+.requests-reset-icon svg{width:18px;height:18px;stroke:currentColor}
+.requests-reset-icon[hidden]{display:none!important}
+html[data-theme="dark"] .requests-reset-icon{background:var(--search-surface)!important;border-color:var(--search-border)!important;color:var(--ink)!important}
+
 /* Remove redundant refresh controls from screen headers and list toolbars. */
 #dashboard-refresh,#requests-refresh,#request-detail-refresh,#notifications-refresh{display:none!important}
 

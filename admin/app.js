@@ -77,9 +77,9 @@ function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequ
 window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;},refresh(){if(current==="dashboard")return loadDashboard();if(activeRequestId)return Promise.all([openRequest(activeRequestId),loadRequests()]);if(current==="requests")return loadRequests();return Promise.resolve();}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
- const s=service();if(!s||typeof s.getDashboardSummary!=="function"){["stat-pending-requests","stat-protected-numbers","stat-open-reports","stat-due-tasks","stat-customers","stat-revenue"].forEach(id=>stat(id,"—"));return;}
- try{const r=await s.getDashboardSummary();if(!r||r.success!==true||!r.summary)return;const x=r.summary;stat("stat-pending-requests",x.pending_requests);stat("stat-protected-numbers",x.protected_numbers);stat("stat-open-reports",x.open_reports);stat("stat-due-tasks",x.due_tasks);stat("stat-customers",x.customers);stat("stat-revenue",x.approved_revenue_yer===undefined?"—":Number(x.approved_revenue_yer).toLocaleString("ar")+" ر.ي");}
- catch{/* keep unavailable values; never fabricate */}}
+ const s=service();if(!s||typeof s.getDashboardSummary!=="function"){["stat-pending-requests","stat-protected-numbers","stat-open-reports","stat-due-tasks","stat-customers","stat-revenue"].forEach(id=>stat(id,"—"));return false;}
+ try{const r=await s.getDashboardSummary();if(!r||r.success!==true||!r.summary)return false;const x=r.summary;stat("stat-pending-requests",x.pending_requests);stat("stat-protected-numbers",x.protected_numbers);stat("stat-open-reports",x.open_reports);stat("stat-due-tasks",x.due_tasks);stat("stat-customers",x.customers);stat("stat-revenue",x.approved_revenue_yer===undefined?"—":Number(x.approved_revenue_yer).toLocaleString("ar")+" ر.ي");return true;}
+ catch{return false;}}
 function normalizeList(r){if(Array.isArray(r))return r;if(Array.isArray(r?.items))return r.items;if(Array.isArray(r?.requests))return r.requests;return [];}
 function requestCard(r){
  const card=document.createElement("button");card.type="button";card.className="admin-request-card";
@@ -99,12 +99,13 @@ function renderRequests(){
  requestRows.forEach(r=>host.append(requestCard(r)));
 }
 async function loadRequests(){
- const s=service(),msg=$("requests-message");if(!s||typeof s.listRequests!=="function"){requestRows=[];renderRequests();message(msg,"تعذر الوصول إلى الطلبات حاليًا.","error");return;}
- if(loading)return;loading=true;message(msg,"جارٍ تحميل الطلبات…");
+ const s=service(),host=$("requests-list");if(!s||typeof s.listRequests!=="function"){host.replaceChildren();message(host,"تعذر الوصول إلى الطلبات حاليًا.","error");return false;}
+ if(loading)return false;loading=true;host.setAttribute("aria-busy","true");
+ if(!requestRows.length){const pending=document.createElement("div");pending.className="empty-state";pending.textContent="جارٍ تحميل الطلبات…";host.replaceChildren(pending);}
  const filters={search:$("request-search").value.trim(),status:$("request-status").value,operation_type:$("request-type").value,company_id:$("request-company").value};
- try{const result=await s.listRequests(filters);if(result?.success!==true)throw Error("not-confirmed");requestRows=normalizeList(result);const companies=Array.isArray(result.companies)?result.companies:[];const select=$("request-company"),selected=select.value;select.replaceChildren(new Option("كل الشركات","all"));companies.forEach(c=>select.add(new Option(c.name,c.id)));if([...select.options].some(o=>o.value===selected))select.value=selected;renderRequests();message(msg,"تم تحديث قائمة الطلبات.","success");}
- catch{message(msg,"تعذر تحميل الطلبات. حاول التحديث لاحقًا.","error");}
- finally{loading=false;}
+ try{const result=await s.listRequests(filters);if(result?.success!==true)throw Error("not-confirmed");requestRows=normalizeList(result);const companies=Array.isArray(result.companies)?result.companies:[];const select=$("request-company"),selected=select.value;select.replaceChildren(new Option("كل الشركات","all"));companies.forEach(c=>select.add(new Option(c.name,c.id)));if([...select.options].some(o=>o.value===selected))select.value=selected;renderRequests();return true;}
+ catch{if(requestRows.length){const note=document.createElement("p");note.className="notice-error";note.textContent="تعذر تحديث القائمة. البيانات المعروضة قد تكون قديمة.";host.append(note);}else{host.replaceChildren();const empty=document.createElement("div");empty.className="empty-state";const title=document.createElement("strong");title.textContent="تعذر تحميل الطلبات";const retry=document.createElement("button");retry.type="button";retry.className="btn btn-outline";retry.textContent="إعادة المحاولة";retry.addEventListener("click",loadRequests);empty.append(title,retry);host.append(empty);}return false;}
+ finally{loading=false;host.removeAttribute("aria-busy");updateRequestResetVisibility();}
 }
  if (window.AMANPullToRefresh) {
   window.AMANPullToRefresh.register("dashboard", loadDashboard);
@@ -146,15 +147,15 @@ async function performDecision(action,id,payload,button,feedback){
 async function openRequest(id){
  activeRequestId=id;window.AMANAdminCurrentRequest=null;$("requests-list-view").hidden=true;$("request-detail-view").hidden=false;$("request-detail-content").replaceChildren();current="request-detail";window.scrollTo({top:0,behavior:"smooth"});
  const host=$("request-detail-content"),s=service();const loadingBox=document.createElement("div");loadingBox.className="surface empty-state";loadingBox.textContent="جارٍ تحميل تفاصيل الطلب…";host.append(loadingBox);
- if(!s||typeof s.getRequestDetails!=="function"){loadingBox.textContent="تفاصيل الطلب غير متاحة حاليًا.";return;}
+ if(!s||typeof s.getRequestDetails!=="function"){loadingBox.textContent="تفاصيل الطلب غير متاحة حاليًا.";return false;}
  try{const r=await s.getRequestDetails({request_id:id});if(r?.success!==true||!r.request)throw Error();detailRecord=r.request;window.AMANAdminCurrentRequest=detailRecord;host.replaceChildren();const q=detailRecord;
  const status=statusLabel[q.status]||"حالة غير معروفة";
  host.append(panel("بيانات الطلب",[["رقم الطلب",q.request_number||q.id],["نوع العملية",typeLabel[q.operation_type]||q.operation_type],["الحالة",status],["تاريخ الطلب",q.created_at],["الرقم",q.phone,"ltr"],["الشركة",q.company_name],["الباقة",q.package_name],["المدة",q.duration_days? q.duration_days+" يوم":null],["السعر",q.price_yer===undefined?null:Number(q.price_yer).toLocaleString("ar")+" ر.ي"],["وسيلة الدفع",q.payment_method_name],["مرجع الدفع",q.payment_reference,"ltr"]]));
  host.append(panel("بيانات العميل",[["اسم العميل",q.customer_name],["تصنيف الحساب",q.customer_type],["حالة الحساب",q.customer_status],["معرّف العميل",q.customer_id]]));
  host.append(panel("حالة الرقم والتحقق",[["حالة الرقم الحالية",q.number_status],["بداية الحماية الحالية",q.current_protection_starts_at],["نهاية الحماية الحالية",q.current_protection_ends_at],["آخر يوم للتنشيط",q.reactivation_deadline]]));
  const warnings=Array.isArray(q.warnings)?q.warnings:[];if(warnings.length){const p=document.createElement("section");p.className="surface";const h=document.createElement("h2");h.className="surface-title";h.textContent="تنبيهات المراجعة";p.append(h);warnings.forEach(w=>{const x=document.createElement("p");x.className="notice-error";x.textContent=String(w);p.append(x);});host.append(p);}
- openInlineActions(q,host);
- }catch{host.replaceChildren();const err=document.createElement("div");err.className="surface empty-state";err.textContent="تعذر تحميل تفاصيل الطلب. تحقق من الاتصال والصلاحيات.";host.append(err);}
+ openInlineActions(q,host);return true;
+ }catch{host.replaceChildren();const err=document.createElement("div");err.className="surface empty-state";err.textContent="تعذر تحميل تفاصيل الطلب. تحقق من الاتصال والصلاحيات.";host.append(err);return false;}
 }
 async function refreshSession(){
  const s=service();if(!s||typeof s.getCurrentAdmin!=="function"){showLogin();return;}
@@ -186,9 +187,11 @@ document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click
 $("admin-back").addEventListener("click",back);$("request-detail-back").addEventListener("click",back);
 
 
-$("requests-reset").addEventListener("click",()=>{$("request-search").value="";$("request-status").value="pending";$("request-type").value="all";$("request-company").value="all";loadRequests();});
-["request-status","request-type","request-company"].forEach(id=>$(id).addEventListener("change",loadRequests));
-let searchTimer=null;$("request-search").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadRequests,350);});
+function updateRequestResetVisibility(){const button=$("requests-reset");if(!button)return;button.hidden=!($("request-search").value.trim()||$("request-status").value!=="pending"||$("request-type").value!=="all"||$("request-company").value!=="all");}
+$("requests-reset").addEventListener("click",()=>{$("request-search").value="";$("request-status").value="pending";$("request-type").value="all";$("request-company").value="all";updateRequestResetVisibility();loadRequests();});
+["request-status","request-type","request-company"].forEach(id=>$(id).addEventListener("change",()=>{updateRequestResetVisibility();loadRequests();}));
+let searchTimer=null;$("request-search").addEventListener("input",()=>{updateRequestResetVisibility();clearTimeout(searchTimer);searchTimer=setTimeout(loadRequests,350);});
+updateRequestResetVisibility();
 $("admin-login").hidden=false;dashboard.hidden=true;section.hidden=true;nav.hidden=true;showAccountButton(false);
 refreshSession();
 })();

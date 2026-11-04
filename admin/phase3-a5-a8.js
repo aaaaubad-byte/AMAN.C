@@ -11,7 +11,6 @@ function panel(title, rows) {
  rows.forEach(([k,v,dir])=>{const row=el("div","admin-detail-row"),a=el("span","",k),b=el("strong","",v);if(dir)b.dir=dir;row.append(a,b);box.append(row);});
  return box;
 }
-function setNotice(node, value, error=false){node.textContent=value;node.className=error?"notice-error":"notice-info";}
 function renderNumbersShell(){
  const host=$("admin-generic-view");host.replaceChildren();delete host.dataset.pullScreen;delete host.dataset.noPullRefresh;
  const wrap=el("div","admin-numbers-view"), filters=el("div","admin-filter-grid");
@@ -21,8 +20,7 @@ function renderNumbersShell(){
  const status=el("select","field");status.id="number-status";
  [["all","كل الحالات"],["protected","محمي"],["inactive","غير نشط"],["expired_confiscated","منتهي / مصادَر"]].forEach(([v,t])=>status.add(new Option(t,v)));
  statusWrap.append(statusLabel,status);filters.append(searchWrap,statusWrap);
- const notice=el("p","","");notice.id="numbers-message";
- const list=el("div","");list.id="numbers-list";wrap.append(filters,notice,list);host.append(wrap);
+ const list=el("div","");list.id="numbers-list";wrap.append(filters,list);host.append(wrap);
  search.addEventListener("input",()=>renderNumbers());status.addEventListener("change",()=>renderNumbers());
 }
 function renderNumbers(){
@@ -38,25 +36,27 @@ function renderNumbers(){
  });
 }
 async function loadNumbers(){
- const host=$("numbers-message"),s=service();numberRows=[];renderNumbers();
- if(!s||typeof s.listNumbers!=="function"){setNotice(host,"تعذر الوصول إلى الأرقام حاليًا.",true);return;}
- setNotice(host,"جارٍ تحميل الأرقام…");
- try{const r=await s.listNumbers({search:$("number-search").value.trim(),status:$("number-status").value});if(r?.success!==true||!Array.isArray(r.numbers))throw Error();numberRows=r.numbers;renderNumbers();setNotice(host,"تم تحديث قائمة الأرقام.");}
- catch{setNotice(host,"تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.",true);}
+ const host=$("numbers-list"),s=service();if(!host)return false;
+ if(!s||typeof s.listNumbers!=="function"){host.replaceChildren(el("p","notice-error","تعذر الوصول إلى الأرقام حاليًا."));return false;}
+ host.setAttribute("aria-busy","true");
+ if(!numberRows.length)host.replaceChildren(el("div","empty-state","جارٍ تحميل الأرقام…"));
+ try{const r=await s.listNumbers({search:$("number-search").value.trim(),status:$("number-status").value});if(r?.success!==true||!Array.isArray(r.numbers))throw Error();numberRows=r.numbers;renderNumbers();return true;}
+ catch{if(numberRows.length){host.append(el("p","notice-error","تعذر تحديث القائمة. البيانات المعروضة قد تكون قديمة."));}else{host.replaceChildren(el("p","notice-error","تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة."));}return false;}
+ finally{host.removeAttribute("aria-busy");}
 }
 async function openNumber(id){
  activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();generic.dataset.pullScreen="numbers-detail";
  const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();loadNumbers();});
  generic.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل الرقم…");generic.append(loading);
- const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return;}
+ const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return false;}
  try{
   const r=await s.getNumberDetails({number_id:id});if(r?.success!==true||!r.number)throw Error();const n=r.number;generic.replaceChildren(back);
   generic.append(panel("بيانات الرقم", [["الرقم",n.phone||n.number,"ltr"],["الشركة",n.company_name],["حالة الحماية",n.protection_status_label||labels[n.protection_status]],["تاريخ الإضافة",n.created_at],["موعد المصادرة المتوقع",n.expected_confiscation_at],["آخر يوم للتنشيط",n.reactivation_deadline]]));
   if(n.current_protection)generic.append(panel("فترة الحماية الحالية",[["بداية الحماية",n.current_protection.starts_at],["نهاية الحماية",n.current_protection.ends_at],["اسم الباقة",n.current_protection.package_name],["إجمالي الأيام",n.current_protection.total_days]]));
   const groups=[["سجل الفترات",n.protection_periods],["سجل الأحداث",n.events],["العملاء المرتبطون",n.customers],["الطلبات المرتبطة",n.requests],["البلاغات",n.reports],["التنبيهات",n.alerts],["مهام السداد",n.tasks]];
   groups.forEach(([title,items])=>{const box=el("section","surface admin-detail-panel"),h=el("h2","surface-title",title);box.append(h);if(!Array.isArray(items)||!items.length){box.append(el("p","surface-desc","لا توجد سجلات متاحة."));}else items.forEach(item=>{const line=el("div","admin-detail-row");line.append(el("span","",item.label||item.type||item.customer_name||item.request_number||item.title||"سجل"),el("strong","",item.summary||item.status_label||item.created_at||item.due_at||item.phone||"—"));box.append(line);});generic.append(box);});
-  generic.append(el("p","surface-desc","هذه الشاشة للقراءة فقط. لا تتضمن إجراءات اشتراك أو تمديد أو تنشيط أو إضافة رقم."));
- }catch{loading.textContent="تعذر تحميل تفاصيل الرقم.";}
+  generic.append(el("p","surface-desc","هذه الشاشة للقراءة فقط. لا تتضمن إجراءات اشتراك أو تمديد أو تنشيط أو إضافة رقم."));return true;
+ }catch{loading.textContent="تعذر تحميل تفاصيل الرقم.";return false;}
 }
 function dialogBase(title){
  const dialog=document.createElement("dialog");dialog.className="admin-decision-dialog";const box=el("div","surface"),h=el("h2","surface-title",title),body=el("div","decision-body");box.append(h,body);dialog.append(box);document.body.append(dialog);return {dialog,body};
