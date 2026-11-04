@@ -27,7 +27,7 @@ const svc = () => {
 const runtime = () => window.AMANServices;
 const fmt = value => runtime().formatDateTime(value);
 
-const screenIds = ["boot", "login", "signup", "home", "numbers", "operations", "operation-detail", "protection", "review", "result", "account", "notifications", "number-alerts", "report"];
+const screenIds = ["boot", "login", "signup", "home", "numbers", "operations", "operation-detail", "protection", "review", "result", "account", "notifications", "number-alerts", "report", "aman-service"];
 const PUBLIC_SCREENS = new Set(["boot", "login", "signup"]);
 const screens = Object.fromEntries(screenIds.map(id => [id, $(id + "-screen")]));
 const tabs = [...document.querySelectorAll("[data-tab]")];
