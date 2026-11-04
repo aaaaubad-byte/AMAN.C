@@ -74,7 +74,7 @@ function navigate(name,{remember=true}={}) {
  return true;
 }
 function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
-window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;},refresh(){if(current==="dashboard")return loadDashboard();if(activeRequestId)return openRequest(activeRequestId);if(current==="requests")return loadRequests();return Promise.resolve();}});
+window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;},refresh(){if(current==="dashboard")return loadDashboard();if(activeRequestId)return Promise.all([openRequest(activeRequestId),loadRequests()]);if(current==="requests")return loadRequests();return Promise.resolve();}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
  const s=service();if(!s||typeof s.getDashboardSummary!=="function"){["stat-pending-requests","stat-protected-numbers","stat-open-reports","stat-due-tasks","stat-customers","stat-revenue"].forEach(id=>stat(id,"—"));return;}
