@@ -8,9 +8,10 @@ function installStyle(){
  const style=document.createElement("style");style.id="aman-pull-refresh-style";style.textContent=STYLE;document.head.append(style);
 }
 function attach(root,refresh){
- if(!root||typeof refresh!=="function")return;
+ if(!root)return;
  const existing=attached.get(root);
- if(existing){existing.refresh=refresh;return;}
+ if(existing){existing.refresh=typeof refresh==="function"?refresh:null;return;}
+ if(typeof refresh!=="function")return;
  installStyle();
  const indicator=document.createElement("div");indicator.className="aman-pull-indicator";indicator.setAttribute("aria-live","polite");
  const spinner=document.createElement("span");spinner.className="aman-pull-spinner";spinner.setAttribute("aria-hidden","true");
@@ -18,7 +19,7 @@ function attach(root,refresh){
  const state={refresh,startY:null,armed:false,refreshing:false};
  attached.set(root,state);
  root.addEventListener("touchstart",event=>{
-  if(state.refreshing||event.touches.length!==1)return;
+  if(!state.refresh||state.refreshing||event.touches.length!==1)return;
   if(event.target.closest("input,select,textarea,[contenteditable=true]"))return;
   if(window.scrollY>1||root.scrollTop>1)return;
   state.startY=event.touches[0].clientY;state.armed=false;
@@ -34,7 +35,7 @@ function attach(root,refresh){
  const finish=async()=>{
   if(state.startY===null)return;
   state.startY=null;indicator.classList.remove("is-pulling");
-  if(!state.armed||state.refreshing){state.armed=false;return;}
+  if(!state.armed||state.refreshing||!state.refresh){state.armed=false;return;}
   state.armed=false;state.refreshing=true;indicator.classList.add("is-refreshing");label.textContent="جارٍ تحديث البيانات…";
   try{await state.refresh();label.textContent="اكتمل التحديث";}
   catch{label.textContent="تعذر التحديث";}
