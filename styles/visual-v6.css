@@ -1,0 +1,107 @@
+/* AMAN.C — visual layer v6.
+   Loaded after styles/app.css (injected by services/theme.js). Presentation only.
+   1) surface layers  2) input-field rule  3) filled two-tone icons  4) horizontal carousel */
+
+/* ---------- 1) Surface layers ----------
+   Light: pure white base; each deeper level (section -> card -> inner element) is a step darker.
+   Dark : darkest base; each deeper level is a step lighter.
+   Fields are always darker than the surface that holds them. */
+:root{
+  --bg:#ffffff;--sheet:#ffffff;
+  --panel:#f3f8fa;      /* section */
+  --paper:#eaf2f5;      /* card */
+  --tile:#e0ebef;       /* inner element */
+  --panel-2:#d8e5ea;
+  --line:#cbdce3;--border:1px solid #cbdce3;
+  --field-bg:#d3e2e8;--field-border:#a9bdc7;
+  --search-surface:var(--field-bg);--search-border:var(--field-border);
+  --ic-a:#153b56;--ic-b:#08a99a;--ic-c:#ffffff;
+  --num:#087f78;--dot:#b8ccd4;
+  --app-pad:16px;
+}
+html[data-theme="dark"]{
+  --bg:#0b161c;--sheet:#0b161c;
+  --panel:#11202a;
+  --paper:#182b35;
+  --tile:#20363f;
+  --panel-2:#2a4552;
+  --line:#33505d;--border:1px solid #33505d;
+  --field-bg:#08121a;--field-border:#456372;
+  --search-surface:var(--field-bg);--search-border:var(--field-border);
+  --ic-a:#bcd9ea;--ic-b:#18c4b3;--ic-c:#10222c;
+  --num:#4fe0d1;--dot:#3f5967;
+}
+@media(min-width:650px){:root{--app-pad:28px}}
+html,body,.app{background:var(--bg)}
+.topbar,.bottom-nav,.screen-head{background:var(--bg)}
+html[data-theme="dark"] body,html[data-theme="dark"] .app,
+html[data-theme="dark"] .topbar,html[data-theme="dark"] .bottom-nav,
+html[data-theme="dark"] .screen-head{background:var(--bg)}
+.sheet{background:var(--sheet)}
+
+/* ---------- 2) Input fields ---------- */
+.field,input.field,select.field,textarea.field,
+.compact-search .field,.toolbar-search .field,.compact-filter-select,
+.compact-filter-icon,.auth-field .field,.password-wrap .field,.admin-filter-grid .field{
+  background:var(--field-bg)!important;
+  border:1px solid var(--field-border)!important;
+  color:var(--ink)!important;
+  caret-color:var(--turquoise);
+  box-shadow:none;
+}
+.field::placeholder{color:var(--muted)!important;opacity:1}
+.field:focus,.compact-filter-select:focus,.compact-search .field:focus{
+  border-color:var(--turquoise)!important;
+  box-shadow:0 0 0 2px rgba(8,169,154,.22)!important;
+  outline:none;
+}
+.field:disabled{opacity:.6}
+select.field option{background:var(--paper);color:var(--ink)}
+.password-toggle{color:var(--muted)}
+
+/* ---------- 3) Filled two-tone icons ---------- */
+svg.ami{fill:none!important;stroke:none!important;flex:0 0 auto;display:block}
+svg.ami *{stroke:none!important}
+svg.ami .a{fill:var(--ic-a)!important}
+svg.ami .b{fill:var(--ic-b)!important}
+svg.ami .c{fill:var(--ic-c)!important}
+.icon-btn svg.ami,.quick-icon svg.ami,.phone-icon svg.ami,.detail-icon svg.ami,
+.sheet-hero-icon svg.ami,.empty-icon svg.ami{width:26px;height:26px}
+.stat-icon svg.ami{width:30px;height:30px}
+.admin-shortcut .quick-icon svg.ami{width:30px;height:30px}
+.screen-head .tile-btn svg.ami{width:24px;height:24px}
+.nav-item svg.ami{width:23px;height:23px}
+.compact-filter-icon svg.ami{width:20px;height:20px}
+.sheet-close svg.ami{width:22px;height:22px}
+
+/* ---------- 4) Horizontal carousel ---------- */
+.aman-carousel-track,.admin-stats.aman-carousel-track{
+  display:flex!important;grid-template-columns:none!important;gap:12px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  margin-inline:calc(-1 * var(--app-pad));
+  padding:8px max(11%,calc((100% - 420px) / 2)) 12px;
+}
+.aman-carousel-track::-webkit-scrollbar{display:none}
+.aman-carousel-track>*{
+  flex:0 0 min(78%,420px);scroll-snap-align:center;scroll-snap-stop:always;
+  border-radius:22px;background:var(--tile);border:1px solid var(--line);
+  transform:scale(.93);opacity:.8;transition:transform .25s ease,opacity .25s ease;
+}
+.aman-carousel-track>.is-active{transform:scale(1);opacity:1}
+.admin-stats.aman-carousel-track .stat-card{
+  min-height:150px;padding:18px;gap:6px;justify-content:space-between;
+  display:flex;flex-direction:column;align-items:flex-start;
+}
+.admin-stats.aman-carousel-track .stat-card small{font-size:11.5px;color:var(--muted)}
+.admin-stats.aman-carousel-track .stat-card strong{font-size:34px;line-height:1.2;color:var(--num);margin-top:0}
+.aman-slot{min-height:150px}
+.aman-dots{display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 14px}
+.aman-dot{width:7px;height:19px;padding:6px 0;border:0;border-radius:7px;background:var(--dot);background-clip:content-box;
+  transition:width .2s ease,background-color .2s ease;cursor:pointer}
+.aman-dot.is-active{width:22px;background-color:var(--turquoise)}
+.aman-home-cards{margin:0 0 4px}
+@media(prefers-reduced-motion:reduce){
+  .aman-carousel-track>*,.aman-dot{transition:none}
+}
