@@ -33,14 +33,14 @@ for (const app of APPS) {
       }
     }
     assert.ok(manifest.icons.some(icon => icon.purpose === "maskable"));
-    const { width, height } = pngSize(join(ROOT, app, "icons", "apple-touch-icon-v2.png"));
+    const { width, height } = pngSize(join(ROOT, app, "icons", "apple-touch-icon-v3.png"));
     assert.deepEqual([width, height], [180, 180]);
   });
 
   test(app + ": الصفحة تربط manifest وpwa.js وأيقونة iOS", () => {
     const html = readFileSync(join(ROOT, app, "index.html"), "utf8");
     assert.match(html, /<link rel="manifest" href="\.\/manifest\.webmanifest">/);
-    assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/apple-touch-icon-v2\.png">/);
+    assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/apple-touch-icon-v3\.png">/);
     assert.match(html, /<script defer src="\.\/pwa\.js"><\/script>/);
   });
 

@@ -11,7 +11,7 @@ const PREFIX = "aman-" + APP + "-" + new URL(SCOPE).pathname.replace(/[^a-z0-9]+
 const CACHE = PREFIX + BUILD;
 const ROOT = new URL("../", SELF_URL).href;
 const PRECACHE = [
-  "./", "./app.js", "./ui-v5.js", "./pwa.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-v2.svg", "./icons/icon-192-v2.png", "./icons/icon-512-v2.png", "./icons/icon-maskable-512-v2.png",
+  "./", "./app.js", "./ui-v5.js", "./pwa.js", "./manifest.webmanifest", "./icons/icon-192-v3.png", "./icons/icon-512-v3.png", "./icons/icon-maskable-512-v3.png", "./icons/apple-touch-icon-v3.png",
   "../styles/app.css", "../services/runtime.js", "../services/supabase-config.js", "../services/supabase-adapter.js", "../services/theme.js"
 ].map(p => new URL(p, SELF_URL).href);
 const SHARED_ALLOWED = new Set([
