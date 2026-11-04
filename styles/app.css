@@ -582,3 +582,210 @@ html[data-theme="dark"] .bottom-nav{background:rgba(25,43,53,.98);border-color:v
 html[data-theme="dark"] .field{background:var(--paper);border-color:var(--line);color:var(--ink)}
 html[data-theme="dark"] .state-active{background:var(--green-bg);color:#8de3d9}
 html[data-theme="dark"] :focus-visible{outline-color:#70d9d0}
+
+
+/* AMAN.C — user-defined unified screen layout (2026-11-04).
+   This is an independent C design decision. It does not inherit measurements,
+   spacing scales, or component geometry from another product/repository. */
+:root{
+  --bg:#edf4f6;
+  --sheet:#edf4f6;
+  --paper:#ffffff;
+  --panel:#e5eef1;
+  --panel-2:#dce9ed;
+  --tile:#f8fbfc;
+  --ink:#153b56;
+  --text:#18394e;
+  --muted:#6f8490;
+  --line:#d5e2e7;
+  --border:1px solid #d5e2e7;
+  --turquoise:#08a99a;
+  --turquoise-deep:#087f78;
+  --blue:#153b56;
+  --navy:#08a99a;
+  --navy-deep:#087f78;
+  --green:#08a99a;
+  --green-ink:#087f78;
+  --green-bg:#dff3ef;
+  --shadow:0 1px 3px rgba(21,59,86,.035);
+}
+html,body{background:var(--bg);color:var(--text)}
+.app{background:var(--bg)}
+/* One uninterrupted base surface from the top edge to the bottom navigation. */
+.topbar{
+  position:sticky;top:0;z-index:35;
+  min-height:64px;height:64px;
+  margin-inline:-16px;padding-inline:16px;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 2px 7px rgba(21,59,86,.045);
+}
+.admin-app .topbar{margin-inline:-28px;padding-inline:28px}
+.bottom-nav{
+  background:var(--bg);
+  border-top:1px solid var(--line);
+  box-shadow:0 -2px 8px rgba(21,59,86,.045);
+}
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .bottom-nav{
+  background:var(--bg);border-color:var(--line);
+  box-shadow:0 2px 9px rgba(0,0,0,.18);
+}
+/* On internal pages the screen title/back control becomes the top header. */
+#client-app:has(#number-alerts-screen:not([hidden]))>.topbar,
+#client-app:has(#report-screen:not([hidden]))>.topbar,
+#client-app:has(#numbers-screen:not([hidden]))>.topbar,
+#client-app:has(#operations-screen:not([hidden]))>.topbar,
+#client-app:has(#operation-detail-screen:not([hidden]))>.topbar,
+#client-app:has(#protection-screen:not([hidden]))>.topbar,
+#client-app:has(#review-screen:not([hidden]))>.topbar,
+#client-app:has(#result-screen:not([hidden]))>.topbar,
+#client-app:has(#account-screen:not([hidden]))>.topbar,
+#client-app:has(#notifications-screen:not([hidden]))>.topbar,
+#client-app:has(#login-screen:not([hidden]))>.topbar,
+#client-app:has(#signup-screen:not([hidden]))>.topbar,
+.admin-app:has(#admin-section:not([hidden]))>.topbar{display:none}
+.screen-head{
+  position:sticky;top:0;z-index:30;
+  min-height:62px;
+  margin:0 -16px 12px;
+  padding:9px 16px;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 2px 7px rgba(21,59,86,.045);
+  grid-template-columns:40px minmax(0,1fr) 40px;
+  gap:10px;
+}
+.admin-app .screen-head{margin-inline:-28px;padding-inline:28px}
+.screen-head .tile-btn{
+  width:40px;height:40px;min-width:40px;
+  background:transparent!important;color:var(--blue);
+  border:0;border-radius:0;
+}
+.screen-head .screen-head-title{text-align:center}
+.screen-head .page-title{font-size:16px;font-weight:800;line-height:1.4;color:var(--blue)}
+.screen-head .screen-subtitle{font-size:11px;color:var(--muted)}
+html[data-theme="dark"] .screen-head{
+  background:var(--bg);border-color:var(--line);
+  box-shadow:0 2px 9px rgba(0,0,0,.18);
+}
+/* Search and filters sit immediately under the screen header in one compact row. */
+.list-tools{
+  margin-top:0;margin-bottom:12px;
+  padding:10px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:11px;
+  box-shadow:none;
+}
+.customer-toolbar{
+  display:grid;align-items:end;gap:8px;
+  margin:0;
+}
+.numbers-toolbar{grid-template-columns:minmax(0,1.35fr) repeat(2,minmax(0,1fr))}
+.operations-toolbar{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.customer-toolbar>div{min-width:0}
+.customer-toolbar .field-label{margin-bottom:4px}
+.customer-toolbar .field{height:42px;min-width:0;padding-inline:8px;font-size:10.5px}
+.admin-filter-grid{
+  display:grid;align-items:end;gap:8px;
+  margin:0;
+  grid-template-columns:minmax(0,1.35fr) repeat(3,minmax(0,1fr));
+}
+.admin-filter-grid:has(>div:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
+.admin-filter-grid:has(>div:nth-child(3):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}
+.admin-filter-grid:has(>div:nth-child(4)){grid-template-columns:minmax(0,1.35fr) repeat(3,minmax(0,1fr))}
+.admin-filter-grid>div{min-width:0}
+.admin-filter-grid .field{height:42px;min-width:0;padding-inline:8px;font-size:10.5px}
+.admin-filter-grid .field-label{margin:0 0 4px}
+.admin-app .surface:has(>.admin-filter-grid){
+  margin-top:0;padding:10px;background:var(--panel);
+  border:1px solid var(--line);box-shadow:none;
+}
+.admin-app .surface:has(>.admin-filter-grid)>.field-row{margin-top:8px}
+.filter-grid{margin-top:8px;gap:8px}
+.filter-grid .field{height:42px}
+@media(max-width:420px){
+  .admin-app .topbar,.admin-app .screen-head{margin-inline:-16px;padding-inline:16px}
+  .admin-filter-grid,.admin-filter-grid:has(>div:nth-child(4)){
+    grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));gap:5px
+  }
+  .admin-filter-grid:has(>div:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
+  .admin-filter-grid:has(>div:nth-child(3):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}
+  .admin-filter-grid .field,.customer-toolbar .field{padding-inline:5px;font-size:9.6px}
+  .list-tools{padding:8px}
+}
+@media(max-width:350px){
+  .admin-filter-grid,.admin-filter-grid:has(>div:nth-child(4)){gap:4px}
+  .admin-filter-grid .field{font-size:9px;padding-inline:3px}
+}
+/* Cards are slightly brighter than the base; borders define their edges quietly. */
+.surface,.auth-card,.login-card{
+  background:var(--paper);border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+.soft-surface{
+  background:var(--panel);border:1px solid var(--line);box-shadow:none;
+}
+.phone-card,.quick-link,.detail-block,.operation-card,.admin-request-card,
+.stat-card,.admin-shortcut{
+  background:var(--tile);border:1px solid var(--line);box-shadow:none;
+}
+.admin-shortcut{border-radius:10px}
+.icon-btn,.screen-head .tile-btn,.empty-icon,.phone-icon,.quick-icon,
+.detail-icon,.stat-icon,.sheet-hero-icon{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  color:var(--blue);box-shadow:none;
+}
+.icon-btn svg,.screen-head .tile-btn svg,.empty-icon svg,.phone-icon svg,
+.quick-icon svg,.detail-icon svg,.stat-icon svg,.sheet-hero-icon svg,
+.nav-item svg{stroke:var(--blue);color:var(--blue)}
+.icon-btn svg path:nth-of-type(2),.screen-head .tile-btn svg path:nth-of-type(2),
+.empty-icon svg path:nth-of-type(2),.phone-icon svg path:nth-of-type(2),
+.quick-icon svg path:nth-of-type(2),.detail-icon svg path:nth-of-type(2),
+.stat-icon svg path:nth-of-type(2),.sheet-hero-icon svg path:nth-of-type(2),
+.nav-item svg path:nth-of-type(2){stroke:var(--turquoise)}
+.nav-item.active,.quiet-link,.eyebrow,.notice-success{color:var(--turquoise-deep)}
+.nav-item.active svg{stroke:var(--turquoise)}
+.btn{background:var(--turquoise);color:#fff}
+.btn-outline{background:var(--paper);border-color:var(--line);color:var(--blue)}
+.btn-soft{background:var(--panel-2);color:var(--blue)}
+.field{background:var(--paper);border-color:var(--line);color:var(--blue)}
+.field:focus{border-color:var(--turquoise);box-shadow:0 0 0 2px rgba(8,169,154,.13)}
+.tab-strip{background:var(--panel-2)}
+.tab-strip button[aria-selected="true"]{background:var(--paper);color:var(--blue)}
+.alert-note,.notice-info{background:var(--panel-2);color:var(--blue)}
+.state-active{background:var(--green-bg);color:var(--turquoise-deep)}
+.progress-fill,.unread-dot{background:var(--turquoise)}
+:focus-visible{outline-color:var(--turquoise)}
+html[data-theme="dark"]{
+  --bg:#101d25;--sheet:#101d25;--paper:#192b35;--panel:#20343e;
+  --panel-2:#293e48;--tile:#1a2d37;--ink:#e8f2f5;--text:#dce9ee;
+  --muted:#9aadb7;--line:#354b56;--border:1px solid #354b56;
+  --navy:#13b8aa;--navy-deep:#70d9d0;--green:#13b8aa;
+  --green-ink:#70d9d0;--green-bg:#173f3d;--shadow:none;
+}
+html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--bg)}
+html[data-theme="dark"] .surface,html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .login-card,html[data-theme="dark"] .soft-surface,
+html[data-theme="dark"] .list-tools,html[data-theme="dark"] .admin-app .surface:has(>.admin-filter-grid){
+  background:var(--paper);border-color:var(--line);box-shadow:none;
+}
+html[data-theme="dark"] .soft-surface{background:var(--panel)}
+html[data-theme="dark"] .phone-card,html[data-theme="dark"] .quick-link,
+html[data-theme="dark"] .detail-block,html[data-theme="dark"] .operation-card,
+html[data-theme="dark"] .admin-request-card,html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .admin-shortcut{background:var(--tile);border-color:var(--line)}
+html[data-theme="dark"] .btn{background:var(--turquoise);color:#082c30}
+html[data-theme="dark"] .btn-outline{background:var(--paper);color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] .field{background:var(--paper);border-color:var(--line);color:var(--ink)}
+html[data-theme="dark"] .icon-btn svg,html[data-theme="dark"] .screen-head .tile-btn svg,
+html[data-theme="dark"] .empty-icon svg,html[data-theme="dark"] .phone-icon svg,
+html[data-theme="dark"] .quick-icon svg,html[data-theme="dark"] .detail-icon svg,
+html[data-theme="dark"] .stat-icon svg,html[data-theme="dark"] .sheet-hero-icon svg,
+html[data-theme="dark"] .nav-item svg{stroke:#d9eaf0}
+html[data-theme="dark"] .icon-btn svg path:nth-of-type(2),
+html[data-theme="dark"] .screen-head .tile-btn svg path:nth-of-type(2),
+html[data-theme="dark"] .quick-icon svg path:nth-of-type(2),
+html[data-theme="dark"] .nav-item.active svg{stroke:var(--turquoise)}
+html[data-theme="dark"] .bottom-nav{background:var(--bg);border-color:var(--line)}
