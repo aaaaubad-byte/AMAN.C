@@ -73,7 +73,7 @@ function navigate(name,{remember=true}={}) {
  if(name==="more")renderMore();
  return true;
 }
-function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
+function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";window.AMANPullRefresh?.attach(section,loadRequests);loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
 window.AMANAdminNavigation=Object.freeze({navigate,back,refreshRequests:()=>loadRequests(),refreshCurrentRequest:()=>activeRequestId?openRequest(activeRequestId):Promise.resolve(),get current(){return current;}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
