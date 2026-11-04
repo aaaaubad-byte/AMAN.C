@@ -58,9 +58,20 @@
     if (!callback) { hide(); return; }
     refreshing = true;
     show("جارٍ تحديث البيانات…", 8);
-    try { await callback(); }
-    catch (error) { /* تبقى معالجة الخطأ ضمن وظيفة تحميل الشاشة نفسها. */ }
-    finally { refreshing = false; show("انتهى التحديث", 8); window.setTimeout(hide, 650); }
+    let succeeded = false;
+    try {
+      const result = await callback();
+      succeeded = result !== false && result?.success !== false;
+    } catch (error) {
+      succeeded = false;
+    }
+    refreshing = false;
+    if (succeeded) {
+      hide();
+      return;
+    }
+    show("تعذر تحديث البيانات", 8);
+    window.setTimeout(hide, 1500);
   }
   function onStart(event) {
     if (refreshing || !event.touches || event.touches.length !== 1) return;
