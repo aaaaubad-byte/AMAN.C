@@ -29,7 +29,7 @@ const definitions={
  complaints:{title:"البلاغات",description:"مراجعة البلاغات ومتابعتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"تظهر البلاغات هنا."},
  reports:{title:"تقارير الإيرادات",description:"العمليات والإيرادات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة",emptyDescription:"تظهر الإيرادات بعد اعتماد العمليات."},
  settings:{title:"الشركات والإعدادات",description:"بيانات الشركات والبادئات وإعدادات المهام والتنشيط.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف الشركات واضبط إعداداتها."},
- notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
+ notifications:{title:"الإشعارات",description:"عرض الإشعارات وإنشاؤها.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"تظهر الإشعارات هنا."},
  alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
  packages:{title:"باقات الحماية",description:"إدارة الباقات بحسب الشركة ونوع العملية والمدة والسعر.",icon:"box",emptyTitle:"لم تُضَف باقات بعد",emptyDescription:"أضف باقات الحماية المعتمدة لكل شركة وعملية."},
  payments:{title:"وسائل الدفع",description:"إدارة وسائل الدفع وتعليماتها واشتراط مرجع الدفع.",icon:"wallet",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
