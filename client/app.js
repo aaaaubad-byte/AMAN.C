@@ -546,7 +546,7 @@ function renderNotifications() {
 async function markRead(id) {
  const result = await svc().markNotificationRead({ notification_id: id });
  if (!session) return;
- if (result.success === true) await refreshNotifications(true); else setMessage($("notifications-message"), serviceProblem(result));
+ if (result.success === true) await refreshNotifications(true); else { const note = el("p", "notice-error", serviceProblem(result)); $("notifications-list").prepend(note); }
 }
 $("notification-filter").addEventListener("change", renderNotifications);
 
