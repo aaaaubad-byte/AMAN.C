@@ -30,7 +30,7 @@ const definitions={
  reports:{title:"تقارير الإيرادات",description:"العمليات والإيرادات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة",emptyDescription:"تظهر الإيرادات بعد اعتماد العمليات."},
  settings:{title:"الشركات والإعدادات",description:"بيانات الشركات والبادئات وإعدادات المهام والتنشيط.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف الشركات واضبط إعداداتها."},
  notifications:{title:"الإشعارات",description:"عرض الإشعارات وإنشاؤها.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"تظهر الإشعارات هنا."},
- alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
+ alerts:{title:"تنبيهات الأرقام",description:"تنبيهات الأرقام المرتبطة بالعملاء.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"تظهر التنبيهات هنا."},
  packages:{title:"باقات الحماية",description:"إدارة الباقات بحسب الشركة ونوع العملية والمدة والسعر.",icon:"box",emptyTitle:"لم تُضَف باقات بعد",emptyDescription:"أضف باقات الحماية المعتمدة لكل شركة وعملية."},
  payments:{title:"وسائل الدفع",description:"إدارة وسائل الدفع وتعليماتها واشتراط مرجع الدفع.",icon:"wallet",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
  content:{title:"المحتوى الثابت",description:"تحرير الشروط والأحكام والخصوصية والتواصل والمساعدة والدعم.",icon:"doc",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص الثابتة المعتمدة."},
