@@ -7,19 +7,19 @@ const service=()=>window.AMANAdminServices||null;
 /* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
 const svgWrap=d=>'<svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const ICONS={
- list:svgWrap('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>'),
- phone:svgWrap('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
- users:svgWrap('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/>'),
- user:svgWrap('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
- clock:svgWrap('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
- timer:svgWrap('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>'),
- flag:svgWrap('<path d="M4 22V4"/><path d="M4 4h14l-2 4 2 4H4"/>'),
- doc:svgWrap('<path d="M7 3h10l3 3v15H4V3z"/><path d="M8 10h8M8 14h8M8 18h5"/>'),
- sliders:svgWrap('<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
- bell:svgWrap('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>'),
- box:svgWrap('<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>'),
- wallet:svgWrap('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'),
- dots:svgWrap('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')
+ list:svgWrap('<path class="icon-fill" d="M5 2.5h11l4 4v14a1.8 1.8 0 0 1-1.8 1.8H5A1.8 1.8 0 0 1 3.2 20V4.3A1.8 1.8 0 0 1 5 2.5Z"/><path class="icon-accent" d="M15.5 2.8v4.5H20zM7 10h10v1.8H7zm0 4h10v1.8H7zm0 4h6v1.8H7z"/>'),
+ phone:svgWrap('<path class="icon-fill" d="M7 1.8h10a2.8 2.8 0 0 1 2.8 2.8v14.8a2.8 2.8 0 0 1-2.8 2.8H7a2.8 2.8 0 0 1-2.8-2.8V4.6A2.8 2.8 0 0 1 7 1.8Z"/><path class="icon-accent" d="M7.2 5h9.6v12H7.2z"/><path class="icon-cut" d="M10 19.2h4"/>'),
+ users:svgWrap('<path class="icon-fill" d="M8.5 3a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 0 0 0-8.4ZM1.8 20.8c.3-4 2.8-6.4 6.7-6.4s6.4 2.4 6.7 6.4H1.8Z"/><path class="icon-accent" d="M16 3.8a3.8 3.8 0 0 1 0 7.4v-2a1.8 1.8 0 0 0 0-3.4zm1.2 10.4c3.1.6 4.8 2.8 5 6.6h-2.2c-.2-2.4-1.1-3.9-2.8-4.6z"/>'),
+ user:svgWrap('<path class="icon-fill" d="M12 2.5a5.1 5.1 0 1 0 0 10.2 5.1 5.1 0 0 0 0-10.2Z"/><path class="icon-accent" d="M3 21c.4-4.5 4-7.2 9-7.2s8.6 2.7 9 7.2H3Z"/><path class="icon-cut" d="M8.5 15.2 12 18l3.5-2.8"/>'),
+ clock:svgWrap('<path class="icon-fill" d="M12 2.4a9.6 9.6 0 1 0 0 19.2 9.6 9.6 0 0 0 0-19.2Z"/><path class="icon-accent" d="M11 5.8h2v6.1l4.1 2.4-1 1.7-5.1-3V5.8Z"/>'),
+ timer:svgWrap('<path class="icon-fill" d="M12 4a8.7 8.7 0 1 0 0 17.4A8.7 8.7 0 0 0 12 4Z"/><path class="icon-accent" d="M10 1.8h4v2h-4zM11 7.5h2v5l3 1.8-1 1.7-4-2.5z"/>'),
+ flag:svgWrap('<path class="icon-fill" d="M4 2h2v20H4z"/><path class="icon-accent" d="M6 3h13l-2.2 4.2L19 11H6V3Z"/><path class="icon-cut" d="M8 5h7"/>'),
+ doc:svgWrap('<path class="icon-fill" d="M6 2.2h8l5 5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4.2a2 2 0 0 1 2-2Z"/><path class="icon-accent" d="M13 2.8v5h5zM7.5 11h9v1.8h-9zm0 4h9v1.8h-9zm0 4h6v1.8h-6z"/>'),
+ sliders:svgWrap('<path class="icon-fill" d="M3 5h18v2H3zm0 6h18v2H3zm0 6h18v2H3z"/><path class="icon-accent" d="M7 3.5h3v5H7zm8 6h3v5h-3zm-5 6h3v5h-3z"/>'),
+ bell:svgWrap('<path class="icon-fill" d="M18 9a6 6 0 0 0-12 0c0 6.1-2.2 7.1-3 8.8-.2.5.2 1.2.8 1.2h16.4c.6 0 1-.7.8-1.2-.8-1.7-3-2.7-3-8.8Z"/><path class="icon-accent" d="M9.2 20h5.6a2.8 2.8 0 0 1-5.6 0Z"/>'),
+ box:svgWrap('<path class="icon-fill" d="m12 2 9 4.8v10.4L12 22l-9-4.8V6.8L12 2Z"/><path class="icon-accent" d="m12 4.3 6.4 3.4-6.4 3.4-6.4-3.4L12 4.3Zm-7 5 6 3.2v6.5l-6-3.2V9.3Zm14 0-6 3.2v6.5l6-3.2V9.3Z"/>'),
+ wallet:svgWrap('<path class="icon-fill" d="M4 4h15a2 2 0 0 1 2 2v2h-9a3 3 0 0 0 0 6h9v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path class="icon-accent" d="M12 9.5h9v5h-9a2.5 2.5 0 0 1 0-5Z"/><path class="icon-cut" d="M16 11.1h2v1.8h-2z"/>'),
+ dots:svgWrap('<path class="icon-fill" d="M5 8.5a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z"/><path class="icon-accent" d="M12 8.5a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Zm7 0a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z"/>')
 };
 const definitions={
  requests:{title:"الطلبات",description:"مراجعة طلبات الخدمة.",icon:"list",emptyTitle:"لا توجد طلبات",emptyDescription:"تظهر الطلبات الواردة هنا."},
