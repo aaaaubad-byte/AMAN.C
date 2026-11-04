@@ -3,11 +3,10 @@
    1) surface layers  2) input-field rule  3) filled two-tone icons  4) horizontal carousel */
 
 /* ---------- 1) Surface layers ----------
-   Light experiment: reverse the surface hierarchy — the screen base is now darker,
-   while cards and inner surfaces become progressively lighter.
-   Dark theme and all input-field colors remain unchanged. */
+   Light theme: screen base and cards share the same pure white (#fff).
+   Section surfaces remain subtly distinct; dark theme and input-field colors stay unchanged. */
 :root{
-  --bg:#f0f0f0;--sheet:#f0f0f0;
+  --bg:#ffffff;--sheet:#ffffff;
   --panel:#f7f7f7;      /* section */
   --paper:#ffffff;      /* card */
   --tile:#ffffff;       /* inner element */
