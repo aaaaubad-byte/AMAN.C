@@ -23,7 +23,7 @@ const ICONS={
 };
 const definitions={
  requests:{title:"الطلبات",description:"مراجعة طلبات الخدمة.",icon:"list",emptyTitle:"لا توجد طلبات",emptyDescription:"تظهر الطلبات الواردة هنا."},
- numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"phone",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"ستظهر الأرقام وحالات الحماية هنا بعد تسجيل طلبات معتمدة."},
+ numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية.",icon:"phone",emptyTitle:"لا توجد أرقام",emptyDescription:"تظهر الأرقام بعد اعتماد الطلبات."},
  customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"ستظهر حسابات العملاء هنا."},
  tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
  complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات هنا."},
