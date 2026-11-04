@@ -76,3 +76,21 @@
 .tab-strip{display:flex;gap:4px;padding:4px;background:var(--panel-2);border-radius:var(--radius-control)}.tab-strip button{flex:1;min-height:36px;border:0;border-radius:6px;background:transparent;color:#596d79;font-size:12px;font-weight:700}.tab-strip button[aria-selected="true"]{background:#fff;color:var(--ink);font-weight:800}
 .sheet-top .sheet-close{margin-inline-start:auto;display:grid;place-items:center}.sheet-close svg{width:20px;height:20px}
 .sheet{max-height:88dvh;overscroll-behavior:contain}
+
+
+/* User-selectable display theme. The default preference follows the operating system. */
+html[data-theme="light"]{color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark;--bg:#10191f;--paper:#17242a;--panel:#1d2b32;--panel-2:#24363e;--navy:#0d463d;--navy-deep:#0c332f;--text:#e6eef1;--ink:#edf4f6;--muted:#a2b1ba;--line:#354851;--green:#17a983;--green-ink:#65d4b3;--green-bg:#174738;--red:#f1a6a6;--red-bg:#462c30;--amber:#d4b76c;--amber-bg:#423820;--sheet:linear-gradient(125deg,#17242a 0%,#111b20 52%,#17242a 100%);--tile:linear-gradient(110deg,#22323a,#1b2a31);--border:1px solid #354851;--shadow:none}
+html[data-theme="dark"] body{background:var(--bg);color:var(--text)}
+html[data-theme="dark"] .surface,html[data-theme="dark"] .auth-card,html[data-theme="dark"] .field,html[data-theme="dark"] .btn-outline,html[data-theme="dark"] .tab-strip button[aria-selected="true"]{background:#1a282f;color:var(--text);border-color:var(--line)}
+html[data-theme="dark"] .bottom-nav{background:#17242a;border-color:var(--line)}
+html[data-theme="dark"] .icon-btn,html[data-theme="dark"] .empty-icon,html[data-theme="dark"] .phone-icon,html[data-theme="dark"] .quick-icon,html[data-theme="dark"] .detail-icon,html[data-theme="dark"] .stat-icon,html[data-theme="dark"] .sheet-hero-icon{background:#263942;color:#dce8ec}
+html[data-theme="dark"] .btn-soft,html[data-theme="dark"] .alert-note,html[data-theme="dark"] .notice-info{background:#243740;color:#d5e2e7}
+html[data-theme="dark"] .state-wait,html[data-theme="dark"] .state-off,html[data-theme="dark"] .state-expired{background:#293941;color:#c2d0d5}
+html[data-theme="dark"] .nav-item{color:#a2b1ba}
+html[data-theme="dark"] .nav-item.active,html[data-theme="dark"] .quiet-link,html[data-theme="dark"] .eyebrow{color:#65d4b3}
+html[data-theme="dark"] .tab-strip button{color:#b3c0c5}
+html[data-theme="dark"] .quick-text small,html[data-theme="dark"] .phone-info small,html[data-theme="dark"] .operation-main small,html[data-theme="dark"] .request-card-main small,html[data-theme="dark"] .request-card-side small,html[data-theme="dark"] .empty-state p,html[data-theme="dark"] .auth-card>p,html[data-theme="dark"] .admin-shortcut small{color:#a2b1ba}
+html[data-theme="dark"] .field::placeholder{color:#9eafb7}
+html[data-theme="dark"] .login-card{background:#1a282f;border-color:var(--line);box-shadow:none}
+html[data-theme="dark"] .login-brand h1{color:var(--ink)}

@@ -11,14 +11,15 @@ const PREFIX = "aman-" + APP + "-" + new URL(SCOPE).pathname.replace(/[^a-z0-9]+
 const CACHE = PREFIX + BUILD;
 const ROOT = new URL("../", SELF_URL).href;
 const PRECACHE = [
-  "./", "./app.js", "./login.css", "./phase3-a5-a8.js", "./phase3-a9-a12.js", "./phase3-a13-a17.js", "./phase4-a18-a25.js", "./phase5-a26-a31.js", "./pwa.js", "./manifest.webmanifest", "./icons/icon.svg",
-  "../styles/app.css", "../services/runtime.js", "../services/supabase-config.js", "../services/supabase-adapter.js"
+  "./", "./app.js", "./login.css", "./phase3-a5-a8.js", "./phase3-a9-a12.js", "./phase3-a13-a17.js", "./phase4-a18-a25.js", "./phase5-a26-a31.js", "./pwa.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-v2.svg", "./icons/icon-192-v2.png", "./icons/icon-512-v2.png", "./icons/icon-maskable-512-v2.png",
+  "../styles/app.css", "../services/runtime.js", "../services/supabase-config.js", "../services/supabase-adapter.js", "../services/theme.js"
 ].map(p => new URL(p, SELF_URL).href);
 const SHARED_ALLOWED = new Set([
   new URL("../styles/app.css", SELF_URL).href,
   new URL("../services/runtime.js", SELF_URL).href,
   new URL("../services/supabase-config.js", SELF_URL).href,
-  new URL("../services/supabase-adapter.js", SELF_URL).href
+  new URL("../services/supabase-adapter.js", SELF_URL).href,
+  new URL("../services/theme.js", SELF_URL).href
 ]);
 const APP_STATIC = new Set(PRECACHE);
 const PRIVATE_HEADERS = /(?:^|,)\s*(?:private|no-store|no-cache|must-revalidate)\b/i;
