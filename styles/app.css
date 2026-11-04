@@ -642,8 +642,6 @@ html[data-theme="dark"] .bottom-nav{
 #client-app:has(#result-screen:not([hidden]))>.topbar,
 #client-app:has(#account-screen:not([hidden]))>.topbar,
 #client-app:has(#notifications-screen:not([hidden]))>.topbar,
-#client-app:has(#login-screen:not([hidden]))>.topbar,
-#client-app:has(#signup-screen:not([hidden]))>.topbar,
 .admin-app:has(#admin-section:not([hidden]))>.topbar{display:none}
 .screen-head{
   position:sticky;top:0;z-index:30;
