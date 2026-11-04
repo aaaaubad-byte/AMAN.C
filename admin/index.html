@@ -16,7 +16,7 @@
 </form></div>
 </div></section>
 
-<section id="dashboard-screen" hidden><div class="page-head"><p class="eyebrow">الإدارة</p><h1 class="page-title">الرئيسية</h1><p class="page-desc">متابعة أعمال أمان.</p><button class="btn btn-outline" id="dashboard-refresh" type="button">تحديث</button></div>
+<section id="dashboard-screen" hidden><div class="page-head"><p class="eyebrow">الإدارة</p><h1 class="page-title">الرئيسية</h1><p class="page-desc">متابعة أعمال أمان.</p></div>
 <div class="admin-stats">
 <article class="stat-card"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span><small>طلبات قيد المراجعة</small><strong id="stat-pending-requests">—</strong></article>
 <article class="stat-card"><span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/></svg></span><small>الأرقام المحمية</small><strong id="stat-protected-numbers">—</strong></article>
@@ -51,13 +51,13 @@
 <div><label class="field-label" for="request-type">نوع العملية</label><select class="field" id="request-type"><option value="all">كل العمليات</option><option value="subscription">اشتراك</option><option value="extension">تمديد الاشتراك</option><option value="reactivation">تنشيط</option></select></div>
 <div><label class="field-label" for="request-company">الشركة</label><select class="field" id="request-company"><option value="all">كل الشركات</option></select></div>
 </div>
-<div class="field-row"><button class="btn btn-outline" id="requests-refresh" type="button">تحديث</button><button class="btn btn-soft" id="requests-reset" type="button">مسح التصفية</button></div>
+<div class="field-row"><button class="btn btn-soft" id="requests-reset" type="button">مسح التصفية</button></div>
 <p id="requests-message" aria-live="polite"></p>
 </div>
 <div id="requests-list" aria-live="polite"><div class="surface empty-state"><strong>سجّل الدخول لعرض الطلبات</strong></div></div>
 </div>
 <div id="request-detail-view" hidden>
-<div class="field-row detail-toolbar"><button class="btn btn-outline" id="request-detail-back" type="button">الطلبات</button><button class="btn btn-soft" id="request-detail-refresh" type="button">تحديث</button></div>
+<div class="field-row detail-toolbar"><button class="btn btn-outline" id="request-detail-back" type="button">الطلبات</button></div>
 <div id="request-detail-content"></div>
 </div>
 <div id="admin-generic-view" class="surface" hidden><div class="empty-state"><div class="empty-icon" id="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><strong id="section-empty-title">لا توجد بيانات لعرضها</strong><p id="section-empty-description"></p></div></div>
