@@ -55,7 +55,7 @@
     show("جارٍ تحديث البيانات…", 8);
     try { await callback(); }
     catch (error) { /* تبقى معالجة الخطأ ضمن وظيفة تحميل الشاشة نفسها. */ }
-    finally { refreshing = false; show("اكتمل التحديث", 8); window.setTimeout(hide, 650); }
+    finally { refreshing = false; show("انتهى التحديث", 8); window.setTimeout(hide, 650); }
   }
   function onStart(event) {
     if (refreshing || !event.touches || event.touches.length !== 1) return;
