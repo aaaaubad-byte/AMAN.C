@@ -15,9 +15,9 @@ function button(text,cls,fn){const b=el("button",cls||"btn btn-outline",text);b.
 /* الأيام المتبقية حتى تاريخ المصادرة (شاملة اليوم الحالي)؛ null إن تعذر الحساب. */
 const daysLeft=t=>{const end=Date.parse(t.confiscation_date||t.due_at);return Number.isNaN(end)?null:Math.ceil((end-Date.now())/DAY);};
 const leftLabel=t=>{const d=daysLeft(t);if(d===null)return "—";return d<=1?"آخر يوم للتنفيذ":"يتبقى "+d+" يوم للتنفيذ";};
-async function refreshAfter(text){const h=host();renderTasks(h);h.prepend(el("p","notice-success",text));await loadTasks();}
+async function refreshAfter(text){const h=host();renderTasks(h);window.AMANPullRefresh?.attach($("admin-section"),loadTasks);h.prepend(el("p","notice-success",text));await loadTasks();}
 async function taskDetail(t){
- const h=host(),back=button("العودة إلى المهام","btn btn-outline",()=>{renderTasks(h);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
+ window.AMANPullRefresh?.attach($("admin-section"),()=>taskDetail(t));const h=host(),back=button("العودة إلى المهام","btn btn-outline",()=>{renderTasks(h);window.AMANPullRefresh?.attach($("admin-section"),loadTasks);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
  h.append(panel("تفاصيل المهمة",[["رقم الهاتف",t.phone],["الشركة",t.company_name],["موعد المهمة",fmtDay(t.due_at)],["تاريخ المصادرة",t.status==="executed"?"—":fmtDay(t.confiscation_date)],["نافذة الظهور",t.due_window_days===undefined?"—":t.due_window_days+" يوم قبل الموعد"],["الحالة",taskStatusLabel[t.status]||t.status],["تاريخ التنفيذ الفعلي",fmtDate(t.executed_at)],["معرّف الحماية",t.protection_id||"—"],["سياق الحماية",t.protection_context||"—"]]));
  if(t.status!=="executed"){
   const actions=el("section","surface"),title=el("h2","surface-title","الإجراءات المتاحة");actions.append(title);
