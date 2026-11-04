@@ -11,7 +11,6 @@ function panel(title, rows) {
  rows.forEach(([k,v,dir])=>{const row=el("div","admin-detail-row"),a=el("span","",k),b=el("strong","",v);if(dir)b.dir=dir;row.append(a,b);box.append(row);});
  return box;
 }
-function setNotice(node, value, error=false){node.textContent=value;node.className=error?"notice-error":"notice-info";}
 function renderNumbersShell(){
  const host=$("admin-generic-view");host.replaceChildren();delete host.dataset.pullScreen;delete host.dataset.noPullRefresh;
  const wrap=el("div","admin-numbers-view"), filters=el("div","admin-filter-grid");
