@@ -247,11 +247,11 @@ function openNumberDetails(number, source = "numbers") {
  const extra = $("sheet-details-extra"); extra.replaceChildren();
  rows.filter(([, v]) => has(v) && v !== "—").forEach(([l, v]) => extra.append(detailBlock(l, v)));
  const notes = {
-  not_subscribed: "الرقم غير مشمول حاليًا بحماية أمان.",
-  protected: "الرقم مشمول بالحماية لدى حسابك.",
-  other_protected: "هذا الرقم محمي حاليًا لدى عميل آخر. لا يمكن الاشتراك فيه من هذا الحساب ولا يمكن عرض أي بيانات تخص ذلك العميل.",
-  inactive: "انتهت فترة الحماية السابقة؛ يتاح التنشيط ضمن مهلة التنشيط.",
-  confiscated: "انتهت مهلة التنشيط. لا يتاح إجراء التنشيط."
+  not_subscribed: "لا توجد حماية لهذا الرقم حاليًا.",
+  protected: "الرقم محمي في حسابك.",
+  other_protected: "هذا الرقم محمي لدى عميل آخر. لا يمكنك الاشتراك فيه أو الاطلاع على بياناته.",
+  inactive: "انتهت الحماية السابقة؛ يمكن التنشيط خلال المهلة.",
+  confiscated: "انتهت مهلة التنشيط؛ لا يمكن تنشيط الرقم."
  };
  const privacy = $("sheet-privacy-note"); privacy.hidden = false; privacy.textContent = notes[status] || ""; privacy.hidden = !notes[status];
  const actions = $("sheet-actions"); actions.replaceChildren();
