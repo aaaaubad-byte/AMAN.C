@@ -24,7 +24,7 @@ function renderNumbersShell(){
  const notice=el("p","","");notice.id="numbers-message";
  const list=el("div","");list.id="numbers-list";wrap.append(filters,notice,list);host.append(wrap);
  search.addEventListener("input",()=>renderNumbers());status.addEventListener("change",()=>renderNumbers());
- window.AMANPullRefresh?.attach(wrap,loadNumbers);
+
 }
 function renderNumbers(){
  const host=$("numbers-list");if(!host)return;host.replaceChildren();
@@ -46,7 +46,7 @@ async function loadNumbers(){
  catch{setNotice(host,"تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.",true);}
 }
 async function openNumber(id){
- activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();
+ activeNumberId=id;window.AMANPullRefresh?.attach($("admin-section"),()=>openNumber(id));const generic=$("admin-generic-view");generic.replaceChildren();
  const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();loadNumbers();});
  generic.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل الرقم…");generic.append(loading);
  const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return;}
@@ -73,7 +73,7 @@ async function openApprovalDialog(){
   body.append(el("p","surface-desc","جارٍ التحقق من أثر الاعتماد…"));
   try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();body.replaceChildren();
    body.append(panel("الأثر المتوقع",[["بداية الحماية",r.preview.starts_at],["نهاية الحماية",r.preview.ends_at],["الأثر",r.preview.effect_description]]));
-   const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();const closeOk=el("button","btn btn-block","إغلاق");closeOk.type="button";closeOk.addEventListener("click",()=>closeDialog(dialog));body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."),closeOk);const refresh=$("request-detail-refresh");if(refresh)refresh.click();const listRefresh=$("requests-refresh");if(listRefresh)listRefresh.click();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
+   const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();const closeOk=el("button","btn btn-block","إغلاق");closeOk.type="button";closeOk.addEventListener("click",()=>closeDialog(dialog));body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."),closeOk);window.AMANAdminNavigation?.refreshCurrentRequest?.();window.AMANAdminNavigation?.refreshRequests?.();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
   }catch{body.replaceChildren(el("p","notice-error","تعذر جلب معاينة موثوقة؛ لم يُنفذ الاعتماد."));}
  }
  const cancel=el("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>closeDialog(dialog));body.append(cancel);dialog.showModal();
@@ -91,7 +91,7 @@ async function openRejectDialog(){
 }
 document.addEventListener("aman:admin-screenchange",e=>{
  currentScreen=e.detail?.screen||"";
- if(currentScreen==="numbers"){renderNumbersShell();loadNumbers();}
+ if(currentScreen==="numbers"){renderNumbersShell();window.AMANPullRefresh?.attach($("admin-section"),loadNumbers);loadNumbers();}
 });
 document.addEventListener("click",e=>{
  const target=e.target.closest("button");if(!target)return;
