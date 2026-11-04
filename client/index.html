@@ -19,21 +19,21 @@
 
 <section id="login-screen" data-screen="login" hidden>
 <div class="auth-wrap"><div class="auth-brand"><picture><source data-theme-dark-logo media="(prefers-color-scheme: dark)" srcset="../assets/brand/logo-mark-light-v2.png"><img class="brand-logo" src="../assets/brand/logo-mark-v2.png" alt="" width="75" height="64"></picture><h1>أمان</h1><p>AMAN</p></div>
-<div class="auth-card"><h2 id="login-title">تسجيل الدخول</h2><p id="login-description">أدخل بريدك الإلكتروني وكلمة المرور للمتابعة إلى حسابك.</p>
+<div class="auth-card"><h2 id="login-title">تسجيل الدخول</h2><p id="login-description">أدخل بيانات حسابك.</p>
 <form id="login-form"><label class="field-label" for="login-email">البريد الإلكتروني</label><input class="field" id="login-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
-<div class="field-wrap"><label class="field-label" for="login-password">كلمة المرور</label><input class="field" id="login-password" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" minlength="4" required></div>
+<div class="field-wrap"><label class="field-label" for="login-password">كلمة المرور</label><input class="field" id="login-password" type="password" autocomplete="current-password"  minlength="4" required></div>
 <p class="notice-error" id="login-message" aria-live="polite"></p><button class="btn btn-block" id="login-submit" type="submit">دخول</button></form>
 <button class="quiet-link" id="login-to-signup" type="button" style="width:100%;margin-top:13px">إنشاء حساب جديد</button></div>
 <p class="auth-foot" id="login-foot" aria-live="polite"></p></div></section>
 
 <section id="signup-screen" data-screen="signup" hidden>
 <div class="auth-wrap"><div class="auth-brand"><picture><source data-theme-dark-logo media="(prefers-color-scheme: dark)" srcset="../assets/brand/logo-mark-light-v2.png"><img class="brand-logo" src="../assets/brand/logo-mark-v2.png" alt="" width="75" height="64"></picture><h1>أمان</h1><p>AMAN</p></div>
-<div class="auth-card"><h2 id="signup-title">إنشاء حساب جديد</h2><p id="signup-description">أدخل بريدك الإلكتروني وكلمة مرور لإنشاء حسابك.</p>
+<div class="auth-card"><h2 id="signup-title">إنشاء حساب جديد</h2><p id="signup-description">أدخل بيانات إنشاء الحساب.</p>
 <form id="signup-form"><label class="field-label" for="signup-email">البريد الإلكتروني</label><input class="field" id="signup-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
 <div class="field-wrap"><label class="field-label" for="signup-password">كلمة المرور</label><input class="field" id="signup-password" type="password" autocomplete="new-password" placeholder="أدخل كلمة المرور" minlength="4" required></div>
-<div class="field-wrap"><label class="field-label" for="signup-confirm">تأكيد كلمة المرور</label><input class="field" id="signup-confirm" type="password" autocomplete="new-password" placeholder="أعد إدخال كلمة المرور" minlength="4" required></div>
+<div class="field-wrap"><label class="field-label" for="signup-confirm">تأكيد كلمة المرور</label><input class="field" id="signup-confirm" type="password" autocomplete="new-password"  minlength="4" required></div>
 <p class="notice-error" id="signup-message" aria-live="polite"></p><button class="btn btn-block" id="signup-submit" type="submit">إنشاء الحساب</button></form>
-<button class="quiet-link" id="signup-to-login" type="button" style="width:100%;margin-top:13px">لديك حساب بالفعل؟ تسجيل الدخول</button></div>
+<button class="quiet-link" id="signup-to-login" type="button" style="width:100%;margin-top:13px">لديك حساب؟ تسجيل الدخول</button></div>
 <p class="auth-foot" id="signup-foot" aria-live="polite"></p></div></section>
 
 <section id="number-alerts-screen" data-screen="number-alerts" hidden><div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">متابعة الرقم</p><h1 class="page-title">تنبيهات الرقم</h1><p class="page-desc">تنبيهات هذا الرقم.</p></div><div class="surface"><div class="detail-label">الرقم</div><div class="detail-value" id="alerts-phone" dir="ltr">—</div><div class="detail-label" style="margin-top:12px">الشركة</div><div class="detail-value" id="alerts-company">—</div><div class="detail-label" style="margin-top:12px">حالة الحماية</div><div class="detail-value" id="alerts-status">—</div></div><p id="number-alerts-message" aria-live="polite"></p><div id="number-alerts-list" aria-live="polite"></div></section>
