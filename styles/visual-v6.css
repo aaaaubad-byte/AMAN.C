@@ -178,3 +178,18 @@ html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .b{
 .section-heading-icon svg{width:21px;height:21px}
 #home-screen>.section-head h2{display:flex;align-items:center}
 @media(max-width:380px){#client-app .topbar-greeting{font-size:12.5px}.home-search-icon{width:44px;height:44px}}
+
+
+/* Admin dashboard: compact top welcome, lifted statistics and circular carousel dots. */
+.admin-app>.admin-topbar{justify-content:flex-start;gap:11px}
+.admin-topbar-greeting{font-size:14px;font-weight:800;color:var(--ink);line-height:1}
+.admin-app #dashboard-screen>.admin-stats{margin-top:-13px;margin-bottom:2px}
+.admin-app #dashboard-screen>.section-head{margin-top:12px;margin-bottom:9px}
+.admin-app #dashboard-screen>.surface{margin-top:12px!important}
+.admin-section-icon{display:inline-grid;place-items:center;width:23px;height:23px;margin-inline-end:7px;color:var(--turquoise);vertical-align:middle}
+.admin-section-icon svg{width:21px;height:21px}
+.admin-app #dashboard-screen .section-head h2{display:flex;align-items:center}
+.admin-app .admin-stats.aman-carousel-track~.aman-dots .aman-dot,
+.admin-app .aman-dots .aman-dot{width:9px;height:9px;min-width:9px;padding:0;border-radius:50%;background:var(--dot);background-clip:border-box}
+.admin-app .aman-dots .aman-dot.is-active{width:9px;height:9px;background:var(--turquoise);transform:scale(1.2)}
+.admin-app .aman-dots{gap:9px;margin:1px 0 8px}
