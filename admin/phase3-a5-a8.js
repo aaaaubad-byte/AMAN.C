@@ -13,7 +13,7 @@ function panel(title, rows) {
 }
 function setNotice(node, value, error=false){node.textContent=value;node.className=error?"notice-error":"notice-info";}
 function renderNumbersShell(){
- const host=$("admin-generic-view");host.replaceChildren();
+ const host=$("admin-generic-view");host.replaceChildren();delete host.dataset.pullScreen;delete host.dataset.noPullRefresh;
  const wrap=el("div","admin-numbers-view"), filters=el("div","admin-filter-grid");
  const searchWrap=el("div"), searchLabel=el("label","field-label","بحث عن الرقم");searchLabel.htmlFor="number-search";
  const search=el("input","field");search.id="number-search";search.placeholder="أدخل الرقم أو اسم الشركة";searchWrap.append(searchLabel,search);
@@ -45,7 +45,7 @@ async function loadNumbers(){
  catch{setNotice(host,"تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.",true);}
 }
 async function openNumber(id){
- activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();
+ activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();generic.dataset.pullScreen="numbers-detail";
  const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();loadNumbers();});
  generic.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل الرقم…");generic.append(loading);
  const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return;}
@@ -88,7 +88,7 @@ async function openRejectDialog(){
  }
  const cancel=el("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>closeDialog(dialog));body.append(cancel);dialog.showModal();
 }
-if (window.AMANPullToRefresh) window.AMANPullToRefresh.register("numbers", loadNumbers);
+if (window.AMANPullToRefresh) { window.AMANPullToRefresh.register("numbers", loadNumbers); window.AMANPullToRefresh.register("numbers-detail", () => activeNumberId ? openNumber(activeNumberId) : loadNumbers()); }
 document.addEventListener("aman:admin-screenchange",e=>{
  currentScreen=e.detail?.screen||"";
  if(currentScreen==="numbers"){renderNumbersShell();loadNumbers();}
