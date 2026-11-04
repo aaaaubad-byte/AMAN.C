@@ -20,7 +20,7 @@
     document.documentElement.dataset.theme = resolved;
     document.documentElement.dataset.themePreference = pref;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = resolved === "dark" ? "#182b35" : "#ffffff";
+    if (meta) meta.content = resolved === "dark" ? "#182b35" : "#f4f8fa";
     document.querySelectorAll("[data-theme-setting]").forEach(control => {
       control.value = pref;
     });

@@ -2,21 +2,27 @@
    Loaded after styles/app.css (injected by services/theme.js). Presentation only.
    1) surface layers  2) input-field rule  3) filled two-tone icons  4) horizontal carousel */
 
-/* ---------- 1) Surface layers ----------
-   The screen base and the cards share ONE color in each theme (--bg = --paper = --sheet).
-   Card edges are defined by borders; inner elements (--tile) and input fields stay distinct. */
+/* ---------- 1) Color system: three surface layers + turquoise accent (single source of truth, light theme) ----------
+   Layer 1  screen/window base  --bg    #F4F8FA
+   Layer 2  cards/containers    --paper #FFFFFF   (edges: border + faint shadow, never a new background)
+   Layer 3  input/search fields --field-bg #E6EEF5, --field-border #A9BDC7 (sit directly on layer 1)
+   Accent   --turquoise #078F87: identity/emphasis only (primary buttons, icons, active states, key numbers). */
 :root{
-  --paper:#ffffff;      /* card */
-  --bg:var(--paper);    /* screen base = card */
-  --sheet:var(--paper);
+  --bg:#F4F8FA;
+  --paper:#FFFFFF;
+  --sheet:var(--bg);
   --panel:var(--paper);
-  --tile:#ffffff;       /* inner element */
-  --panel-2:#ffffff;
-  --line:#dedede;--border:1px solid #dedede;
-  --field-bg:#d3e2e8;--field-border:#a9bdc7;
+  --panel-2:var(--paper);
+  --tile:var(--paper);
+  --line:#D8E3E9;--border:1px solid #D8E3E9;
+  --shadow:0 1px 3px rgba(21,59,86,.05);
+  --field-bg:#E6EEF5;--field-border:#A9BDC7;
   --search-surface:var(--field-bg);--search-border:var(--field-border);
-  --ic-a:#153b56;--ic-b:#08a99a;--ic-c:#ffffff;
-  --num:#087f78;--dot:#b8ccd4;
+  --turquoise:#078F87;--turquoise-deep:#078F87;
+  --navy:var(--turquoise);--navy-deep:var(--turquoise);
+  --green:var(--turquoise);--green-ink:var(--turquoise);--green-bg:#E6F4F3;
+  --ic-a:#153b56;--ic-b:var(--turquoise);--ic-c:#ffffff;
+  --num:var(--turquoise);--dot:#b8ccd4;
   --app-pad:16px;
 }
 html[data-theme="dark"]{
@@ -51,7 +57,7 @@ html,body,.app,.topbar,.bottom-nav,.screen-head,.sheet{
 .field::placeholder{color:var(--muted)!important;opacity:1}
 .field:focus,.compact-filter-select:focus,.compact-search .field:focus{
   border-color:var(--turquoise)!important;
-  box-shadow:0 0 0 2px rgba(8,169,154,.22)!important;
+  box-shadow:0 0 0 2px rgba(7,143,135,.22)!important;
   outline:none;
 }
 .field:disabled{opacity:.6}
@@ -104,3 +110,21 @@ svg.ami .c{fill:var(--ic-c)!important}
 @media(prefers-reduced-motion:reduce){
   .aman-carousel-track>*,.aman-dot{transition:none}
 }
+
+
+/* ---------- 5) Component rules for the color system (consume tokens only) ---------- */
+.surface,.soft-surface,.auth-card,.login-card,.phone-card,.quick-link,.detail-block,.operation-card,
+.admin-request-card,.stat-card,.admin-shortcut{background:var(--paper)}
+.btn.btn-outline{background:var(--paper);color:var(--ink);border-color:var(--field-border)}
+.btn.btn-soft{background:var(--paper);color:var(--turquoise);border-color:var(--line)}
+.tab-strip{background:var(--field-bg);border:1px solid var(--field-border)}
+.tab-strip button[aria-selected="true"]{background:var(--paper);color:var(--ink)}
+.alert-note,.notice-info{background:var(--paper);border:1px solid var(--line)}
+.notice-info{border:0}
+.login-submit{background:var(--turquoise)}
+.remember-row input{accent-color:var(--turquoise)}
+.password-toggle[aria-pressed="true"]{color:var(--turquoise)}
+.login-card .field:focus{border-color:var(--turquoise)}
+html[data-theme="dark"] .tab-strip{background:var(--panel-2);border:0}
+html[data-theme="dark"] .alert-note{border:0}
+html[data-theme="dark"] .btn.btn-soft{background:#203d43;color:#c5e9e5;border-color:transparent}
