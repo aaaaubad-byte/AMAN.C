@@ -520,7 +520,7 @@ $("signout-confirm-yes").addEventListener("click", async () => {
 function renderNotifications() {
  const host = $("notifications-list"), filter = $("notification-filter").value;
  host.replaceChildren();
- const box = listStateBox("notifications", () => refreshNotifications(), "لا توجد إشعارات", "ستظهر هنا إشعارات حسابك عند وصولها.");
+ const box = listStateBox("notifications", () => refreshNotifications(), "لا توجد إشعارات", "تظهر إشعاراتك هنا.");
  $("notifications-dot").hidden = !lists.notifications.items.some(n => !n.read_at);
  if (box) { host.append(box); return; }
  const items = lists.notifications.items.filter(n => filter === "all" || (filter === "unread" && !n.read_at) || (filter === "read" && n.read_at));
