@@ -72,7 +72,7 @@ const ICONS = {
 };
 function el(tag, cls, content) {
  const n = document.createElement(tag); if (cls) n.className = cls;
- if (tag === "button" && cls && /\\bbtn\\b/.test(cls) && content !== undefined) {
+ if (tag === "button" && cls && /\bbtn\b/.test(cls) && content !== undefined) {
   const label = document.createElement("span"); label.textContent = content;
   const value = String(content);
   const name = /بحث/.test(value) ? "search" : /إعادة المحاولة|تحديث/.test(value) ? "clock" : /تسجيل الخروج/.test(value) ? "logout" : /تسجيل الدخول|دخول/.test(value) ? "user" : /إلغاء|إغلاق/.test(value) ? "close" : /حفظ|تأكيد|إرسال|متابعة|اعتماد/.test(value) ? "check" : null;
