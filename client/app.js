@@ -212,11 +212,11 @@ function renderHomeNumbers() {
 }
 function renderNumbers() {
  const host = $("numbers-list"); host.replaceChildren();
- const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام بعد", "تظهر هنا الأرقام بعد اعتماد طلب الاشتراك. البحث عن رقم لا يضيفه إلى قائمتك.");
+ const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام", "تظهر الأرقام بعد اعتماد الاشتراك. البحث لا يضيف الرقم إلى حسابك.");
  if (box) { host.append(box); updateCompanyFilter(); return; }
  const query = normalizePhone($("numbers-search").value), company = $("numbers-company-filter").value, status = $("numbers-status-filter").value;
  const filtered = lists.numbers.items.filter(i => (!query || normalizePhone(i.phone).includes(query)) && (!company || i.company_id === company) && (!status || i.status === status));
- if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "غيّر عبارة البحث أو خيارات التصفية.")); updateCompanyFilter(); return; }
+ if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "عدّل البحث أو التصفية.")); updateCompanyFilter(); return; }
  filtered.forEach(n => host.append(numberCard(n, "numbers")));
  updateCompanyFilter();
 }
