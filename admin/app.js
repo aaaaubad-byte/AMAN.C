@@ -22,7 +22,7 @@ const ICONS={
  dots:svgWrap('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')
 };
 const definitions={
- requests:{title:"الطلبات",description:"مراجعة طلبات الاشتراك والتمديد والتنشيط واتخاذ القرار بشأنها.",icon:"list",emptyTitle:"لا توجد طلبات حتى الآن",emptyDescription:"ستظهر الطلبات الواردة هنا."},
+ requests:{title:"الطلبات",description:"مراجعة طلبات الخدمة.",icon:"list",emptyTitle:"لا توجد طلبات",emptyDescription:"تظهر الطلبات الواردة هنا."},
  numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"phone",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"ستظهر الأرقام وحالات الحماية هنا بعد تسجيل طلبات معتمدة."},
  customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"ستظهر حسابات العملاء هنا."},
  tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
@@ -95,7 +95,7 @@ function requestCard(r){
 }
 function renderRequests(){
  const host=$("requests-list");host.replaceChildren();
- if(!requestRows.length){const empty=document.createElement("div");empty.className="surface empty-state";const strong=document.createElement("strong");strong.textContent="لا توجد طلبات مطابقة";const p=document.createElement("p");p.textContent="جرّب تغيير المرشحات أو تحديث القائمة.";empty.append(strong,p);host.append(empty);return;}
+ if(!requestRows.length){const empty=document.createElement("div");empty.className="surface empty-state";const strong=document.createElement("strong");strong.textContent="لا توجد طلبات مطابقة";const p=document.createElement("p");p.textContent="عدّل التصفية أو حدّث القائمة.";empty.append(strong,p);host.append(empty);return;}
  requestRows.forEach(r=>host.append(requestCard(r)));
 }
 async function loadRequests(){
@@ -112,7 +112,7 @@ function openInlineActions(record,host){
  if(record.status!=="pending")return;
  const actions=document.createElement("section");actions.className="surface";
  const h=document.createElement("h2");h.className="surface-title";h.textContent="إجراءات الطلب";actions.append(h);
- const note=document.createElement("p");note.className="surface-desc";note.textContent="لا يُعتمد الطلب أو يُرفض إلا بعد تأكيد الخادم صلاحية المدير والحالة الحالية وبيانات الرقم ومرجع الدفع.";actions.append(note);
+ const note=document.createElement("p");note.className="surface-desc";note.textContent="يتحقق أمان من الصلاحية والبيانات ومرجع الدفع قبل اعتماد الطلب أو رفضه.";actions.append(note);
  const approve=document.createElement("button");approve.className="btn btn-block";approve.type="button";approve.textContent="مراجعة أثر الاعتماد";approve.addEventListener("click",()=>showApprovePreview(record,actions));actions.append(approve);
  const reject=document.createElement("button");reject.className="btn btn-outline btn-block";reject.type="button";reject.style.marginTop="9px";reject.textContent="رفض الطلب";reject.addEventListener("click",()=>showRejectForm(record,actions));actions.append(reject);host.append(actions);
 }
