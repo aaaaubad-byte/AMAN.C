@@ -351,3 +351,127 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
 .admin-app #request-detail-back{display:none}
 @media(max-width:350px){.screen-head{gap:6px;margin-bottom:16px}.screen-head .page-title{font-size:16px}.screen-head .screen-subtitle{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.screen-head .tile-btn{transition:none}}
+
+
+/* Visual layer refinement — AMAN.Y surface hierarchy, retaining AMAN.C turquoise identity.
+   Flat, intentional surface levels: page background → white cards → soft inset tiles.
+   This block changes presentation only; component structure and behavior remain untouched. */
+:root{
+ --bg:#f1f5f6;
+ --paper:#ffffff;
+ --panel:#edf2f4;
+ --panel-2:#e5edf1;
+ --sheet:#f1f5f6;
+ --tile:#e8eff2;
+ --navy:#087f67;
+ --navy-deep:#075f50;
+ --green:#079f7a;
+ --green-ink:#087f67;
+ --green-bg:#dff3ec;
+ --muted:#71838d;
+ --line:#dfe7ea;
+ --border:1px solid #dfe7ea;
+ --shadow:0 1px 3px rgba(16,36,53,.045);
+}
+html,body{background:var(--bg)}
+.app{background:var(--sheet)}
+.surface,.auth-card,.login-card{
+ background:var(--paper);
+ border:var(--border);
+ box-shadow:var(--shadow);
+}
+.soft-surface{background:var(--panel);border:1px solid #e3eaed;box-shadow:none}
+.sheet{background:var(--sheet);box-shadow:0 -8px 28px rgba(16,36,53,.08)}
+.admin-decision-dialog>.surface{background:var(--paper);box-shadow:0 16px 42px rgba(16,36,53,.16)}
+.phone-card,.quick-link,.detail-block,.operation-card,.admin-request-card,
+.stat-card,.admin-shortcut{background:var(--tile);box-shadow:none}
+.icon-btn,.screen-head .tile-btn,.empty-icon,.phone-icon,.quick-icon,
+.detail-icon,.stat-icon,.sheet-hero-icon{
+ background:#dcebe8;color:#087f67;
+}
+.brand-symbol{background:#087f67;color:#fff}
+.btn{background:var(--navy);color:#fff}
+.btn-outline{background:var(--paper);border-color:#b9d3ce;color:var(--navy-deep)}
+.btn-soft{background:#dcebe8;color:#075f50}
+.field{background:var(--paper);border-color:#cbd8dc;color:var(--ink)}
+.field:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(9,164,120,.14)}
+.field:disabled{background:var(--panel);color:var(--muted)}
+.field::placeholder{color:#98a8af}
+.quiet-link,.eyebrow,.notice-success{color:var(--green-ink)}
+.tab-strip{background:var(--panel-2)}
+.tab-strip button[aria-selected="true"]{background:var(--paper);color:var(--navy)}
+.bottom-nav{background:rgba(255,255,255,.96);border-color:var(--line)}
+.nav-item.active{color:var(--green-ink)}
+.state-active{background:var(--green-bg);color:#087f67}
+.state-wait,.state-off,.state-expired{background:var(--panel-2);color:#536b76}
+.alert-note,.notice-info{background:#e2efed;color:#315f59}
+.unread-dot{background:var(--green);border-color:var(--paper)}
+.progress-track{background:var(--line)}
+.progress-fill{background:var(--green)}
+.admin-decision-dialog::backdrop,.overlay{background:rgba(16,36,53,.42)}
+.screen-head .tile-btn:active,.icon-btn:active{background:#d1e5df}
+:focus-visible{outline-color:var(--green)}
+html[data-theme="dark"]{
+ --bg:#10191f;
+ --paper:#17242a;
+ --panel:#1d2b32;
+ --panel-2:#24363e;
+ --sheet:#10191f;
+ --tile:#22343b;
+ --navy:#18a987;
+ --navy-deep:#65d4b3;
+ --text:#e6eef1;
+ --ink:#edf4f6;
+ --muted:#a2b1ba;
+ --line:#354851;
+ --border:1px solid #354851;
+ --green:#25b892;
+ --green-ink:#65d4b3;
+ --green-bg:#174738;
+ --red:#f1a6a6;
+ --red-bg:#462c30;
+ --amber:#d4b76c;
+ --amber-bg:#423820;
+ --shadow:none;
+}
+html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--bg)}
+html[data-theme="dark"] .surface,
+html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .login-card,
+html[data-theme="dark"] .admin-decision-dialog>.surface{background:var(--paper);border-color:var(--line);box-shadow:none}
+html[data-theme="dark"] .soft-surface{background:var(--panel);border-color:var(--line)}
+html[data-theme="dark"] .sheet{background:var(--sheet);box-shadow:0 -8px 28px rgba(0,0,0,.3)}
+html[data-theme="dark"] .phone-card,
+html[data-theme="dark"] .quick-link,
+html[data-theme="dark"] .detail-block,
+html[data-theme="dark"] .operation-card,
+html[data-theme="dark"] .admin-request-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .admin-shortcut{background:var(--tile)}
+html[data-theme="dark"] .icon-btn,
+html[data-theme="dark"] .screen-head .tile-btn,
+html[data-theme="dark"] .empty-icon,
+html[data-theme="dark"] .phone-icon,
+html[data-theme="dark"] .quick-icon,
+html[data-theme="dark"] .detail-icon,
+html[data-theme="dark"] .stat-icon,
+html[data-theme="dark"] .sheet-hero-icon{background:#29443f;color:#8de0c9}
+html[data-theme="dark"] .brand-symbol{background:#087f67;color:#fff}
+html[data-theme="dark"] .field{background:#17242a;border-color:var(--line);color:var(--ink)}
+html[data-theme="dark"] .field:disabled{background:var(--panel);color:var(--muted)}
+html[data-theme="dark"] .btn{background:var(--navy);color:#062c26}
+html[data-theme="dark"] .btn-outline{background:var(--paper);border-color:#46665f;color:var(--ink)}
+html[data-theme="dark"] .btn-soft,
+html[data-theme="dark"] .alert-note,
+html[data-theme="dark"] .notice-info{background:#243c3a;color:#c7e8df}
+html[data-theme="dark"] .bottom-nav{background:rgba(23,36,42,.97);border-color:var(--line)}
+html[data-theme="dark"] .tab-strip{background:var(--panel-2)}
+html[data-theme="dark"] .tab-strip button[aria-selected="true"]{background:var(--paper);color:var(--ink)}
+html[data-theme="dark"] .state-active{background:var(--green-bg);color:#8de0c9}
+html[data-theme="dark"] .state-wait,
+html[data-theme="dark"] .state-off,
+html[data-theme="dark"] .state-expired{background:#293941;color:#c2d0d5}
+html[data-theme="dark"] .unread-dot{border-color:var(--paper)}
+html[data-theme="dark"] .admin-decision-dialog::backdrop,
+html[data-theme="dark"] .overlay{background:rgba(0,0,0,.62)}
+html[data-theme="dark"] :focus-visible{outline-color:#65d4b3}
