@@ -21,7 +21,7 @@ for (const app of APPS) {
     assert.equal(manifest.display, "standalone");
     assert.equal(manifest.dir, "rtl");
     assert.equal(manifest.lang, "ar");
-    assert.equal(manifest.id, "aman-" + app);
+    assert.equal(manifest.id, "/AMAN.C/" + app + "/");
     assert.equal(manifest.start_url, "./");
     assert.equal(manifest.scope, "./");
     for (const icon of manifest.icons) {
