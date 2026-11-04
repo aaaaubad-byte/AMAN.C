@@ -235,48 +235,54 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
 }
 
 
-/* Auth screens — align customer login/signup geometry with the admin login layout. */
+/* Customer authentication — same visual geometry and field rhythm as admin login. */
+#client-app:has(#login-screen:not([hidden])) .topbar,
+#client-app:has(#signup-screen:not([hidden])) .topbar{display:none}
+#client-app:has(#login-screen:not([hidden])),
+#client-app:has(#signup-screen:not([hidden])){padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .auth-wrap{
  width:min(100%,440px);
- min-height:calc(100dvh - 100px);
+ min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
  margin-inline:auto;
- display:grid;
- grid-template-rows:minmax(24px,1fr) auto auto minmax(24px,1fr);
- align-content:stretch;
- padding:16px 0;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ padding:24px 0;
 }
 .auth-brand{
- align-self:end;
  display:grid;
  justify-items:center;
- gap:0;
- margin:0 0 20px;
+ gap:12px;
+ margin:0 0 28px;
  text-align:center;
 }
-.auth-brand picture{display:block;margin:0 auto 10px}
-.auth-brand .brand-logo{width:auto;height:64px;margin:0 auto}
-.auth-brand h1{font-size:18px;line-height:1.4;margin:0}
-.auth-brand p{font-size:10.8px;line-height:1.4;margin:4px 0 0}
+.auth-brand picture{display:block;margin:0 auto}
+.auth-brand .brand-logo{width:auto;height:76px;margin:0 auto}
+.auth-brand h1{font-size:24px;line-height:1.35;font-weight:800;margin:0;color:var(--navy-deep)}
+.auth-brand p{font-size:12px;line-height:1.4;margin:0;color:var(--muted)}
 .auth-card{
  width:min(100%,400px);
  margin:0 auto;
- padding:20px;
+ padding:24px 20px 22px;
  border-radius:16px;
 }
-.auth-card h2{text-align:center;margin:0 0 8px}
-.auth-card>p{margin:0 0 14px;text-align:center}
-.auth-card form{display:grid;gap:12px}
-.auth-card .field-wrap{margin-top:0}
-.auth-card .field-label{margin:0 0 5px}
-.auth-card .field{height:48px}
-.auth-card .btn{min-height:48px}
-.auth-foot{align-self:start;width:min(100%,400px);margin:12px auto 0;text-align:center}
+.auth-card h2{text-align:center;font-size:18px;line-height:1.4;margin:0 0 10px}
+.auth-card>p{margin:0 0 18px;text-align:center}
+.auth-card form{display:grid;gap:16px}
+.auth-field{display:grid;gap:6px;min-width:0}
+.auth-field .field-label{margin:0;font-size:13px;font-weight:700;color:var(--ink)}
+.auth-field .field{height:48px;padding:10px 14px;border-radius:10px;font-size:15px}
+.auth-card .btn{min-height:48px;margin-top:4px;border-radius:10px;font-size:16px}
+.auth-card .notice-error{margin:0;font-size:13px;line-height:1.7}
+.auth-card>.quiet-link{font-size:12px;margin-top:14px!important}
+.auth-foot{width:min(100%,400px);margin:12px auto 0;text-align:center;font-size:10px;line-height:1.7}
 @media(max-width:380px){
- .auth-wrap{padding:12px 0;grid-template-rows:minmax(16px,1fr) auto auto minmax(16px,1fr)}
- .auth-brand{margin-bottom:16px}
- .auth-card{padding:16px}
+ .auth-wrap{padding:16px 0}
+ .auth-brand{margin-bottom:20px}
+ .auth-brand .brand-logo{height:64px}
+ .auth-card{padding:20px 16px 18px}
 }
-
+ 
 /* Search/filter bars — Y reference pattern: search and filters share one top row. */
 .customer-toolbar{display:grid;align-items:end;gap:8px;margin:0 0 12px}
 .numbers-toolbar{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr)}
