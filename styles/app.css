@@ -1,6 +1,91 @@
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
-/* AMAN v5 design tokens — source: AMAN_UI_Design_System_Reference_v5.html */
-:root{color-scheme:light;--bg:#f1f5f6;--paper:#fff;--panel:#edf2f4;--panel-2:#e5edf1;--navy:#112230;--navy-deep:#102435;--text:#102435;--ink:#102435;--muted:#8596a5;--line:#d9e2e6;--green:#09a478;--green-ink:#00a775;--green-bg:#daf4e9;--red:#a44343;--red-bg:#e9eff1;--amber:#506b7a;--amber-bg:#f0f4f5;--sheet:linear-gradient(125deg,#fafcfd 0%,#f1f5f6 52%,#f7f9fa 100%);--tile:linear-gradient(110deg,#f0f4f5,#e9eff1);--radius-xl:20px;--radius-lg:13px;--radius-md:9px;--radius-control:8px;--control-height:44px;--border:1px solid #d9e2e6;--shadow:none;font-family:Alexandria,'DM Sans',sans-serif}
+/* ==========================================================================
+   AMAN.C — CENTRAL COLOR / DESIGN TOKENS (single reference; everything below consumes these)
+   Light theme (agreed palette):
+     --bg #F4F8FA screen/window · --paper #FFFFFF cards/containers · --field-bg #E6EEF5 inputs/search
+     --field-border #A9BDC7 · --turquoise #078F87 the only accent (buttons, icons, active, key numbers)
+   Dark theme: values below are the previously effective app.css values, moved verbatim (styles/visual-v6.css
+   still layers its own dark surface values on top, as before).
+   Legacy aliases (--navy, --navy-deep, --green, --green-ink, --turquoise-deep) point to the single turquoise.
+   ========================================================================== */
+:root{
+  color-scheme:light;
+  font-family:Alexandria,'DM Sans',sans-serif;
+  /* surfaces */
+  --bg:#F4F8FA;
+  --paper:#FFFFFF;
+  --sheet:var(--bg);
+  --panel:var(--paper);
+  --panel-2:var(--paper);
+  --tile:var(--paper);
+  /* lines, shadow */
+  --line:#D8E3E9;
+  --border:1px solid #D8E3E9;
+  --shadow:0 1px 3px rgba(21,59,86,.05);
+  /* input / search fields */
+  --field-bg:#E6EEF5;
+  --field-border:#A9BDC7;
+  --search-surface:var(--field-bg);
+  --search-border:var(--field-border);
+  /* accent: one turquoise */
+  --turquoise:#078F87;
+  --turquoise-deep:#078F87;
+  --navy:var(--turquoise);
+  --navy-deep:var(--turquoise);
+  --green:var(--turquoise);
+  --green-ink:var(--turquoise);
+  --green-bg:#E6F4F3;
+  /* text and supporting colors */
+  --text:#18394e;
+  --ink:#153b56;
+  --muted:#778895;
+  --blue:#153b56;
+  --blue-soft:#e7f0f4;
+  --red:#a44343;
+  --red-bg:#e9eff1;
+  --amber:#506b7a;
+  --amber-bg:#f0f4f5;
+  /* icons */
+  --icon-base:var(--blue);
+  --icon-accent:var(--turquoise);
+  --icon-size:23px;
+  /* geometry */
+  --radius-xl:20px;
+  --radius-lg:17px;
+  --radius-md:13px;
+  --radius-control:10px;
+  --control-height:45px;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101d25;
+  --sheet:#14232c;
+  --paper:#192b35;
+  --panel:#20333d;
+  --panel-2:#293e48;
+  --tile:#20343e;
+  --line:#354b56;
+  --border:1px solid #354b56;
+  --shadow:none;
+  --search-surface:#1a303a;
+  --search-border:#405965;
+  --turquoise:#4bb8ad;
+  --turquoise-deep:#70c9c0;
+  --navy:#258f88;
+  --navy-deep:#70c9c0;
+  --green:#258f88;
+  --green-ink:#70c9c0;
+  --green-bg:#193d3c;
+  --text:#dce9ee;
+  --ink:#e8f2f5;
+  --muted:#9aadb7;
+  --red:#f1a6a6;
+  --red-bg:#462c30;
+  --amber:#d4b76c;
+  --amber-bg:#423820;
+  --icon-base:#d7e8ee;
+  --icon-accent:var(--turquoise);
+}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}body{font-family:inherit;font-size:12.6px;line-height:1.55;-webkit-font-smoothing:antialiased}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}[hidden]{display:none!important}:focus-visible{outline:2px solid #079f7a;outline-offset:3px}
 .app{width:min(100%,760px);min-height:100vh;margin:auto;padding:0 16px calc(100px + env(safe-area-inset-bottom));background:var(--sheet)}.topbar{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px}.brand-symbol{width:34px;height:38px;display:grid;place-items:center;background:#102d45;color:#83a7ba;border-radius:7px 7px 17px 17px;font-size:18px;font-weight:800}.brand-copy strong{display:block;font-size:18.9px;line-height:1;font-weight:800;color:var(--ink)}.brand-copy small{display:block;color:var(--muted);font-size:9.9px;font-weight:700;letter-spacing:1px;margin-top:3px}.icon-btn{width:44px;height:44px;border:0;border-radius:var(--radius-control);background:#e5edf1;color:var(--ink);display:grid;place-items:center}.icon-btn svg,.icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .page-head{padding:12px 2px 18px}.eyebrow{font-size:10.8px;font-weight:700;color:#087f67;margin:0 0 6px}.page-title{font-size:19.8px;line-height:1.4;font-weight:800;margin:0;color:var(--ink)}.page-desc{font-size:10.8px;line-height:1.7;color:var(--muted);margin:5px 0 0}
@@ -80,7 +165,6 @@
 
 /* User-selectable display theme. The default preference follows the operating system. */
 html[data-theme="light"]{color-scheme:light}
-html[data-theme="dark"]{color-scheme:dark;--bg:#10191f;--paper:#17242a;--panel:#1d2b32;--panel-2:#24363e;--navy:#0d463d;--navy-deep:#0c332f;--text:#e6eef1;--ink:#edf4f6;--muted:#a2b1ba;--line:#354851;--green:#17a983;--green-ink:#65d4b3;--green-bg:#174738;--red:#f1a6a6;--red-bg:#462c30;--amber:#d4b76c;--amber-bg:#423820;--sheet:linear-gradient(125deg,#17242a 0%,#111b20 52%,#17242a 100%);--tile:linear-gradient(110deg,#22323a,#1b2a31);--border:1px solid #354851;--shadow:none}
 html[data-theme="dark"] body{background:var(--bg);color:var(--text)}
 html[data-theme="dark"] .surface,html[data-theme="dark"] .auth-card,html[data-theme="dark"] .field,html[data-theme="dark"] .btn-outline,html[data-theme="dark"] .tab-strip button[aria-selected="true"]{background:#1a282f;color:var(--text);border-color:var(--line)}
 html[data-theme="dark"] .bottom-nav{background:#17242a;border-color:var(--line)}
@@ -97,7 +181,6 @@ html[data-theme="dark"] .login-brand h1{color:var(--ink)}
 
 
 /* AMAN.Y visual-reference adaptation — presentation only; AMAN.C structure and behavior remain authoritative. */
-:root{--radius-xl:20px;--radius-lg:17px;--radius-md:13px;--radius-control:10px;--control-height:45px}
 body{font-family:Alexandria,'DM Sans',sans-serif}
 .surface,.auth-card,.admin-decision-dialog>.surface{border-radius:17px}
 .soft-surface,.stat-card,.admin-shortcut,.phone-card,.quick-link,.operation-card,.admin-request-card,.detail-block{border-radius:13px}
@@ -355,24 +438,8 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
 
 /* Visual layer refinement — AMAN.Y surface hierarchy, retaining AMAN.C turquoise identity.
    Flat, intentional surface levels: page background → white cards → soft inset tiles.
-   This block changes presentation only; component structure and behavior remain untouched. */
-:root{
- --bg:#f1f5f6;
- --paper:#ffffff;
- --panel:#edf2f4;
- --panel-2:#e5edf1;
- --sheet:#f1f5f6;
- --tile:#e8eff2;
- --navy:#087f67;
- --navy-deep:#075f50;
- --green:#079f7a;
- --green-ink:#087f67;
- --green-bg:#dff3ec;
- --muted:#71838d;
- --line:#dfe7ea;
- --border:1px solid #dfe7ea;
- --shadow:0 1px 3px rgba(16,36,53,.045);
-}
+   This block changes presentation only; component structure and behavior remain untouched.
+   (Its token values now live in the central block at the top of this file.) */
 html,body{background:var(--bg)}
 .app{background:var(--sheet)}
 .surface,.auth-card,.login-card{
@@ -411,29 +478,6 @@ html,body{background:var(--bg)}
 .admin-decision-dialog::backdrop,.overlay{background:rgba(16,36,53,.42)}
 .screen-head .tile-btn:active,.icon-btn:active{background:#d1e5df}
 :focus-visible{outline-color:var(--green)}
-html[data-theme="dark"]{
- --bg:#10191f;
- --paper:#17242a;
- --panel:#1d2b32;
- --panel-2:#24363e;
- --sheet:#10191f;
- --tile:#22343b;
- --navy:#18a987;
- --navy-deep:#65d4b3;
- --text:#e6eef1;
- --ink:#edf4f6;
- --muted:#a2b1ba;
- --line:#354851;
- --border:1px solid #354851;
- --green:#25b892;
- --green-ink:#65d4b3;
- --green-bg:#174738;
- --red:#f1a6a6;
- --red-bg:#462c30;
- --amber:#d4b76c;
- --amber-bg:#423820;
- --shadow:none;
-}
 html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--bg)}
 html[data-theme="dark"] .surface,
 html[data-theme="dark"] .auth-card,
@@ -479,28 +523,6 @@ html[data-theme="dark"] :focus-visible{outline-color:#65d4b3}
 
 /* AMAN.C visual identity refinement — turquoise + deep blue, icon-first treatment.
    Presentation only: keep all controls, hit areas, states and behavior intact. */
-:root{
- --turquoise:#08a99a;
- --turquoise-deep:#087f78;
- --blue:#153b56;
- --blue-soft:#e7f0f4;
- --navy:#08a99a;
- --navy-deep:#087f78;
- --green:#08a99a;
- --green-ink:#087f78;
- --green-bg:#dff3ef;
- --ink:#153b56;
- --text:#18394e;
- --muted:#718591;
- --line:#dce6e9;
- --border:1px solid #dce6e9;
- --panel:#f0f5f6;
- --panel-2:#e8f0f2;
- --tile:#edf3f5;
- --sheet:#f4f7f8;
- --bg:#edf3f5;
- --shadow:0 1px 3px rgba(21,59,86,.035);
-}
 html,body{background:var(--bg);color:var(--text)}
 .app{background:var(--sheet)}
 .surface,.auth-card,.login-card{background:#fff;border-color:var(--line);box-shadow:var(--shadow)}
@@ -549,12 +571,6 @@ html,body{background:var(--bg);color:var(--text)}
 .bottom-nav{background:rgba(255,255,255,.97);border-color:var(--line)}
 .brand-symbol{background:var(--blue);color:#fff}
 :focus-visible{outline-color:var(--turquoise)}
-html[data-theme="dark"]{
- --bg:#101d25;--sheet:#14232c;--paper:#192b35;--panel:#20333d;--panel-2:#293e48;
- --tile:#20343e;--navy:#13b8aa;--navy-deep:#70d9d0;--green:#13b8aa;
- --green-ink:#70d9d0;--green-bg:#173f3d;--ink:#e8f2f5;--text:#dce9ee;
- --muted:#9aadb7;--line:#354b56;--border:1px solid #354b56;--shadow:none;
-}
 html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--bg)}
 html[data-theme="dark"] .surface,html[data-theme="dark"] .auth-card,
 html[data-theme="dark"] .login-card,html[data-theme="dark"] .admin-decision-dialog>.surface{
@@ -587,28 +603,6 @@ html[data-theme="dark"] :focus-visible{outline-color:#70d9d0}
 /* AMAN.C — user-defined unified screen layout (2026-11-04).
    This is an independent C design decision. It does not inherit measurements,
    spacing scales, or component geometry from another product/repository. */
-:root{
-  --bg:#edf4f6;
-  --sheet:#edf4f6;
-  --paper:#ffffff;
-  --panel:#e5eef1;
-  --panel-2:#dce9ed;
-  --tile:#f8fbfc;
-  --ink:#153b56;
-  --text:#18394e;
-  --muted:#6f8490;
-  --line:#d5e2e7;
-  --border:1px solid #d5e2e7;
-  --turquoise:#08a99a;
-  --turquoise-deep:#087f78;
-  --blue:#153b56;
-  --navy:#08a99a;
-  --navy-deep:#087f78;
-  --green:#08a99a;
-  --green-ink:#087f78;
-  --green-bg:#dff3ef;
-  --shadow:0 1px 3px rgba(21,59,86,.035);
-}
 html,body{background:var(--bg);color:var(--text)}
 .app{background:var(--bg)}
 /* One uninterrupted base surface from the top edge to the bottom navigation. */
@@ -756,13 +750,6 @@ html[data-theme="dark"] .screen-head{
 .state-active{background:var(--green-bg);color:var(--turquoise-deep)}
 .progress-fill,.unread-dot{background:var(--turquoise)}
 :focus-visible{outline-color:var(--turquoise)}
-html[data-theme="dark"]{
-  --bg:#101d25;--sheet:#101d25;--paper:#192b35;--panel:#20343e;
-  --panel-2:#293e48;--tile:#1a2d37;--ink:#e8f2f5;--text:#dce9ee;
-  --muted:#9aadb7;--line:#354b56;--border:1px solid #354b56;
-  --navy:#13b8aa;--navy-deep:#70d9d0;--green:#13b8aa;
-  --green-ink:#70d9d0;--green-bg:#173f3d;--shadow:none;
-}
 html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--bg)}
 html[data-theme="dark"] .surface,html[data-theme="dark"] .auth-card,
 html[data-theme="dark"] .login-card,html[data-theme="dark"] .soft-surface,
@@ -838,12 +825,8 @@ html[data-theme="dark"] .requests-reset-icon{background:var(--search-surface)!im
 
 /* AMAN.C — inline search and filter controls (user-approved refinement).
    Search/filter controls are integrated into the screen surface, not presented
-   as a separate card. This layer changes presentation only. */
-:root{
-  --paper:#f7fafb;
-  --search-surface:#e4edf0;
-  --search-border:#c8d9de;
-}
+   as a separate card. This layer changes presentation only.
+   (--search-surface / --search-border now live in the central token block.) */
 .list-tools,
 .admin-app .surface:has(>.admin-filter-grid){
   padding:0!important;
@@ -917,11 +900,6 @@ html[data-theme="dark"] .admin-app .admin-filter-grid .compact-filter-icon{
 }
 html[data-theme="dark"] .admin-app .admin-filter-grid .compact-filter-icon svg{stroke:#d9eaf0}
 
-html[data-theme="dark"]{
-  --paper:#192b35;
-  --search-surface:#1a303a;
-  --search-border:#405965;
-}
 html[data-theme="dark"] .compact-search .field,
 html[data-theme="dark"] .toolbar-search .field,
 html[data-theme="dark"] .compact-filter select.field{
@@ -1038,30 +1016,12 @@ html[data-theme="dark"] .compact-filter.is-expanded .compact-filter-icon{border-
 }
 
 
-/* Final AMAN.C brand calibration — derived from the official logo gradient. */
-:root{
- --turquoise:#087f78;
- --turquoise-deep:#01616d;
- --navy:#087f78;
- --navy-deep:#01616d;
- --green:#087f78;
- --green-ink:#01616d;
- --green-bg:#e5f0ef;
- --bg:#f3f5f7;
- --sheet:#f7f8fa;
- --panel:#f0f3f5;
- --panel-2:#e9eef2;
- --tile:#eef2f5;
- --line:#dce3e8;
- --border:1px solid #dce3e8;
- --muted:#778895;
- --shadow:0 1px 3px rgba(21,59,86,.025);
-}
+/* Final AMAN.C brand calibration — derived from the official logo gradient.
+   (Its token values now live in the central block at the top of this file.) */
 html,body{background:var(--bg);color:var(--text)}
 .app{background:var(--sheet)}
 .soft-surface{background:var(--panel);border-color:#e5eaee}
 .phone-card,.quick-link,.detail-block,.operation-card,.admin-request-card,.stat-card,.admin-shortcut{background:var(--tile)}
-.btn{background:var(--turquoise)}
 .btn-soft{background:#e8f0f2;color:var(--turquoise-deep)}
 .field:focus{border-color:var(--turquoise);box-shadow:0 0 0 2px rgba(1,97,109,.11)}
 .quiet-link,.eyebrow,.notice-success,.nav-item.active{color:var(--turquoise-deep)}
@@ -1074,27 +1034,9 @@ html,body{background:var(--bg);color:var(--text)}
  background:transparent;border:0;box-shadow:none;padding:0;margin:0;
 }
 .admin-customers-view>.admin-filter-grid{margin-bottom:0}
-html[data-theme="dark"]{
- --turquoise:#4bb8ad;
- --turquoise-deep:#70c9c0;
- --navy:#258f88;
- --navy-deep:#70c9c0;
- --green:#258f88;
- --green-ink:#70c9c0;
- --green-bg:#193d3c;
- --bg:#101d25;
- --sheet:#14232c;
- --panel:#20333d;
- --panel-2:#293e48;
- --tile:#20343e;
- --line:#354b56;
- --border:1px solid #354b56;
-}
 
 
 /* AMAN.C refined duotone icon system: bold silhouettes, clear two-part colour and larger optical scale. */
-:root{--icon-base:var(--blue);--icon-accent:var(--turquoise);--icon-size:23px}
-html[data-theme="dark"]{--icon-base:#d7e8ee;--icon-accent:var(--turquoise)}
 svg.aman-icon{display:block;flex:0 0 auto;width:var(--icon-size);height:var(--icon-size);overflow:visible;fill:none;stroke:none;vector-effect:non-scaling-stroke}
 svg.aman-icon .icon-fill{fill:var(--icon-base);stroke:none}
 svg.aman-icon .icon-accent{fill:var(--icon-accent);stroke:none}
