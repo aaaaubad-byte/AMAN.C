@@ -169,3 +169,25 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
 @media(prefers-reduced-motion:reduce){
  .admin-shortcut,.btn,.field{transition:none}
 }
+
+
+/* Wide admin dashboard: retain square shortcuts and fit the existing ten sections in three rows. */
+@media(min-width:650px){
+ .admin-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+.admin-request-card{transition:background .16s ease,transform .16s ease}
+.admin-request-card:active,.phone-card:active,.quick-link:active{transform:scale(.992)}
+.admin-detail-panel{border-radius:13px}
+.admin-detail-row{line-height:1.7}
+.admin-detail-row>span{min-width:0}
+.admin-detail-row>strong{min-width:0}
+@media(hover:hover){
+ .admin-shortcut:hover,.quick-link:hover,.phone-card:hover,.admin-request-card:hover{filter:brightness(.985)}
+ .btn-outline:hover{border-color:var(--green);color:var(--green-ink)}
+}
+@media(max-width:360px){
+ .nav-item{font-size:10px}
+ .nav-item svg{width:18px;height:18px}
+ .state{font-size:10px;padding:4px 7px}
+ .admin-detail-row{gap:8px}
+}
