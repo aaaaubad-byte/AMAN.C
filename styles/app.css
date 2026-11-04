@@ -1,6 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
 /* AMAN v5 design tokens — source: AMAN_UI_Design_System_Reference_v5.html */
-:root{color-scheme:light;--bg:#f1f5f6;--paper:#fff;--panel:#edf2f4;--panel-2:#e5edf1;--navy:#112230;--navy-deep:#102435;--text:#102435;--ink:#102435;--muted:#8596a5;--line:#d9e2e6;--green:#09a478;--green-ink:#00a775;--green-bg:#daf4e9;--red:#a44343;--red-bg:#e9eff1;--amber:#506b7a;--amber-bg:#f0f4f5;--sheet:linear-gradient(125deg,#fafcfd 0%,#f1f5f6 52%,#f7f9fa 100%);--tile:linear-gradient(110deg,#f0f4f5,#e9eff1);--radius-xl:20px;--radius-lg:13px;--radius-md:9px;--radius-control:8px;--control-height:44px;--border:1px solid #d9e2e6;--shadow:none;font-family:Tajawal,sans-serif}
+:root{color-scheme:light;--bg:#f1f5f6;--paper:#fff;--panel:#edf2f4;--panel-2:#e5edf1;--navy:#112230;--navy-deep:#102435;--text:#102435;--ink:#102435;--muted:#8596a5;--line:#d9e2e6;--green:#09a478;--green-ink:#00a775;--green-bg:#daf4e9;--red:#a44343;--red-bg:#e9eff1;--amber:#506b7a;--amber-bg:#f0f4f5;--sheet:linear-gradient(125deg,#fafcfd 0%,#f1f5f6 52%,#f7f9fa 100%);--tile:linear-gradient(110deg,#f0f4f5,#e9eff1);--radius-xl:20px;--radius-lg:13px;--radius-md:9px;--radius-control:8px;--control-height:44px;--border:1px solid #d9e2e6;--shadow:none;font-family:Alexandria,'DM Sans',sans-serif}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}body{font-family:inherit;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}[hidden]{display:none!important}:focus-visible{outline:2px solid #079f7a;outline-offset:3px}
 .app{width:min(100%,760px);min-height:100vh;margin:auto;padding:0 16px calc(100px + env(safe-area-inset-bottom));background:var(--sheet)}.topbar{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px}.brand-symbol{width:34px;height:38px;display:grid;place-items:center;background:#102d45;color:#83a7ba;border-radius:7px 7px 17px 17px;font-size:20px;font-weight:800}.brand-copy strong{display:block;font-size:21px;line-height:1;font-weight:800;color:var(--ink)}.brand-copy small{display:block;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:1px;margin-top:3px}.icon-btn{width:44px;height:44px;border:0;border-radius:var(--radius-control);background:#e5edf1;color:var(--ink);display:grid;place-items:center}.icon-btn svg,.icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .page-head{padding:12px 2px 18px}.eyebrow{font-size:12px;font-weight:700;color:#087f67;margin:0 0 6px}.page-title{font-size:22px;line-height:1.4;font-weight:800;margin:0;color:var(--ink)}.page-desc{font-size:12px;line-height:1.7;color:var(--muted);margin:5px 0 0}
@@ -94,3 +94,24 @@ html[data-theme="dark"] .quick-text small,html[data-theme="dark"] .phone-info sm
 html[data-theme="dark"] .field::placeholder{color:#9eafb7}
 html[data-theme="dark"] .login-card{background:#1a282f;border-color:var(--line);box-shadow:none}
 html[data-theme="dark"] .login-brand h1{color:var(--ink)}
+
+
+/* AMAN.Y visual-reference adaptation — presentation only; AMAN.C structure and behavior remain authoritative. */
+:root{--radius-xl:20px;--radius-lg:17px;--radius-md:13px;--radius-control:10px;--control-height:45px}
+body{font-family:Alexandria,'DM Sans',sans-serif}
+.surface,.auth-card,.admin-decision-dialog>.surface{border-radius:17px}
+.soft-surface,.stat-card,.admin-shortcut,.phone-card,.quick-link,.operation-card,.admin-request-card,.detail-block{border-radius:13px}
+.field,.btn,.icon-btn,.tab-strip,.tab-strip button{border-radius:10px}
+.field{min-height:45px}
+.btn{min-height:45px}
+.section-head{margin-top:24px;margin-bottom:13px}
+.empty-state{padding:26px 18px}
+.bottom-nav{min-height:72px;padding-top:8px}
+.nav-item{gap:4px;padding-top:6px;padding-bottom:6px}
+.nav-item.active{position:relative}
+.nav-item.active:after{content:"";position:absolute;bottom:1px;left:calc(50% - 10px);width:20px;height:3px;border-radius:3px;background:var(--green)}
+.admin-shortcuts{gap:10px}
+.admin-shortcut{min-height:112px;padding:14px}
+.stat-card{min-height:112px;padding:14px}
+@media(min-width:650px){.surface,.soft-surface{padding:20px}.admin-shortcuts{gap:12px}}
+@media(max-width:350px){.app{padding-left:12px;padding-right:12px}.surface,.soft-surface{padding:13px}}
