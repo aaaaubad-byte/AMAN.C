@@ -886,6 +886,31 @@ html[data-theme="dark"] .admin-app .surface:has(>.admin-filter-grid){
   color:var(--blue)!important;
   box-shadow:none!important;
 }
+/* Ensure PR28 inline search/filter colors also cover dynamically rendered admin grids. */
+.admin-app .admin-filter-grid .field{
+  background:var(--search-surface)!important;
+  border:1px solid var(--search-border)!important;
+  color:var(--blue)!important;
+  box-shadow:none!important;
+}
+.admin-app .admin-filter-grid .field:focus{
+  background:var(--search-surface)!important;
+  border-color:var(--turquoise)!important;
+  box-shadow:0 0 0 2px rgba(8,169,154,.11)!important;
+}
+.admin-app .admin-filter-grid .compact-filter-icon{
+  background:var(--search-surface)!important;
+  border:1px solid var(--search-border)!important;
+  color:var(--blue)!important;
+}
+html[data-theme="dark"] .admin-app .admin-filter-grid .field,
+html[data-theme="dark"] .admin-app .admin-filter-grid .compact-filter-icon{
+  background:var(--search-surface)!important;
+  border-color:var(--search-border)!important;
+  color:var(--ink)!important;
+}
+html[data-theme="dark"] .admin-app .admin-filter-grid .compact-filter-icon svg{stroke:#d9eaf0}
+
 html[data-theme="dark"]{
   --paper:#192b35;
   --search-surface:#1a303a;
