@@ -71,27 +71,27 @@
 </section>
 
 <section id="operation-detail-screen" data-screen="operation-detail" hidden>
-<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى العمليات</button><p class="eyebrow">سجل طلباتك</p><h1 class="page-title">تفاصيل العملية</h1><p class="page-desc">تفاصيل الطلب وحالته الحالية.</p></div>
+<div class="page-head"><button class="quiet-link" type="button" data-back>‹ العودة إلى العمليات</button><p class="eyebrow">العمليات</p><h1 class="page-title">تفاصيل العملية</h1></div>
 <div id="operation-detail-content"></div>
 </section>
 <section id="protection-screen" data-screen="protection" hidden>
-<div class="page-head"><button class="quiet-link" type="button" id="protection-back">‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">خدمات أمان</p><h1 class="page-title">طلب الحماية</h1><p class="page-desc">راجع بيانات الرقم واختر الباقة ووسيلة الدفع المتاحة.</p></div>
+<div class="page-head"><button class="quiet-link" type="button" id="protection-back">‹ العودة إلى تفاصيل الرقم</button><p class="eyebrow">خدمات أمان</p><h1 class="page-title">طلب الحماية</h1><p class="page-desc">اختر الباقة ووسيلة الدفع.</p></div>
 <div class="surface"><div class="detail-label">الرقم</div><div class="detail-value" id="protection-phone" dir="ltr">—</div><div class="detail-label" style="margin-top:12px">الشركة</div><div class="detail-value" id="protection-company">—</div><div class="detail-label" style="margin-top:12px">نوع العملية</div><div class="detail-value" id="protection-type">—</div></div>
 <form id="protection-form">
-<div class="surface"><label class="field-label" for="protection-package">باقة الحماية</label><select class="field" id="protection-package" required><option value="">اختر الباقة المتاحة</option></select><p class="surface-desc" id="package-summary">تظهر الباقات المعتمدة لهذه الشركة ونوع العملية عند توفرها.</p></div>
-<div class="surface"><label class="field-label" for="protection-payment">وسيلة الدفع</label><select class="field" id="protection-payment" required><option value="">اختر وسيلة الدفع</option></select><div class="alert-note" id="payment-instructions" style="margin-top:12px;white-space:pre-line">تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.</div>
+<div class="surface"><label class="field-label" for="protection-package">باقة الحماية</label><select class="field" id="protection-package" required><option value="">اختر الباقة المتاحة</option></select><p class="surface-desc" id="package-summary">الباقات المتاحة.</p></div>
+<div class="surface"><label class="field-label" for="protection-payment">وسيلة الدفع</label><select class="field" id="protection-payment" required><option value="">اختر وسيلة الدفع</option></select><div class="alert-note" id="payment-instructions" style="margin-top:12px;white-space:pre-line">تعليمات الدفع بعد اختيار الوسيلة.</div>
 <div class="field-wrap"><label class="field-label" for="payment-reference">مرجع الدفع</label><input class="field" id="payment-reference" type="text" autocomplete="off" placeholder="أدخل مرجع عملية الدفع" required></div></div>
 <p id="protection-message" aria-live="polite"></p><button class="btn btn-block" id="protection-continue" type="submit">متابعة للمراجعة</button>
 </form></section>
 <section id="review-screen" data-screen="review" hidden>
-<div class="page-head"><button class="quiet-link" type="button" id="review-back">‹ العودة للتعديل</button><p class="eyebrow">قبل الإرسال</p><h1 class="page-title">مراجعة العملية</h1><p class="page-desc">تأكد من صحة التفاصيل قبل إرسال الطلب إلى إدارة أمان.</p></div>
-<div class="surface" id="review-details"></div><div class="alert-note">إرسال الطلب لا يبدأ الحماية. تبدأ الحماية فقط بعد اعتماد الإدارة للطلب.</div>
+<div class="page-head"><button class="quiet-link" type="button" id="review-back">‹ العودة للتعديل</button><p class="eyebrow">قبل الإرسال</p><h1 class="page-title">مراجعة العملية</h1><p class="page-desc">راجع التفاصيل قبل الإرسال.</p></div>
+<div class="surface" id="review-details"></div><div class="alert-note">لا تبدأ الحماية إلا بعد اعتماد الإدارة.</div>
 <p id="review-message" aria-live="polite"></p><button class="btn btn-block" id="confirm-protection" type="button">تأكيد وإرسال الطلب</button>
 </section>
 <section id="result-screen" data-screen="result" hidden>
-<div class="page-head"><p class="eyebrow">حالة الإرسال</p><h1 class="page-title" id="result-title">نتيجة العملية</h1><p class="page-desc" id="result-description">ستظهر نتيجة الطلب هنا بعد إرساله.</p></div>
-<div class="surface" id="result-content"><div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><strong>لم يتم إرسال طلب بعد</strong><p>ستظهر حالة طلبك هنا فور إرساله.</p></div></div>
-<div class="sheet-actions"><button class="btn btn-block" id="result-retry" type="button" hidden>إعادة المحاولة</button><button class="btn btn-block" id="result-to-operations" type="button">الانتقال إلى العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">العودة إلى تفاصيل الرقم</button></div>
+<div class="page-head"><p class="eyebrow">حالة الإرسال</p><h1 class="page-title" id="result-title">نتيجة العملية</h1><p class="page-desc" id="result-description">تظهر النتيجة هنا.</p></div>
+<div class="surface" id="result-content"><div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><strong>لم يُرسل طلب بعد</strong><p>تظهر حالة الطلب هنا.</p></div></div>
+<div class="sheet-actions"><button class="btn btn-block" id="result-retry" type="button" hidden>إعادة المحاولة</button><button class="btn btn-block" id="result-to-operations" type="button">العمليات</button><button class="btn btn-outline btn-block" id="result-to-number" type="button">تفاصيل الرقم</button></div>
 </section>
 <section id="account-screen" data-screen="account" hidden>
 <div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">الحساب</h1><p class="page-desc">إدارة بياناتك وإعدادات أمان حسابك.</p></div>
