@@ -933,3 +933,100 @@ html[data-theme="dark"] .compact-filter-icon svg path:nth-of-type(2){stroke:var(
 html[data-theme="dark"] .compact-filter-icon[aria-expanded="true"]{
   border-color:var(--turquoise)!important;color:var(--turquoise)!important;
 }
+
+
+/* Unified search/filter row — shared by customer and every admin list. */
+.compact-filter-row{
+  display:flex!important;align-items:center!important;flex-wrap:nowrap!important;
+  gap:6px!important;width:100%;min-width:0;margin:0!important;
+}
+.compact-filter-row>.compact-search{
+  flex:1 1 0!important;min-width:58px!important;max-width:none!important;
+}
+.compact-filter-row>.compact-search .field{
+  width:100%!important;height:40px!important;min-height:40px!important;
+  padding:7px 10px!important;border-radius:8px!important;
+  background:var(--search-surface)!important;border:1px solid var(--search-border)!important;
+  color:var(--blue)!important;box-shadow:none!important;font-size:11px!important;
+}
+.compact-filter-row>.compact-search .field:focus{
+  border-color:var(--turquoise)!important;box-shadow:0 0 0 2px rgba(8,169,154,.12)!important;
+}
+.compact-filter-row>.compact-filter{
+  display:flex!important;align-items:center!important;gap:4px!important;
+  flex:0 0 40px!important;width:auto!important;min-width:0!important;max-width:230px!important;
+  transition:flex-basis .24s cubic-bezier(.2,.75,.25,1),max-width .24s ease;
+}
+.compact-filter-row>.compact-filter.is-expanded{
+  flex-basis:clamp(150px,28vw,210px)!important;max-width:230px!important;
+}
+.compact-filter-control{display:flex;align-items:center;flex:0 0 auto;min-width:0}
+.compact-filter-icon{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:6px!important;width:40px!important;min-width:40px!important;height:40px!important;
+  padding:0 9px!important;overflow:hidden!important;white-space:nowrap!important;
+  border:1px solid var(--search-border)!important;border-radius:8px!important;
+  background:var(--search-surface)!important;color:var(--blue)!important;
+  box-shadow:none!important;transition:width .24s cubic-bezier(.2,.75,.25,1),min-width .24s ease,
+    border-color .18s ease,background .18s ease;
+}
+.compact-filter-icon .compact-filter-glyph{display:grid;place-items:center;flex:0 0 19px;width:19px;height:19px}
+.compact-filter-icon svg{display:block;width:19px;height:19px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.compact-filter-icon .compact-filter-caption{
+  display:block;max-width:0;overflow:hidden;opacity:0;font-size:10px;font-weight:700;
+  transition:max-width .22s ease,opacity .16s ease;
+}
+.compact-filter-icon .compact-filter-close{
+  display:grid;place-items:center;flex:0 0 0;width:0;height:20px;overflow:hidden;
+  opacity:0;font-size:17px;line-height:1;font-weight:500;
+  transition:width .2s ease,opacity .16s ease;
+}
+.compact-filter.is-expanded .compact-filter-icon{
+  width:76px!important;min-width:76px!important;justify-content:flex-start!important;
+  border-color:var(--turquoise)!important;background:var(--search-surface)!important;
+  color:var(--turquoise-deep)!important;
+}
+.compact-filter.is-expanded .compact-filter-caption{max-width:42px;opacity:1}
+.compact-filter.is-expanded .compact-filter-close{flex-basis:16px;width:16px;opacity:1;color:var(--turquoise-deep)}
+.compact-filter-select{
+  display:block!important;flex:1 1 auto!important;width:0!important;min-width:0!important;
+  max-width:0!important;height:40px!important;min-height:40px!important;
+  padding:0!important;opacity:0;overflow:hidden!important;pointer-events:none;
+  border:0!important;background:var(--search-surface)!important;
+  transition:max-width .24s cubic-bezier(.2,.75,.25,1),opacity .16s ease,padding .2s ease;
+}
+.compact-filter.is-expanded .compact-filter-select{
+  width:100%!important;max-width:132px!important;min-width:72px!important;
+  padding:6px 7px!important;opacity:1;pointer-events:auto;
+  border:1px solid var(--search-border)!important;border-radius:8px!important;
+  color:var(--blue)!important;
+}
+.compact-filter-select:focus{border-color:var(--turquoise)!important;outline:none}
+.compact-filter-icon:hover{border-color:var(--turquoise)!important}
+.compact-filter-row .toolbar-clear{flex:0 0 auto}
+.compact-filter-row>.compact-search .toolbar-search-control{display:flex;min-width:0;gap:5px}
+.compact-filter-row>.compact-search .toolbar-clear{min-width:36px;padding-inline:7px}
+html[data-theme="dark"] .compact-filter-row>.compact-search .field,
+html[data-theme="dark"] .compact-filter-select{
+  background:var(--search-surface)!important;border-color:var(--search-border)!important;color:var(--ink)!important;
+}
+html[data-theme="dark"] .compact-filter-icon{background:var(--search-surface)!important;border-color:var(--search-border)!important;color:var(--ink)!important}
+html[data-theme="dark"] .compact-filter-icon svg{stroke:var(--ink)}
+html[data-theme="dark"] .compact-filter.is-expanded .compact-filter-icon{border-color:var(--turquoise)!important;color:var(--turquoise)!important}
+@media(max-width:420px){
+  .compact-filter-row{gap:4px!important}
+  .compact-filter-row>.compact-filter{flex-basis:36px!important}
+  .compact-filter-row>.compact-filter.is-expanded{flex-basis:clamp(142px,44vw,168px)!important}
+  .compact-filter-icon{width:36px!important;min-width:36px!important;height:38px!important;padding-inline:7px!important}
+  .compact-filter.is-expanded .compact-filter-icon{width:68px!important;min-width:68px!important}
+  .compact-filter-icon .compact-filter-glyph{flex-basis:17px;width:17px;height:17px}
+  .compact-filter-icon svg{width:17px;height:17px}
+  .compact-filter.is-expanded .compact-filter-caption{max-width:32px;font-size:9px}
+  .compact-filter.is-expanded .compact-filter-close{flex-basis:14px;width:14px}
+  .compact-filter.is-expanded .compact-filter-select{max-width:96px!important;min-width:68px!important;font-size:9.5px!important}
+  .compact-filter-row>.compact-search{min-width:48px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .compact-filter-row>.compact-filter,.compact-filter-icon,.compact-filter-caption,
+  .compact-filter-close,.compact-filter-select{transition:none!important}
+}
