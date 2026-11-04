@@ -59,14 +59,19 @@
 
 <section id="numbers-screen" data-screen="numbers" hidden>
 <div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">أرقامي</h1><p class="page-desc">الأرقام المعتمدة في حسابك.</p></div>
-<section class="surface list-tools"><label class="field-label" for="numbers-search">بحث برقم الهاتف</label><div class="field-row"><input class="field" id="numbers-search" type="search" placeholder="رقم الهاتف" autocomplete="off"><button class="btn btn-outline" id="clear-numbers-search" type="button" aria-label="مسح البحث">مسح</button></div>
-<div class="filter-grid"><div><label class="field-label" for="numbers-company-filter">الشركة</label><select class="field" id="numbers-company-filter"><option value="">كل الشركات</option></select></div><div><label class="field-label" for="numbers-status-filter">الحالة</label><select class="field" id="numbers-status-filter"><option value="">كل الحالات</option><option value="protected">محمي</option><option value="inactive">غير نشط</option><option value="confiscated">منتهي-مصادر</option></select></div></div></section>
+<section class="surface list-tools"><div class="customer-toolbar numbers-toolbar">
+<div class="toolbar-search"><label class="field-label" for="numbers-search">بحث برقم الهاتف</label><div class="toolbar-search-control"><input class="field" id="numbers-search" type="search" placeholder="رقم الهاتف" autocomplete="off"><button class="btn btn-outline toolbar-clear" id="clear-numbers-search" type="button" aria-label="مسح البحث">مسح</button></div></div>
+<div class="toolbar-filter"><label class="field-label" for="numbers-company-filter">الشركة</label><select class="field" id="numbers-company-filter"><option value="">كل الشركات</option></select></div>
+<div class="toolbar-filter"><label class="field-label" for="numbers-status-filter">الحالة</label><select class="field" id="numbers-status-filter"><option value="">كل الحالات</option><option value="protected">محمي</option><option value="inactive">غير نشط</option><option value="confiscated">منتهي-مصادر</option></select></div>
+</div></section>
 <div id="numbers-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/></svg></div><strong>لا توجد أرقام</strong><p>تظهر الأرقام بعد اعتماد الاشتراك. البحث لا يضيف الرقم إلى حسابك.</p></div></div>
 </section>
 <section id="operations-screen" data-screen="operations" hidden>
 <div class="page-head"><p class="eyebrow">حسابك</p><h1 class="page-title">العمليات</h1><p class="page-desc">طلبات الاشتراك والتمديد والتنشيط.</p></div>
-<section class="surface list-tools"><label class="field-label" for="operations-search">بحث</label><input class="field" id="operations-search" type="search" placeholder="رقم الهاتف أو الطلب" autocomplete="off">
-<div class="filter-grid single-filter"><div><label class="field-label" for="operations-status-filter">الحالة</label><select class="field" id="operations-status-filter"><option value="">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div></div></section>
+<section class="surface list-tools"><div class="customer-toolbar operations-toolbar">
+<div class="toolbar-search"><label class="field-label" for="operations-search">بحث</label><input class="field" id="operations-search" type="search" placeholder="رقم الهاتف أو الطلب" autocomplete="off"></div>
+<div class="toolbar-filter"><label class="field-label" for="operations-status-filter">الحالة</label><select class="field" id="operations-status-filter"><option value="">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">معتمد</option><option value="rejected">مرفوض</option></select></div>
+</div></section>
 <div id="operations-list" aria-live="polite"><div class="soft-surface empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><strong>لا توجد عمليات</strong><p>تظهر طلباتك بعد إرسالها. تبدأ الحماية بعد اعتماد الاشتراك.</p></div></div>
 </section>
 
