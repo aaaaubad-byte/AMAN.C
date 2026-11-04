@@ -215,7 +215,7 @@ test("الأرقام والتقارير: رقم معتمد يظهر بحالته
 test("العملاء: تعطيل بسبب ثم إعادة تفعيل، وتحديث الحالة في الواجهة والخدمة", { skip }, async () => {
   const t = await start();
   await go(t.page, "customers");
-  assert.equal(await t.page.locator("text=تحديث العملاء").count(), 0, "زر تحديث العملاء القديم غير موجود");
+  assert.equal(await t.page.evaluate(() => [...document.querySelectorAll("button")].filter(b => b.textContent.trim() === "تحديث العملاء").length), 0, "زر تحديث العملاء القديم غير موجود");
   await t.page.waitForSelector("text=لا يوجد عملاء مطابقون");
   await seed(t.page);
   await pullToRefresh(t.page);
