@@ -21,8 +21,7 @@ function renderNumbersShell(){
  const status=el("select","field");status.id="number-status";
  [["all","كل الحالات"],["protected","محمي"],["inactive","غير نشط"],["expired_confiscated","منتهي / مصادَر"]].forEach(([v,t])=>status.add(new Option(t,v)));
  statusWrap.append(statusLabel,status);filters.append(searchWrap,statusWrap);
- const notice=el("p","","");notice.id="numbers-message";
- const list=el("div","");list.id="numbers-list";wrap.append(filters,notice,list);host.append(wrap);
+ const list=el("div","");list.id="numbers-list";wrap.append(filters,list);host.append(wrap);
  search.addEventListener("input",()=>renderNumbers());status.addEventListener("change",()=>renderNumbers());
 }
 function renderNumbers(){
@@ -38,11 +37,13 @@ function renderNumbers(){
  });
 }
 async function loadNumbers(){
- const host=$("numbers-message"),s=service();numberRows=[];renderNumbers();
- if(!s||typeof s.listNumbers!=="function"){setNotice(host,"تعذر الوصول إلى الأرقام حاليًا.",true);return;}
- setNotice(host,"جارٍ تحميل الأرقام…");
- try{const r=await s.listNumbers({search:$("number-search").value.trim(),status:$("number-status").value});if(r?.success!==true||!Array.isArray(r.numbers))throw Error();numberRows=r.numbers;renderNumbers();setNotice(host,"تم تحديث قائمة الأرقام.");}
- catch{setNotice(host,"تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.",true);}
+ const host=$("numbers-list"),s=service();if(!host)return false;
+ if(!s||typeof s.listNumbers!=="function"){host.replaceChildren(el("p","notice-error","تعذر الوصول إلى الأرقام حاليًا."));return false;}
+ host.setAttribute("aria-busy","true");
+ if(!numberRows.length)host.replaceChildren(el("div","empty-state","جارٍ تحميل الأرقام…"));
+ try{const r=await s.listNumbers({search:$("number-search").value.trim(),status:$("number-status").value});if(r?.success!==true||!Array.isArray(r.numbers))throw Error();numberRows=r.numbers;renderNumbers();return true;}
+ catch{if(numberRows.length){host.append(el("p","notice-error","تعذر تحديث القائمة. البيانات المعروضة قد تكون قديمة."));}else{host.replaceChildren(el("p","notice-error","تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة."));}return false;}
+ finally{host.removeAttribute("aria-busy");}
 }
 async function openNumber(id){
  activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();generic.dataset.pullScreen="numbers-detail";
