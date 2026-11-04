@@ -47,7 +47,7 @@ async function loadNumbers(){
 }
 async function openNumber(id){
  activeNumberId=id;window.AMANPullRefresh?.attach($("admin-section"),()=>openNumber(id));const generic=$("admin-generic-view");generic.replaceChildren();
- const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();loadNumbers();});
+ const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();window.AMANPullRefresh?.attach($("admin-section"),loadNumbers);loadNumbers();});
  generic.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل الرقم…");generic.append(loading);
  const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return;}
  try{
