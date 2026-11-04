@@ -167,6 +167,14 @@ async function loadList(name, call, silent = false) {
 const refreshNumbers = silent => loadList("numbers", () => svc().listMyNumbers(), silent === true);
 const refreshOperations = silent => loadList("operations", () => svc().listMyOperations(), silent === true);
 const refreshNotifications = silent => loadList("notifications", () => svc().getNotifications(), silent === true);
+if (window.AMANPullToRefresh) {
+ window.AMANPullToRefresh.register("home", () => refreshNumbers(true));
+ window.AMANPullToRefresh.register("numbers", () => refreshNumbers(true));
+ window.AMANPullToRefresh.register("operations", () => refreshOperations(true));
+ window.AMANPullToRefresh.register("notifications", () => refreshNotifications(true));
+ window.AMANPullToRefresh.register("number-alerts", () => lastNumber ? openNumberAlerts(lastNumber) : Promise.resolve());
+ window.AMANPullToRefresh.register("account", () => loadSession());
+}
 
 /* يحدد الجلسة الحالية؛ لا ينتظر القوائم (تعرض حالة التحميل بنفسها). يُرجع نتيجة الخدمة. */
 async function loadSession() {
@@ -539,7 +547,7 @@ async function markRead(id) {
  if (result.success === true) await refreshNotifications(true); else setMessage($("notifications-message"), serviceProblem(result));
 }
 $("notification-filter").addEventListener("change", renderNotifications);
-$("notifications-refresh").addEventListener("click", () => refreshNotifications());
+
 
 function renderAll() { renderHomeNumbers(); renderNumbers(); renderOperations(); renderNotifications(); }
 
