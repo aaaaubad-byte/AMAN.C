@@ -31,8 +31,16 @@ html[data-theme="dark"]{
   --num:#4fe0d1;--dot:#3f5967;
 }
 @media(min-width:650px){:root{--app-pad:28px}}
-html,body,.app{background:var(--bg)}
-.topbar,.bottom-nav,.screen-head{background:var(--bg)}
+html,body,.app{
+  background:#ffffff!important;
+  background-color:#ffffff!important;
+  background-image:none!important;
+}
+.topbar,.bottom-nav,.screen-head{
+  background:#ffffff!important;
+  background-color:#ffffff!important;
+  background-image:none!important;
+}
 html[data-theme="dark"] body,html[data-theme="dark"] .app,
 html[data-theme="dark"] .topbar,html[data-theme="dark"] .bottom-nav,
 html[data-theme="dark"] .screen-head{background:var(--bg)}
