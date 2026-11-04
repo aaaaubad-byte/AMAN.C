@@ -37,7 +37,7 @@ const definitions={
  audit:{title:"سجل التدقيق",description:"إجراءات الإدارة المسجلة.",icon:"clock",emptyTitle:"لا توجد سجلات",emptyDescription:"تظهر الإجراءات المسجلة هنا."},
  followup:{title:"نافذة الظهور والمتابعة",description:"المهام المستحقة للتنفيذ أو الجدولة.",icon:"timer",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"تظهر المهام المستحقة هنا."},
  more:{title:"المزيد",description:"باقي أقسام الإدارة.",icon:"dots",emptyTitle:"",emptyDescription:""},
- account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
+ account:{title:"الحساب الإداري",description:"بيانات المدير والجلسة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
 /* حارس المصادقة في الواجهة: لا يُعرض أي قسم إداري إلا بعد تأكيد الخادم أن الحساب مدير.
