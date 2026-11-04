@@ -47,7 +47,7 @@ test("السمة الافتراضية تتبع تفضيل النظام وتضب�
   const light = loadTheme(false);
   assert.equal(light.root.dataset.theme, "light");
   assert.equal(light.source.media, "not all");
-  assert.equal(light.meta.content, "#ffffff");
+  assert.equal(light.meta.content, "#f4f8fa");
 });
 
 test("الاختيار اليدوي يُحفظ ويتجاوز تفضيل النظام", () => {
