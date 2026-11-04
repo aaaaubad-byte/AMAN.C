@@ -74,7 +74,7 @@ function navigate(name,{remember=true}={}) {
  return true;
 }
 function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
-window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;}});
+window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;},refresh(){if(current==="dashboard")return loadDashboard();if(activeRequestId)return openRequest(activeRequestId);if(current==="requests")return loadRequests();return Promise.resolve();}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
  const s=service();if(!s||typeof s.getDashboardSummary!=="function"){["stat-pending-requests","stat-protected-numbers","stat-open-reports","stat-due-tasks","stat-customers","stat-revenue"].forEach(id=>stat(id,"—"));return;}
@@ -106,6 +106,11 @@ async function loadRequests(){
  catch{message(msg,"تعذر تحميل الطلبات. حاول التحديث لاحقًا.","error");}
  finally{loading=false;}
 }
+ if (window.AMANPullToRefresh) {
+  window.AMANPullToRefresh.register("dashboard", loadDashboard);
+  window.AMANPullToRefresh.register("requests", loadRequests);
+  window.AMANPullToRefresh.register("requests-detail", () => activeRequestId ? openRequest(activeRequestId) : loadRequests());
+ }
 function detailRow(label,value,dir){const row=document.createElement("div");row.className="admin-detail-row";const l=document.createElement("span");l.textContent=label;const v=document.createElement("strong");v.textContent=text(value);if(dir)v.dir=dir;row.append(l,v);return row;}
 function panel(title,rows){const box=document.createElement("section");box.className="surface admin-detail-panel";const h=document.createElement("h2");h.className="surface-title";h.textContent=title;box.append(h);rows.forEach(x=>box.append(detailRow(x[0],x[1],x[2])));return box;}
 function openInlineActions(record,host){
@@ -174,13 +179,13 @@ $("admin-login-form").addEventListener("submit",async e=>{
  if(ok){form.reset();setPasswordVisible(false);message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
 });
 $("admin-password-toggle").addEventListener("click",()=>setPasswordVisible($("admin-password").type==="password"));
-$("dashboard-refresh").addEventListener("click",loadDashboard);
+
 accountBtn.addEventListener("click",()=>{if(!authed()){showLogin();return;}navigate("account");});
 tabs.forEach(t=>t.addEventListener("click",()=>navigate(t.dataset.adminTab)));
 document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.section)));
 $("admin-back").addEventListener("click",back);$("request-detail-back").addEventListener("click",back);
-$("request-detail-refresh").addEventListener("click",()=>activeRequestId&&openRequest(activeRequestId));
-$("requests-refresh").addEventListener("click",loadRequests);
+
+
 $("requests-reset").addEventListener("click",()=>{$("request-search").value="";$("request-status").value="pending";$("request-type").value="all";$("request-company").value="all";loadRequests();});
 ["request-status","request-type","request-company"].forEach(id=>$(id).addEventListener("change",loadRequests));
 let searchTimer=null;$("request-search").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadRequests,350);});
