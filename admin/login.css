@@ -1,6 +1,8 @@
 /*
  * AMAN.C — تنسيق شاشة تسجيل دخول الإدارة فقط.
- * المصدر المرجعي للهوية: docs/design/ — الألوان: #102435 أساسي، #09a478 ثانوي، #8596a5 مساعد، #edf2f4 سطح، #dbe3e7 خلفية.
+ * الألوان تأتي حصراً من الرموز المركزية (styles/visual-v6.css القسم 1): --bg #F4F8FA، --paper #FFFFFF،
+ * --field-bg #E6EEF5، --field-border #A9BDC7، --turquoise #078F87. لا ألوان حرفية للوضع الفاتح هنا.
+ * قواعد الوضع الداكن في آخر الملف كما هي دون تغيير.
  * لا يؤثر على بقية شاشات الإدارة ولا على تطبيق العميل (محصور بـ .admin-app و #admin-login).
  */
 
@@ -38,17 +40,17 @@
   font-size: 24px;
   line-height: 1.35;
   font-weight: 800;
-  color: var(--navy-deep);
+  color: var(--ic-a);
 }
 
 /* البطاقة */
 .login-card {
   width: min(100%, 400px);
-  background: #fff;
+  background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px 20px 22px;
-  box-shadow: 0 10px 30px rgba(16, 36, 53, .07);
+  box-shadow: 0 1px 3px rgba(21, 59, 86, .035);
 }
 .login-card h2 {
   margin: 0 0 20px;
@@ -66,11 +68,11 @@
 .login-card .field {
   height: 48px;
   padding: 10px 14px;
-  border: 1px solid #c3ced5;
+  border: 1px solid var(--field-border);
   border-radius: 10px;
   font-size: 15px;
 }
-.login-card .field:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(9, 164, 120, .16); }
+.login-card .field:focus { border-color: var(--turquoise); box-shadow: 0 0 0 2px rgba(7, 143, 135, .22); }
 /* حقول لاتينية (بريد/كلمة مرور) داخل واجهة عربية: اتجاه يسار-يمين مع محاذاة يمنى متسقة مع باقي الشاشة */
 .login-input-ltr { direction: ltr; text-align: right; }
 
@@ -85,7 +87,7 @@
   border: 0;
   border-radius: 10px;
   background: transparent;
-  color: #627b89;
+  color: var(--muted);
   display: grid;
   place-items: center;
 }
@@ -93,7 +95,7 @@
 .password-toggle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .password-toggle .eye-slash { display: none; }
 .password-toggle[aria-pressed="true"] .eye-slash { display: inline; }
-.password-toggle[aria-pressed="true"] { color: var(--green); }
+.password-toggle[aria-pressed="true"] { color: var(--turquoise); }
 
 /* تذكرني */
 .remember-row {
@@ -107,18 +109,18 @@
   cursor: pointer;
   user-select: none;
 }
-.remember-row input { width: 20px; height: 20px; margin: 0; accent-color: var(--green); cursor: pointer; }
+.remember-row input { width: 20px; height: 20px; margin: 0; accent-color: var(--turquoise); cursor: pointer; }
 
 /* رسالة الحالة: يضبط app.js الصنف بنفسه، لذا التنسيق بالمعرّف. تختفي عند الفراغ فلا تترك فجوة */
 #admin-login-message { margin: 0; font-size: 13px; line-height: 1.7; }
 #admin-login-message:empty { display: none; }
 
-/* زر الدخول: الزر الأساسي في الهوية (#09a478) */
+/* زر الدخول: الزر الأساسي بالتركوازي المعتمد */
 .login-submit {
   min-height: 48px;
   margin-top: 4px;
   border-radius: 10px;
-  background: var(--green);
+  background: var(--turquoise);
   color: #fff;
   font-size: 16px;
   font-weight: 800;
@@ -132,14 +134,7 @@
 }
 
 
-/* AMAN.C identity alignment — turquoise primary action with deep-blue typography. */
-.login-brand h1{color:#153b56}
-.login-card{border-color:#dce6e9;box-shadow:0 1px 3px rgba(21,59,86,.035)}
-.login-card .field:focus{border-color:#08a99a;box-shadow:0 0 0 3px rgba(8,169,154,.13)}
-.password-toggle{color:#153b56}
-.password-toggle[aria-pressed="true"]{color:#08a99a}
-.remember-row input{accent-color:#08a99a}
-.login-submit{background:#08a99a;color:#fff}
+/* الوضع الداكن — دون تغيير */
 html[data-theme="dark"] .login-brand h1{color:#e8f2f5}
 html[data-theme="dark"] .login-card{background:#192b35;border-color:#354b56;box-shadow:none}
 html[data-theme="dark"] .login-card .field{background:#192b35;border-color:#354b56;color:#e8f2f5}
