@@ -5,19 +5,19 @@ const dashboard=$("dashboard-screen"),section=$("admin-section"),login=$("admin-
 const tabs=[...document.querySelectorAll("[data-admin-tab]")];
 const service=()=>window.AMANAdminServices||null;
 /* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
-const svgWrap=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+const svgWrap=d=>'<svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const ICONS={
- list:svgWrap('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
+ list:svgWrap('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>'),
  phone:svgWrap('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
  users:svgWrap('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/>'),
  user:svgWrap('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
  clock:svgWrap('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
  timer:svgWrap('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>'),
- flag:svgWrap('<path d="M4 22V4M4 4h14l-2 4 2 4H4"/>'),
- doc:svgWrap('<path d="M7 3h10l3 3v15H4V3zM8 10h8M8 14h8M8 18h5"/>'),
+ flag:svgWrap('<path d="M4 22V4"/><path d="M4 4h14l-2 4 2 4H4"/>'),
+ doc:svgWrap('<path d="M7 3h10l3 3v15H4V3z"/><path d="M8 10h8M8 14h8M8 18h5"/>'),
  sliders:svgWrap('<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
- bell:svgWrap('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>'),
- box:svgWrap('<path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/>'),
+ bell:svgWrap('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>'),
+ box:svgWrap('<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>'),
  wallet:svgWrap('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'),
  dots:svgWrap('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')
 };
@@ -48,6 +48,7 @@ const showAccountButton=on=>{accountBtn.style.display=on?"":"none";};
 const statusLabel={pending:"قيد المراجعة",approved:"معتمد",rejected:"مرفوض"};
 const typeLabel={subscription:"اشتراك",extension:"تمديد الاشتراك",reactivation:"تنشيط"};
 function message(node,text,kind="info"){node.textContent=text;node.className=kind==="error"?"notice-error":kind==="success"?"notice-success":"notice-info";}
+function addActionIcon(button,name){if(!button)return;button.querySelectorAll(".button-icon").forEach(n=>n.remove());const holder=document.createElement("span");holder.className="button-icon";holder.innerHTML=ICONS[name]||"";if(holder.firstElementChild)button.prepend(holder);button.classList.add("has-icon");}
 function text(v,fallback="—"){return v===null||v===undefined||v===""?fallback:String(v);}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 const primaryTabs=["dashboard","requests","numbers","customers"];
@@ -104,7 +105,7 @@ async function loadRequests(){
  if(!requestRows.length){const pending=document.createElement("div");pending.className="empty-state";pending.textContent="جارٍ تحميل الطلبات…";host.replaceChildren(pending);}
  const filters={search:$("request-search").value.trim(),status:$("request-status").value,operation_type:$("request-type").value,company_id:$("request-company").value};
  try{const result=await s.listRequests(filters);if(result?.success!==true)throw Error("not-confirmed");requestRows=normalizeList(result);const companies=Array.isArray(result.companies)?result.companies:[];const select=$("request-company"),selected=select.value;select.replaceChildren(new Option("كل الشركات","all"));companies.forEach(c=>select.add(new Option(c.name,c.id)));if([...select.options].some(o=>o.value===selected))select.value=selected;renderRequests();return true;}
- catch{if(requestRows.length){const note=document.createElement("p");note.className="notice-error";note.textContent="تعذر تحديث القائمة. البيانات المعروضة قد تكون قديمة.";host.append(note);}else{host.replaceChildren();const empty=document.createElement("div");empty.className="empty-state";const title=document.createElement("strong");title.textContent="تعذر تحميل الطلبات";const retry=document.createElement("button");retry.type="button";retry.className="btn btn-outline";retry.textContent="إعادة المحاولة";retry.addEventListener("click",loadRequests);empty.append(title,retry);host.append(empty);}return false;}
+ catch{if(requestRows.length){const note=document.createElement("p");note.className="notice-error";note.textContent="تعذر تحديث القائمة. البيانات المعروضة قد تكون قديمة.";host.append(note);}else{host.replaceChildren();const empty=document.createElement("div");empty.className="empty-state";const title=document.createElement("strong");title.textContent="تعذر تحميل الطلبات";const retry=document.createElement("button");retry.type="button";retry.className="btn btn-outline";retry.textContent="إعادة المحاولة";addActionIcon(retry,"clock");retry.addEventListener("click",loadRequests);empty.append(title,retry);host.append(empty);}return false;}
  finally{loading=false;host.removeAttribute("aria-busy");updateRequestResetVisibility();}
 }
  if (window.AMANPullToRefresh) {
@@ -119,30 +120,30 @@ function openInlineActions(record,host){
  const actions=document.createElement("section");actions.className="surface";
  const h=document.createElement("h2");h.className="surface-title";h.textContent="إجراءات الطلب";actions.append(h);
  const note=document.createElement("p");note.className="surface-desc";note.textContent="يتحقق أمان من الصلاحية والبيانات ومرجع الدفع قبل اعتماد الطلب أو رفضه.";actions.append(note);
- const approve=document.createElement("button");approve.className="btn btn-block";approve.type="button";approve.textContent="مراجعة أثر الاعتماد";approve.addEventListener("click",()=>showApprovePreview(record,actions));actions.append(approve);
- const reject=document.createElement("button");reject.className="btn btn-outline btn-block";reject.type="button";reject.style.marginTop="9px";reject.textContent="رفض الطلب";reject.addEventListener("click",()=>showRejectForm(record,actions));actions.append(reject);host.append(actions);
+ const approve=document.createElement("button");approve.className="btn btn-block";approve.type="button";approve.textContent="مراجعة أثر الاعتماد";addActionIcon(approve,"doc");approve.addEventListener("click",()=>showApprovePreview(record,actions));actions.append(approve);
+ const reject=document.createElement("button");reject.className="btn btn-outline btn-block";reject.type="button";reject.style.marginTop="9px";reject.textContent="رفض الطلب";addActionIcon(reject,"flag");reject.addEventListener("click",()=>showRejectForm(record,actions));actions.append(reject);host.append(actions);
 }
 async function showApprovePreview(record,host){
  const s=service(),box=document.createElement("div");box.className="soft-surface";const h=document.createElement("h3");h.textContent="تأكيد أثر الاعتماد";box.append(h);
  if(!s||typeof s.getApprovalPreview!=="function"){const p=document.createElement("p");p.textContent="معاينة أثر الاعتماد غير متاحة حاليًا.";box.append(p);host.append(box);return;}
  const p=document.createElement("p");p.textContent="جارٍ تحميل الفترة والأثر…";box.append(p);host.append(box);
- try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();p.textContent="الفترة التي ستنشأ عند التأكيد:";box.append(detailRow("بداية الحماية",r.preview.starts_at),detailRow("نهاية الحماية",r.preview.ends_at),detailRow("أثر الاعتماد",r.preview.effect_description));const confirm=document.createElement("button");confirm.className="btn btn-block";confirm.textContent="تأكيد الاعتماد";confirm.addEventListener("click",()=>performDecision("approve",record.id,{},confirm));box.append(confirm);}
+ try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();p.textContent="الفترة التي ستنشأ عند التأكيد:";box.append(detailRow("بداية الحماية",r.preview.starts_at),detailRow("نهاية الحماية",r.preview.ends_at),detailRow("أثر الاعتماد",r.preview.effect_description));const confirm=document.createElement("button");confirm.className="btn btn-block";confirm.textContent="تأكيد الاعتماد";addActionIcon(confirm,"flag");confirm.addEventListener("click",()=>performDecision("approve",record.id,{},confirm));box.append(confirm);}
  catch{p.textContent="تعذر جلب معاينة موثوقة. لم يُعتمد الطلب.";}
 }
 async function showRejectForm(record,host){
  const s=service(),form=document.createElement("form");form.className="soft-surface";const h=document.createElement("h3");h.textContent="تسجيل رفض الطلب";form.append(h);
  const label=document.createElement("label");label.className="field-label";label.textContent="سبب الرفض";const select=document.createElement("select");select.className="field";select.required=true;select.add(new Option("اختر سبب الرفض",""));form.append(label,select);
  const explain=document.createElement("label");explain.className="field-label";explain.style.marginTop="12px";explain.textContent="توضيح إضافي (إن لزم)";const textarea=document.createElement("textarea");textarea.className="field";textarea.rows=3;textarea.maxLength=1000;form.append(explain,textarea);
- const feedback=document.createElement("p");feedback.setAttribute("aria-live","polite");const submit=document.createElement("button");submit.className="btn btn-block";submit.textContent="تأكيد الرفض";form.append(feedback,submit);host.append(form);
+ const feedback=document.createElement("p");feedback.setAttribute("aria-live","polite");const submit=document.createElement("button");submit.className="btn btn-block";submit.textContent="تأكيد الرفض";addActionIcon(submit,"flag");form.append(feedback,submit);host.append(form);
  if(!s||typeof s.getRejectReasons!=="function"){message(feedback,"قائمة أسباب الرفض غير متاحة حاليًا.","error");submit.disabled=true;return;}
  try{const r=await s.getRejectReasons();const items=Array.isArray(r?.items)?r.items:[];items.forEach(x=>select.add(new Option(x.label,x.code)));if(r?.success!==true||!items.length)throw Error();}catch{message(feedback,"تعذر تحميل أسباب الرفض المعتمدة.","error");submit.disabled=true;}
  form.addEventListener("submit",e=>{e.preventDefault();if(!select.value){message(feedback,"اختر سبب الرفض أولًا.","error");return;}performDecision("reject",record.id,{reason_code:select.value,explanation:textarea.value.trim()},submit,feedback);});
 }
 async function performDecision(action,id,payload,button,feedback){
  const s=service(),method=action==="approve"?"approveRequest":"rejectRequest";if(!s||typeof s[method]!=="function"){if(feedback)message(feedback,"تعذر تنفيذ القرار حاليًا.","error");return;}
- button.disabled=true;button.textContent="جارٍ تنفيذ القرار…";
+ button.disabled=true;button.textContent="جارٍ تنفيذ القرار…";addActionIcon(button,"clock");
  try{const r=await s[method]({request_id:id,...payload});if(r?.success!==true)throw Error();if(feedback)message(feedback,action==="approve"?"تم اعتماد الطلب.":"تم رفض الطلب.","success");await openRequest(id);await loadRequests();}
- catch{if(feedback)message(feedback,"لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.","error");else window.alert("لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.");button.disabled=false;button.textContent=action==="approve"?"تأكيد الاعتماد":"تأكيد الرفض";}
+ catch{if(feedback)message(feedback,"لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.","error");else window.alert("لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.");button.disabled=false;button.textContent=action==="approve"?"تأكيد الاعتماد":"تأكيد الرفض";addActionIcon(button,"flag");}
 }
 async function openRequest(id){
  activeRequestId=id;window.AMANAdminCurrentRequest=null;$("requests-list-view").hidden=true;$("request-detail-view").hidden=false;$("request-detail-content").replaceChildren();current="request-detail";window.scrollTo({top:0,behavior:"smooth"});

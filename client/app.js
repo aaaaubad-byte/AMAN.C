@@ -58,16 +58,29 @@ const normalizeDigits = value => String(value ?? "").replace(/[٠-٩]/g, d => "�
 const normalizePhone = value => normalizeDigits(value).replace(/[^0-9]/g, "");
 const has = value => value !== null && value !== undefined && value !== "";
 /* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
-const svgIcon = d => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>";
+const svgIcon = d => '<svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>";
 const ICONS = {
  clock: svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
  user: svgIcon('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
- alert: svgIcon('<path d="M12 3 2 20h20zM12 10v5M12 18h.01"/>'),
+ alert: svgIcon('<path d="M12 3 2 20h20z"/><path d="M12 10v5M12 18h.01"/>'),
  phone: svgIcon('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
  search: svgIcon('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'),
- bell: svgIcon('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>')
+ check: svgIcon('<path d="M5 12l4 4"/><path d="M9 16 19 6"/>'),
+ close: svgIcon('<path d="M6 6l12 12"/><path d="M18 6 6 18"/>'),
+ logout: svgIcon('<path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 3v18"/>'),
+ bell: svgIcon('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>')
 };
-function el(tag, cls, content) { const n = document.createElement(tag); if (cls) n.className = cls; if (content !== undefined) n.textContent = content; return n; }
+function el(tag, cls, content) {
+ const n = document.createElement(tag); if (cls) n.className = cls;
+ if (tag === "button" && cls && /\bbtn\b/.test(cls) && content !== undefined) {
+  const label = document.createElement("span"); label.textContent = content;
+  const value = String(content);
+  const name = /بحث/.test(value) ? "search" : /إعادة المحاولة|تحديث/.test(value) ? "clock" : /تسجيل الخروج/.test(value) ? "logout" : /تسجيل الدخول|دخول/.test(value) ? "user" : /إلغاء|إغلاق/.test(value) ? "close" : /حفظ|تأكيد|إرسال|متابعة|اعتماد/.test(value) ? "check" : null;
+  if (name && ICONS[name]) { const holder = document.createElement("span"); holder.className = "button-icon"; holder.innerHTML = ICONS[name]; n.classList.add("has-icon"); n.append(holder, label); }
+  else n.textContent = content;
+ } else if (content !== undefined) n.textContent = content;
+ return n;
+}
 function iconEl(cls, name) { const n = el("span", cls); n.innerHTML = ICONS[name] || ""; return n; }
 function setMessage(node, message, kind = "error") { if (!node) return; node.textContent = message; node.className = kind === "success" ? "notice-success" : kind === "info" ? "notice-info" : "notice-error"; }
 function detailBlock(label, value, dir) { const b = el("div", "detail-block"), l = el("div", "detail-label", label), v = el("div", "detail-value", value); if (dir) v.dir = dir; b.append(l, v); return b; }
