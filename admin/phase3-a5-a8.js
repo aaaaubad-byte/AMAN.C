@@ -57,7 +57,7 @@ async function openNumber(id){
   const groups=[["سجل الفترات",n.protection_periods],["سجل الأحداث",n.events],["العملاء المرتبطون",n.customers],["الطلبات المرتبطة",n.requests],["البلاغات",n.reports],["التنبيهات",n.alerts],["مهام السداد",n.tasks]];
   groups.forEach(([title,items])=>{const box=el("section","surface admin-detail-panel"),h=el("h2","surface-title",title);box.append(h);if(!Array.isArray(items)||!items.length){box.append(el("p","surface-desc","لا توجد سجلات متاحة."));}else items.forEach(item=>{const line=el("div","admin-detail-row");line.append(el("span","",item.label||item.type||item.customer_name||item.request_number||item.title||"سجل"),el("strong","",item.summary||item.status_label||item.created_at||item.due_at||item.phone||"—"));box.append(line);});generic.append(box);});
   generic.append(el("p","surface-desc","هذه الشاشة للقراءة فقط. لا تتضمن إجراءات اشتراك أو تمديد أو تنشيط أو إضافة رقم."));
- }catch{loading.textContent="تعذر تحميل تفاصيل الرقم. لم يتم عرض بيانات بديلة.";}
+ }catch{loading.textContent="تعذر تحميل تفاصيل الرقم.";}
 }
 function dialogBase(title){
  const dialog=document.createElement("dialog");dialog.className="admin-decision-dialog";const box=el("div","surface"),h=el("h2","surface-title",title),body=el("div","decision-body");box.append(h,body);dialog.append(box);document.body.append(dialog);return {dialog,body};
