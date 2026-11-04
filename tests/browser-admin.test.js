@@ -10,6 +10,19 @@ test.after(async () => { if (browser) await browser.close(); });
 
 const view = page => page.locator("#admin-generic-view");
 const T = { timeout: 5000 };
+async function pullToRefresh(page, selector = "#admin-section") {
+  await page.evaluate(selector => {
+    const root = document.querySelector(selector);
+    const send = (type, y) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "touches", { value: type === "touchend" ? [] : [{ clientY: y }] });
+      root.dispatchEvent(event);
+    };
+    send("touchstart", 100);
+    send("touchmove", 180);
+    send("touchend", 180);
+  }, selector);
+}
 async function start(path = "/admin/", opts) {
   const t = await open(browser, path, opts);
   await adminLogin(t.page);
@@ -121,10 +134,11 @@ test("وسائل الدفع (D9): حالة فراغ ← إضافة بالحقو�
 test("الطلبات: اعتماد من القائمة إلى التفاصيل إلى المعاينة والتأكيد ثم تحديث الواجهة والنجاح بعد النجاح", { skip }, async () => {
   const t = await start();
   await go(t.page, "requests");
+  assert.equal(await t.page.locator("#requests-refresh").count(), 0, "زر التحديث القديم غير موجود");
   await t.page.waitForSelector("text=لا توجد طلبات مطابقة");
   await seed(t.page);
   const id = await submitRequest(t.page);
-  await t.page.click("#requests-refresh");
+  await pullToRefresh(t.page);
   await t.page.waitForSelector(".admin-request-card", T);
   await t.page.click(".admin-request-card");
   await t.page.waitForSelector("text=مراجعة أثر الاعتماد", T);
@@ -201,9 +215,10 @@ test("الأرقام والتقارير: رقم معتمد يظهر بحالته
 test("العملاء: تعطيل بسبب ثم إعادة تفعيل، وتحديث الحالة في الواجهة والخدمة", { skip }, async () => {
   const t = await start();
   await go(t.page, "customers");
+  assert.equal(await t.page.locator("text=تحديث العملاء").count(), 0, "زر تحديث العملاء القديم غير موجود");
   await t.page.waitForSelector("text=لا يوجد عملاء مطابقون");
   await seed(t.page);
-  await t.page.click("text=تحديث العملاء");
+  await pullToRefresh(t.page);
   await t.page.waitForSelector("text=c@test.local", T);
   await t.page.click("text=c@test.local");
   await t.page.click("button:has-text('تعطيل الحساب')");
