@@ -108,6 +108,8 @@ function navigate(name, { scroll = true, remember = true } = {}) {
   if (name === "operations") refreshOperations(true);
   if (name === "notifications") refreshNotifications(true);
  }
+ const pullTargets={home:()=>refreshNumbers(),numbers:()=>refreshNumbers(),operations:()=>refreshOperations(),notifications:()=>refreshNotifications()};
+ if(pullTargets[name])window.AMANPullRefresh?.attach(screens[name],pullTargets[name]);
  document.dispatchEvent(new CustomEvent("aman:screenchange", { detail: { screen: name, previous: previousScreen } }));
  return true;
 }
@@ -539,7 +541,7 @@ async function markRead(id) {
  if (result.success === true) await refreshNotifications(true); else setMessage($("notifications-message"), serviceProblem(result));
 }
 $("notification-filter").addEventListener("change", renderNotifications);
-$("notifications-refresh").addEventListener("click", () => refreshNotifications());
+
 
 function renderAll() { renderHomeNumbers(); renderNumbers(); renderOperations(); renderNotifications(); }
 
