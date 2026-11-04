@@ -1092,45 +1092,45 @@ html[data-theme="dark"]{
 }
 
 
-/* AMAN.C icon system — modern, human-centred institutional duotone. */
-:root{--icon-base:var(--blue);--icon-accent:var(--turquoise);--icon-size:19px}
+/* AMAN.C refined duotone icon system: bold silhouettes, clear two-part colour and larger optical scale. */
+:root{--icon-base:var(--blue);--icon-accent:var(--turquoise);--icon-size:23px}
 html[data-theme="dark"]{--icon-base:#d7e8ee;--icon-accent:var(--turquoise)}
-svg.aman-icon{display:block;flex:0 0 auto;width:var(--icon-size);height:var(--icon-size);overflow:visible;fill:none;stroke:var(--icon-base);stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-svg.aman-icon path:nth-of-type(2),svg.aman-icon circle:nth-of-type(2),svg.aman-icon rect:nth-of-type(2),svg.aman-icon line:nth-of-type(2),svg.aman-icon polyline:nth-of-type(2){stroke:var(--icon-accent)}
-svg.aman-icon circle:first-of-type{stroke:var(--icon-accent)}
+svg.aman-icon{display:block;flex:0 0 auto;width:var(--icon-size);height:var(--icon-size);overflow:visible;fill:none;stroke:none;vector-effect:non-scaling-stroke}
+svg.aman-icon .icon-fill{fill:var(--icon-base);stroke:none}
+svg.aman-icon .icon-accent{fill:var(--icon-accent);stroke:none}
+svg.aman-icon .icon-cut{fill:none;stroke:var(--panel);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round}
 .icon-btn,.tile-btn,.password-toggle,.sheet-close,.stat-icon,.quick-icon,.empty-icon,.phone-icon,.sheet-hero-icon,.button-icon{display:grid;place-items:center;flex:0 0 auto}
-.icon-btn{width:42px;height:42px;min-width:42px;border-radius:10px;background:var(--panel-2);color:var(--icon-base);transition:background .16s ease,transform .16s ease}
+.icon-btn{width:44px;height:44px;min-width:44px;border-radius:11px;background:var(--panel-2);color:var(--icon-base);transition:background .16s ease,transform .16s ease}
 .icon-btn:active,.tile-btn:active{transform:scale(.96)}
-.icon-btn svg,.tile-btn svg,.password-toggle svg,.sheet-close svg{width:20px;height:20px}
+.icon-btn svg,.tile-btn svg,.password-toggle svg,.sheet-close svg{width:24px;height:24px}
 .topbar-actions{display:flex;align-items:center;gap:8px}
-.tile-btn{width:40px;height:40px;min-width:40px;border-radius:10px;background:var(--panel-2);color:var(--icon-base);border:1px solid var(--line)}
+.tile-btn{width:42px;height:42px;min-width:42px;border-radius:11px;background:var(--panel-2);color:var(--icon-base);border:1px solid var(--line)}
 .screen-head{display:flex;align-items:center;gap:11px;min-height:58px}
 .screen-head-title{flex:1;min-width:0;align-self:center}
-.screen-head-spacer{flex:0 0 40px}
+.screen-head-spacer{flex:0 0 42px}
 .quick-link,.admin-shortcut{display:flex;align-items:center;gap:11px;text-align:start}
-.quick-icon,.phone-icon,.stat-icon,.empty-icon,.sheet-hero-icon{width:38px;height:38px;min-width:38px;border-radius:10px;background:var(--panel-2);color:var(--icon-base)}
-.quick-icon svg,.phone-icon svg,.stat-icon svg,.empty-icon svg,.sheet-hero-icon svg{width:20px;height:20px}
+.quick-icon,.phone-icon,.stat-icon,.empty-icon,.sheet-hero-icon{width:42px;height:42px;min-width:42px;border-radius:11px;background:var(--panel-2);color:var(--icon-base)}
+.quick-icon svg,.phone-icon svg,.stat-icon svg,.empty-icon svg,.sheet-hero-icon svg{width:25px;height:25px}
 .quick-text,.phone-info,.admin-shortcut strong{min-width:0;flex:1}
 .quick-link .chevron{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;color:var(--icon-accent);font-size:21px;line-height:1}
-.stat-icon{border-radius:10px}
-.nav-item{align-content:center;justify-items:center;gap:4px;min-height:48px;padding:5px 2px}
-.nav-item svg{width:21px;height:21px;stroke:var(--icon-base)}
-.nav-item.active svg{stroke:var(--icon-accent);stroke-width:2.1}
-.admin-shortcut{min-height:62px;padding:10px 12px}
+.stat-icon{border-radius:11px}
+.nav-item{align-content:center;justify-items:center;gap:4px;min-height:50px;padding:5px 2px}
+.nav-item svg{width:25px;height:25px;stroke:none}
+.nav-item.active svg{filter:drop-shadow(0 1px 1px #079f7a24)}
+.admin-shortcut{min-height:66px;padding:11px 12px}
 .admin-shortcut .quick-icon{margin:0}
 .empty-icon{margin-inline:auto}
 .btn.has-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn.has-icon svg,.button-icon svg{width:17px;height:17px}
+.btn.has-icon svg,.button-icon svg{width:20px;height:20px}
 .btn.has-icon .button-icon{display:contents}
-.btn.has-icon>svg{width:17px;height:17px}
+.btn.has-icon>svg{width:20px;height:20px}
 .btn.has-icon>span:not(.button-icon){display:inline-block}
-.btn.has-icon svg{stroke:currentColor}
-.btn.has-icon:not(.btn-outline) svg{stroke:#fff}
-.btn.has-icon.btn-outline svg{stroke:var(--icon-base)}
-.password-toggle{width:40px;height:40px}
-.sheet-close{width:38px;height:38px;border-radius:9px;color:var(--icon-base)}
-.sheet-close svg{stroke:var(--icon-accent)}
+.btn.has-icon svg{stroke:none}
+.password-toggle{width:42px;height:42px}
+.sheet-close{width:40px;height:40px;border-radius:10px;color:var(--icon-base)}
+.sheet-close svg{stroke:none}
 .admin-shortcut>strong,.quick-text strong{line-height:1.45}
-@media(max-width:380px){.screen-head{gap:8px}.tile-btn,.screen-head-spacer{flex-basis:36px;width:36px;min-width:36px}.quick-icon,.phone-icon,.stat-icon,.empty-icon,.sheet-hero-icon{width:36px;height:36px;min-width:36px}.nav-item{font-size:9.4px}}
+@media(max-width:380px){.screen-head{gap:8px}.tile-btn,.screen-head-spacer{flex-basis:38px;width:38px;min-width:38px}.quick-icon,.phone-icon,.stat-icon,.empty-icon,.sheet-hero-icon{width:39px;height:39px;min-width:39px}.nav-item{font-size:9.4px}.nav-item svg{width:23px;height:23px}}
 @media(prefers-reduced-motion:reduce){.icon-btn,.tile-btn{transition:none}}
+.btn.has-icon:not(.btn-outline) svg.aman-icon .icon-cut{stroke:#d8f6f1!important}
 .btn.has-icon:not(.btn-outline) svg.aman-icon path:nth-of-type(2),.btn.has-icon:not(.btn-outline) svg.aman-icon circle:first-of-type{stroke:#c8eee8!important}

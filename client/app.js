@@ -60,15 +60,15 @@ const has = value => value !== null && value !== undefined && value !== "";
 /* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
 const svgIcon = d => '<svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>";
 const ICONS = {
- clock: svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
- user: svgIcon('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
- alert: svgIcon('<path d="M12 3 2 20h20z"/><path d="M12 10v5M12 18h.01"/>'),
- phone: svgIcon('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
- search: svgIcon('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'),
- check: svgIcon('<path d="M5 12l4 4"/><path d="M9 16 19 6"/>'),
- close: svgIcon('<path d="M6 6l12 12"/><path d="M18 6 6 18"/>'),
- logout: svgIcon('<path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 3v18"/>'),
- bell: svgIcon('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>')
+ clock: svgIcon('<path class="icon-fill" d="M12 2.4a9.6 9.6 0 1 0 0 19.2 9.6 9.6 0 0 0 0-19.2Z"/><path class="icon-accent" d="M11 5.8h2v6.1l4.1 2.4-1 1.7-5.1-3V5.8Z"/><path class="icon-cut" d="M12 2.4v2.1"/>'),
+ user: svgIcon('<path class="icon-fill" d="M12 2.5a5.1 5.1 0 1 0 0 10.2 5.1 5.1 0 0 0 0-10.2Z"/><path class="icon-accent" d="M3 21c.4-4.5 4-7.2 9-7.2s8.6 2.7 9 7.2H3Z"/><path class="icon-cut" d="M8.5 15.2 12 18l3.5-2.8"/>'),
+ alert: svgIcon('<path class="icon-fill" d="M12 2 21 5.5v6.2c0 5-3.6 8.7-9 10.3-5.4-1.6-9-5.3-9-10.3V5.5L12 2Z"/><path class="icon-accent" d="M11 6.5h2v7h-2zM11 15.5h2v2h-2z"/>'),
+ phone: svgIcon('<path class="icon-fill" d="M7 1.8h10A2.8 2.8 0 0 1 19.8 4.6v14.8a2.8 2.8 0 0 1-2.8 2.8H7a2.8 2.8 0 0 1-2.8-2.8V4.6A2.8 2.8 0 0 1 7 1.8Z"/><path class="icon-accent" d="M7.2 5h9.6v12H7.2z"/><path class="icon-cut" d="M10 19.2h4"/>'),
+ search: svgIcon('<path class="icon-fill" d="M10.5 2.2a8.3 8.3 0 1 0 0 16.6 8.3 8.3 0 0 0 0-16.6Z"/><path class="icon-accent" d="m16.5 15.1 5.3 5.3-1.5 1.5-5.3-5.3z"/><path class="icon-cut" d="M6.8 10.5a3.7 3.7 0 0 1 3.7-3.7"/>'),
+ check: svgIcon('<path class="icon-fill" d="M12 2 21 5.5v6.2c0 5-3.6 8.7-9 10.3-5.4-1.6-9-5.3-9-10.3V5.5L12 2Z"/><path class="icon-accent" d="m7.1 11.8 3.2 3.2 6.8-7 1.5 1.5-8.3 8.5-4.7-4.7z"/>'),
+ close: svgIcon('<path class="icon-fill" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path class="icon-accent" d="m8 6.6 4 4 4-4 1.4 1.4-4 4 4 4-1.4 1.4-4-4-4 4L6.6 16l4-4-4-4L8 6.6Z"/>'),
+ logout: svgIcon('<path class="icon-fill" d="M4 2.5h9a2 2 0 0 1 2 2v3h-2v-3H4v15h9v-3h2v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z"/><path class="icon-accent" d="M14.2 7.2 19 12l-4.8 4.8-1.4-1.4 2.4-2.4H7v-2h8.2l-2.4-2.4 1.4-1.4Z"/>'),
+ bell: svgIcon('<path class="icon-fill" d="M18 9a6 6 0 0 0-12 0c0 6.1-2.2 7.1-3 8.8-.2.5.2 1.2.8 1.2h16.4c.6 0 1-.7.8-1.2-.8-1.7-3-2.7-3-8.8Z"/><path class="icon-accent" d="M9.2 20h5.6a2.8 2.8 0 0 1-5.6 0Z"/><path class="icon-cut" d="M9 5.5a4 4 0 0 1 5.2 0"/>')
 };
 function el(tag, cls, content) {
  const n = document.createElement(tag); if (cls) n.className = cls;
