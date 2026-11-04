@@ -86,7 +86,7 @@ svg.ami .c{fill:var(--ic-c)!important}
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
   scrollbar-width:none;
   margin-inline:calc(-1 * var(--app-pad));
-  padding:8px max(11%,calc((100% - 420px) / 2)) 12px;
+  padding:6px max(11%,calc((100% - 420px) / 2)) 8px;
 }
 .aman-carousel-track::-webkit-scrollbar{display:none}
 .aman-carousel-track>*{
@@ -96,12 +96,12 @@ svg.ami .c{fill:var(--ic-c)!important}
 }
 .aman-carousel-track>.is-active{transform:scale(1);opacity:1}
 .admin-stats.aman-carousel-track .stat-card{
-  min-height:150px;padding:18px;gap:6px;justify-content:space-between;
+  min-height:132px;padding:15px;gap:5px;justify-content:space-between;
   display:flex;flex-direction:column;align-items:flex-start;
 }
 .admin-stats.aman-carousel-track .stat-card small{font-size:11.5px;color:var(--muted)}
 .admin-stats.aman-carousel-track .stat-card strong{font-size:34px;line-height:1.2;color:var(--num);margin-top:0}
-.aman-slot{min-height:150px}
+.aman-slot{min-height:132px}
 .aman-dots{display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 14px}
 .aman-dot{width:7px;height:19px;padding:6px 0;border:0;border-radius:7px;background:var(--dot);background-clip:content-box;
   transition:width .2s ease,background-color .2s ease;cursor:pointer}
@@ -183,7 +183,7 @@ html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .b{
 /* Admin dashboard: compact top welcome, lifted statistics and circular carousel dots. */
 .admin-app>.admin-topbar{justify-content:flex-start;gap:11px}
 .admin-topbar-greeting{font-size:14px;font-weight:800;color:var(--ink);line-height:1}
-.admin-app #dashboard-screen>.admin-stats{margin-top:-13px;margin-bottom:2px}
+.admin-app #dashboard-screen>.admin-stats{margin-top:-6px;margin-bottom:2px}
 .admin-app #dashboard-screen>.section-head{margin-top:12px;margin-bottom:9px}
 .admin-app #dashboard-screen>.surface{margin-top:12px!important}
 .admin-section-icon{display:inline-grid;place-items:center;width:23px;height:23px;margin-inline-end:7px;color:var(--turquoise);vertical-align:middle}
@@ -193,3 +193,31 @@ html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .b{
 .admin-app .aman-dots .aman-dot{width:9px;height:9px;min-width:9px;padding:0;border-radius:50%;background:var(--dot);background-clip:border-box}
 .admin-app .aman-dots .aman-dot.is-active{width:9px;height:9px;background:var(--turquoise);transform:scale(1.2)}
 .admin-app .aman-dots{gap:9px;margin:1px 0 8px}
+
+
+/* Correct admin statistics carousel: explicit turquoise fill and true circular indicators.
+   Keep this override scoped to the light theme; the dark theme remains unchanged. */
+html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-carousel-track>.stat-card{
+  background:var(--turquoise)!important;
+  background-color:var(--turquoise)!important;
+  border-color:var(--turquoise)!important;
+  color:#fff!important;
+}
+html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-carousel-track>.stat-card small,
+html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-carousel-track>.stat-card strong{
+  color:#fff!important;
+}
+html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-carousel-track>.stat-card .stat-icon{
+  background:rgba(255,255,255,.18)!important;
+  color:#fff!important;
+}
+html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-carousel-track>.stat-card .stat-icon .a{fill:#fff!important}
+html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-carousel-track>.stat-card .stat-icon .b{fill:#d8f3f0!important}
+.admin-app #dashboard-screen>.admin-stats.aman-carousel-track~.aman-dots .aman-dot{
+  width:9px!important;height:9px!important;min-width:9px!important;min-height:9px!important;
+  padding:0!important;border:0!important;border-radius:50%!important;
+  background:var(--dot)!important;background-clip:border-box!important;
+}
+.admin-app #dashboard-screen>.admin-stats.aman-carousel-track~.aman-dots .aman-dot.is-active{
+  width:9px!important;height:9px!important;background:var(--turquoise)!important;transform:scale(1.2);
+}
