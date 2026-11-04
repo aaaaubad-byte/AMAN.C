@@ -13,10 +13,10 @@ function customerList(host){
  const type=node("select","field");[["all","كل التصنيفات"],["user","مستخدمون"],["customer","عملاء"]].forEach(([v,t])=>type.add(new Option(t,v)));type.value=filters.type;
  const status=node("select","field");[["all","كل الحالات"],["active","فعّال"],["disabled","معطّل"]].forEach(([v,t])=>status.add(new Option(t,v)));status.value=filters.status;
  [["البحث",search],["تصنيف الحساب",type],["حالة الحساب",status]].forEach(([label,input])=>{const box=node("div",""),l=node("label","field-label",label);box.append(l,input);grid.append(box);});
- const refresh=node("button","btn btn-outline","تحديث العملاء");refresh.type="button";refresh.addEventListener("click",loadCustomers);
- const msg=node("p","notice-info","");msg.id="customers-message";filtersBox.append(grid,refresh,msg);
+ const msg=node("p","notice-info","");msg.id="customers-message";filtersBox.append(grid,msg);
  const list=node("div","");list.id="customers-list";wrap.append(filtersBox,list);host.append(wrap);
  [search,type,status].forEach(input=>input.addEventListener(input===search?"input":"change",()=>{filters={search:search.value.trim(),type:type.value,status:status.value};renderCustomers();}));
+ window.AMANPullRefresh?.attach(wrap,loadCustomers);
 }
 function renderCustomers(){
  const host=$("customers-list");if(!host)return;host.replaceChildren();
