@@ -15,7 +15,7 @@ function attach(root,refresh){
  let startY=null,armed=false,refreshing=false;
  root.addEventListener("touchstart",event=>{
   if(refreshing||event.touches.length!==1)return;
-  if(event.target.closest("input,select,textarea,button,a,[contenteditable=true]"))return;
+  if(event.target.closest("input,select,textarea,[contenteditable=true]"))return;
   if(window.scrollY>1||root.scrollTop>1)return;
   startY=event.touches[0].clientY;armed=false;
  },{passive:true});
