@@ -191,3 +191,26 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
  .state{font-size:10px;padding:4px 7px}
  .admin-detail-row{gap:8px}
 }
+
+/* Admin login — styles mapped to the existing admin/index.html markup only. */
+.login-screen{min-height:calc(100dvh - 72px);display:flex;align-items:center;justify-content:center;padding:18px 0}
+.login-wrap{width:min(100%,440px);margin:auto;display:flex;flex-direction:column;justify-content:center;padding:20px 0}
+.login-brand{text-align:center;margin-bottom:22px}
+.login-brand picture{display:block;margin:0 auto 12px}
+.login-logo{display:block;width:auto;height:64px;margin:0 auto}
+.login-brand h1{margin:0;color:var(--ink);font-size:22px;line-height:1.5;font-weight:800}
+.login-card{background:var(--paper);border:var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow)}
+.login-card h2{margin:0 0 14px;color:var(--ink);font-size:19px;line-height:1.5;font-weight:800}
+.login-form{display:grid;gap:12px}
+.login-field{display:grid;gap:6px;min-width:0}
+.login-input-ltr{direction:ltr;text-align:left}
+.password-wrap{position:relative;min-width:0}
+.password-wrap .field{padding-inline-end:48px}
+.password-toggle{position:absolute;inset-inline-end:6px;top:50%;display:grid;width:36px;height:36px;place-items:center;transform:translateY(-50%);border:0;border-radius:8px;background:transparent;color:var(--muted)}
+.password-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.password-toggle:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+.remember-row{display:flex;align-items:center;gap:9px;min-height:28px;color:var(--text);font-size:12px;cursor:pointer}
+.remember-row input{width:17px;height:17px;margin:0;accent-color:var(--green)}
+.login-submit{margin-top:2px}
+#admin-login-message:empty{display:none}
+@media(max-width:380px){.login-wrap{padding:12px 0}.login-card{padding:16px}.login-brand{margin-bottom:17px}}
