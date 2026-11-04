@@ -8,13 +8,13 @@ const panel=(title,rows)=>{const box=node("section","surface admin-detail-panel"
 const notice=(host,msg,error=false)=>{const p=node("p",error?"notice-error":"notice-info",msg);host.append(p);};
 function shell(){const host=$("admin-generic-view");host.replaceChildren();delete host.dataset.pullScreen;delete host.dataset.noPullRefresh;return host;}
 function customerList(host){
- const wrap=node("div","admin-customers-view"),filtersBox=node("div","surface"),grid=node("div","admin-filter-grid");
+ const wrap=node("div","admin-customers-view"),grid=node("div","admin-filter-grid");
  const search=node("input","field");search.placeholder="اسم العميل أو البريد أو الهاتف";search.value=filters.search;
  const type=node("select","field");[["all","كل التصنيفات"],["user","مستخدمون"],["customer","عملاء"]].forEach(([v,t])=>type.add(new Option(t,v)));type.value=filters.type;
  const status=node("select","field");[["all","كل الحالات"],["active","فعّال"],["disabled","معطّل"]].forEach(([v,t])=>status.add(new Option(t,v)));status.value=filters.status;
  [["البحث",search],["تصنيف الحساب",type],["حالة الحساب",status]].forEach(([label,input])=>{const box=node("div",""),l=node("label","field-label",label);box.append(l,input);grid.append(box);});
- const msg=node("p","notice-info","");msg.id="customers-message";filtersBox.append(grid,msg);
- const list=node("div","");list.id="customers-list";wrap.append(filtersBox,list);host.append(wrap);
+ const msg=node("p","notice-info","");msg.id="customers-message";wrap.append(grid,msg);
+ const list=node("div","");list.id="customers-list";wrap.append(list);host.append(wrap);
  [search,type,status].forEach(input=>input.addEventListener(input===search?"input":"change",()=>{filters={search:search.value.trim(),type:type.value,status:status.value};renderCustomers();}));
 }
 function renderCustomers(){
