@@ -8,11 +8,11 @@
 <body>
 <main class="app" id="client-app">
 <header class="topbar">
-<div class="topbar-actions" id="topbar-actions" style="display:none">
+<div class="topbar-actions" id="topbar-actions" style="display:none"><strong class="topbar-greeting">مرحبًا بك</strong>
 <button class="icon-btn" id="account-button" type="button" aria-label="الحساب"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
 <button class="icon-btn" id="notifications-button" type="button" aria-label="الإشعارات"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span class="unread-dot" id="notifications-dot" hidden aria-label="يوجد إشعارات غير مقروءة"></span></button>
 </div>
-<a class="brand" href="./" aria-label="أمان - الرئيسية"><picture><source data-theme-dark-logo media="(prefers-color-scheme: dark)" srcset="../assets/brand/logo-mark-light-v2.png"><img class="brand-logo" src="../assets/brand/logo-mark-v2.png" alt="" width="42" height="36"></picture><span class="brand-copy"><strong>أمان</strong><small>AMAN</small></span></a>
+
 </header>
 
 <section id="boot-screen" data-screen="boot"><div class="soft-surface empty-state"><div class="empty-icon"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><strong>جارٍ التحميل…</strong><p>نتحقق من جلسة حسابك.</p></div></section>
@@ -47,16 +47,16 @@
 <p class="surface-desc">البلاغ لا ينقل ملكية الرقم أو يلغي حماية العميل الآخر، ولا يضمن نتيجة. لا تُدرج كلمات مرور أو بيانات مالية.</p><p id="report-message" aria-live="polite"></p><button class="btn btn-block" type="submit" id="report-submit">إرسال البلاغ</button></div></form></section>
 
 <section id="home-screen" data-screen="home" hidden>
-<div class="page-head"><p class="eyebrow">أمان</p><h1 class="page-title">مرحبًا بك</h1></div>
-<section class="surface"><h2 class="surface-title">البحث عن حالة الرقم</h2>
-<form id="search-form"><div class="field-row"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="رقم الهاتف" aria-label="رقم الهاتف" required><button class="btn" type="submit">بحث</button></div></form><p id="search-message" class="notice-error" aria-live="polite"></p></section>
-<div class="section-head"><h2>أرقامي</h2><button class="quiet-link" id="show-all-numbers" type="button">عرض الكل</button></div>
+
+<section class="surface home-search"><div class="home-search-hero"><span class="home-search-icon" aria-hidden="true"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16.2 16.2 5 5M8 10.8h5.6M10.8 8v5.6"/></svg></span><h2>أدخل رقم الهاتف</h2></div><form id="search-form"><input class="field" id="phone-search" type="tel" inputmode="tel" placeholder="رقم الهاتف" aria-label="رقم الهاتف" required><button class="btn btn-block home-search-submit" type="submit" aria-label="تنفيذ البحث"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16.2 16.2 5 5"/></svg></button></form><p id="search-message" class="notice-error" aria-live="polite"></p></section>
+<div class="section-head"><h2><span class="section-heading-icon">▣</span>الأرقام</h2><button class="quiet-link" id="show-all-numbers" type="button">عرض الكل</button></div>
 <div id="my-numbers"><div class="soft-surface empty-state"><div class="empty-icon"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6"/><path d="M9 10h2m3 0h1"/><path d="M9 14h2m3 0h1m-5 4h2"/></svg></div><strong>لا توجد أرقام مرتبطة بحسابك</strong><p>تظهر أرقامك بعد اعتماد الاشتراك.</p></div></div>
-<div class="section-head"><h2>خدماتك</h2></div>
-<button class="quick-link" type="button" data-navigate="operations"><span class="quick-icon"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></span><span class="quick-text"><strong>العمليات</strong><small>طلباتك وحالاتها</small></span><span class="chevron">‹</span></button>
+<div class="section-head"><h2><span class="section-heading-icon">✦</span>من أجلك</h2></div>
 <button class="quick-link" type="button" data-navigate="notifications"><span class="quick-icon"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><span class="quick-text"><strong>الإشعارات</strong><small>تنبيهات أرقامك</small></span><span class="chevron">‹</span></button>
+<button class="quick-link" type="button" data-navigate="aman-service"><span class="quick-icon"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 20 5v6c0 5.2-3.4 8.7-8 11-4.6-2.3-8-5.8-8-11V5z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/></svg></span><span class="quick-text"><strong>خدمة أمان</strong><small>خدمات الحماية من أمان</small></span><span class="chevron">‹</span></button>
 </section>
 
+<section id="aman-service-screen" data-screen="aman-service" hidden><header class="page-head screen-head"><button class="tile-btn" type="button" data-back aria-label="رجوع">‹</button><h1 class="page-title">خدمة أمان</h1></header><section class="surface"><div class="empty-state"><div class="empty-icon">✓</div><strong>خدمة أمان</strong><p>سيتم تحديد محتوى هذه الخدمة وربطها بالإدارة لاحقًا.</p></div></section></section>
 <section id="numbers-screen" data-screen="numbers" hidden>
 <header class="page-head screen-head"><button class="tile-btn" type="button" type="button" data-back aria-label="رجوع"><svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button><div class="screen-head-title"><h1 class="page-title">أرقامي</h1><p class="screen-subtitle">الأرقام المعتمدة في حسابك.</p></div><span class="screen-head-spacer" aria-hidden="true"></span></header>
 <section class="surface list-tools"><div class="customer-toolbar numbers-toolbar">

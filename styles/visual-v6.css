@@ -128,3 +128,68 @@ svg.ami .c{fill:var(--ic-c)!important}
 html[data-theme="dark"] .tab-strip{background:var(--panel-2);border:0}
 html[data-theme="dark"] .alert-note{border:0}
 html[data-theme="dark"] .btn.btn-soft{background:#203d43;color:#c5e9e5;border-color:transparent}
+
+
+/* ---------- 6) Turquoise home cards (light theme only) ----------
+   Apply the approved identity turquoise to the admin statistics cards and
+   the three intentionally empty client-home carousel slots. Dark theme is untouched. */
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card,
+html:not([data-theme="dark"]) .aman-home-cards .aman-carousel-track .aman-slot{
+  background:var(--turquoise);
+  border-color:var(--turquoise);
+  color:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card small,
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card strong{
+  color:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon{
+  background:rgba(255,255,255,.18);
+  color:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .a{
+  fill:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .b{
+  fill:#d8f3f0;
+}
+
+
+/* Home refinement: topbar, search card, spacing and circular carousel indicators. */
+#client-app .topbar-actions{width:100%;justify-content:flex-start;gap:8px}
+#client-app .topbar-greeting{order:2;margin-inline-start:auto;font-size:14px;font-weight:800;color:var(--ink)}
+#client-app .topbar-actions .icon-btn{order:1}
+.admin-app>.topbar{justify-content:flex-start}
+.aman-dot,.aman-dot.is-active{width:9px;height:9px;min-width:9px;padding:0;border-radius:50%;background:var(--dot)}
+.aman-dot.is-active{background:var(--turquoise);transform:scale(1.2)}
+.aman-dots{gap:9px;margin-top:0}
+.aman-home-cards{margin-top:-9px;margin-bottom:0}
+#home-screen>.section-head{margin-top:16px;margin-bottom:9px}
+#home-screen>.surface.home-search{padding:13px 15px 14px;margin-bottom:9px}
+.home-search-hero{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 12px;text-align:center}
+.home-search-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--field-bg);color:var(--turquoise)}
+.home-search-icon svg{width:29px;height:29px}
+.home-search-hero h2{font-size:14px;font-weight:800;margin:0;color:var(--ink)}
+#search-form{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+#search-form .field{width:100%;margin:0}
+#search-form .home-search-submit{width:100%;min-height:42px;padding:7px}
+#search-form .home-search-submit svg{width:21px;height:21px}
+.section-heading-icon{display:inline-grid;place-items:center;width:23px;height:23px;margin-inline-end:7px;color:var(--turquoise);vertical-align:middle}
+.section-heading-icon svg{width:21px;height:21px}
+#home-screen>.section-head h2{display:flex;align-items:center}
+@media(max-width:380px){#client-app .topbar-greeting{font-size:12.5px}.home-search-icon{width:44px;height:44px}}
+
+
+/* Admin dashboard: compact top welcome, lifted statistics and circular carousel dots. */
+.admin-app>.admin-topbar{justify-content:flex-start;gap:11px}
+.admin-topbar-greeting{font-size:14px;font-weight:800;color:var(--ink);line-height:1}
+.admin-app #dashboard-screen>.admin-stats{margin-top:-13px;margin-bottom:2px}
+.admin-app #dashboard-screen>.section-head{margin-top:12px;margin-bottom:9px}
+.admin-app #dashboard-screen>.surface{margin-top:12px!important}
+.admin-section-icon{display:inline-grid;place-items:center;width:23px;height:23px;margin-inline-end:7px;color:var(--turquoise);vertical-align:middle}
+.admin-section-icon svg{width:21px;height:21px}
+.admin-app #dashboard-screen .section-head h2{display:flex;align-items:center}
+.admin-app .admin-stats.aman-carousel-track~.aman-dots .aman-dot,
+.admin-app .aman-dots .aman-dot{width:9px;height:9px;min-width:9px;padding:0;border-radius:50%;background:var(--dot);background-clip:border-box}
+.admin-app .aman-dots .aman-dot.is-active{width:9px;height:9px;background:var(--turquoise);transform:scale(1.2)}
+.admin-app .aman-dots{gap:9px;margin:1px 0 8px}

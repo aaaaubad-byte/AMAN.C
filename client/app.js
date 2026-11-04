@@ -27,7 +27,7 @@ const svc = () => {
 const runtime = () => window.AMANServices;
 const fmt = value => runtime().formatDateTime(value);
 
-const screenIds = ["boot", "login", "signup", "home", "numbers", "operations", "operation-detail", "protection", "review", "result", "account", "notifications", "number-alerts", "report"];
+const screenIds = ["boot", "login", "signup", "home", "numbers", "operations", "operation-detail", "protection", "review", "result", "account", "notifications", "number-alerts", "report", "aman-service"];
 const PUBLIC_SCREENS = new Set(["boot", "login", "signup"]);
 const screens = Object.fromEntries(screenIds.map(id => [id, $(id + "-screen")]));
 const tabs = [...document.querySelectorAll("[data-tab]")];
@@ -155,7 +155,6 @@ document.querySelectorAll("[data-back-number]").forEach(node => node.addEventLis
 $("show-all-numbers").addEventListener("click", () => navigate("numbers"));
 $("account-button").addEventListener("click", () => { renderAccount(); navigate("account"); });
 $("notifications-button").addEventListener("click", () => navigate("notifications"));
-document.querySelector(".brand").addEventListener("click", event => { event.preventDefault(); navigate("home"); });
 
 function closeNumberSheet() { if (numberSheet) numberSheet.hidden = true; }
 $("close-sheet").addEventListener("click", closeNumberSheet);
