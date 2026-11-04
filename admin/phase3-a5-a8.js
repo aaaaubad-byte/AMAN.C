@@ -21,10 +21,10 @@ function renderNumbersShell(){
  const status=el("select","field");status.id="number-status";
  [["all","كل الحالات"],["protected","محمي"],["inactive","غير نشط"],["expired_confiscated","منتهي / مصادَر"]].forEach(([v,t])=>status.add(new Option(t,v)));
  statusWrap.append(statusLabel,status);filters.append(searchWrap,statusWrap);
- const tools=el("div","field-row"),refresh=el("button","btn btn-outline","تحديث الأرقام");refresh.type="button";refresh.addEventListener("click",loadNumbers);
- const notice=el("p","","");notice.id="numbers-message";tools.append(refresh);
- const list=el("div","");list.id="numbers-list";wrap.append(filters,tools,notice,list);host.append(wrap);
+ const notice=el("p","","");notice.id="numbers-message";
+ const list=el("div","");list.id="numbers-list";wrap.append(filters,notice,list);host.append(wrap);
  search.addEventListener("input",()=>renderNumbers());status.addEventListener("change",()=>renderNumbers());
+
 }
 function renderNumbers(){
  const host=$("numbers-list");if(!host)return;host.replaceChildren();
@@ -46,8 +46,8 @@ async function loadNumbers(){
  catch{setNotice(host,"تعذر تحميل الأرقام. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.",true);}
 }
 async function openNumber(id){
- activeNumberId=id;const generic=$("admin-generic-view");generic.replaceChildren();
- const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();loadNumbers();});
+ activeNumberId=id;window.AMANPullRefresh?.attach($("admin-section"),()=>openNumber(id));const generic=$("admin-generic-view");generic.replaceChildren();
+ const back=el("button","btn btn-outline","العودة إلى الأرقام");back.type="button";back.addEventListener("click",()=>{activeNumberId=null;renderNumbersShell();window.AMANPullRefresh?.attach($("admin-section"),loadNumbers);loadNumbers();});
  generic.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل الرقم…");generic.append(loading);
  const s=service();if(!s||typeof s.getNumberDetails!=="function"){loading.textContent="تفاصيل الرقم غير متاحة حاليًا.";return;}
  try{
@@ -73,7 +73,7 @@ async function openApprovalDialog(){
   body.append(el("p","surface-desc","جارٍ التحقق من أثر الاعتماد…"));
   try{const r=await s.getApprovalPreview({request_id:record.id});if(r?.success!==true||!r.preview)throw Error();body.replaceChildren();
    body.append(panel("الأثر المتوقع",[["بداية الحماية",r.preview.starts_at],["نهاية الحماية",r.preview.ends_at],["الأثر",r.preview.effect_description]]));
-   const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();const closeOk=el("button","btn btn-block","إغلاق");closeOk.type="button";closeOk.addEventListener("click",()=>closeDialog(dialog));body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."),closeOk);const refresh=$("request-detail-refresh");if(refresh)refresh.click();const listRefresh=$("requests-refresh");if(listRefresh)listRefresh.click();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
+   const confirm=el("button","btn btn-block","تأكيد الاعتماد");confirm.type="button";confirm.addEventListener("click",async()=>{confirm.disabled=true;confirm.textContent="جارٍ التأكيد…";try{const out=await s.approveRequest({request_id:record.id});if(out?.success!==true)throw Error();const closeOk=el("button","btn btn-block","إغلاق");closeOk.type="button";closeOk.addEventListener("click",()=>closeDialog(dialog));body.replaceChildren(el("p","notice-success","أكد الخادم اعتماد الطلب."),closeOk);window.AMANAdminNavigation?.refreshCurrentRequest?.();window.AMANAdminNavigation?.refreshRequests?.();}catch{confirm.disabled=false;confirm.textContent="تأكيد الاعتماد";body.append(el("p","notice-error","لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة."));}});body.append(confirm);
   }catch{body.replaceChildren(el("p","notice-error","تعذر جلب معاينة موثوقة؛ لم يُنفذ الاعتماد."));}
  }
  const cancel=el("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>closeDialog(dialog));body.append(cancel);dialog.showModal();
@@ -85,13 +85,13 @@ async function openRejectDialog(){
  else {
   const form=el("form","");const label=el("label","field-label","سبب الرفض");const select=el("select","field");select.required=true;select.add(new Option("اختر سبب الرفض",""));const noteLabel=el("label","field-label","توضيح إضافي (اختياري)"),note=el("textarea","field");note.rows=3;note.maxLength=1000;const feedback=el("p","");const submit=el("button","btn btn-block","تأكيد الرفض");submit.type="submit";form.append(label,select,noteLabel,note,feedback,submit);body.append(form);
   try{const r=await s.getRejectReasons();if(r?.success!==true||!Array.isArray(r.items)||!r.items.length)throw Error();r.items.forEach(x=>select.add(new Option(x.label,x.code)));}catch{setNotice(feedback,"تعذر تحميل أسباب الرفض المعتمدة.",true);submit.disabled=true;}
-  form.addEventListener("submit",async e=>{e.preventDefault();if(!select.value){setNotice(feedback,"اختر سبب الرفض أولًا.",true);return;}submit.disabled=true;try{const out=await s.rejectRequest({request_id:record.id,reason_code:select.value,explanation:note.value.trim()});if(out?.success!==true)throw Error();setNotice(feedback,"أكد الخادم رفض الطلب.");const refresh=$("request-detail-refresh");if(refresh)refresh.click();const listRefresh=$("requests-refresh");if(listRefresh)listRefresh.click();}catch{setNotice(feedback,"لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة.",true);submit.disabled=false;}});
+  form.addEventListener("submit",async e=>{e.preventDefault();if(!select.value){setNotice(feedback,"اختر سبب الرفض أولًا.",true);return;}submit.disabled=true;try{const out=await s.rejectRequest({request_id:record.id,reason_code:select.value,explanation:note.value.trim()});if(out?.success!==true)throw Error();setNotice(feedback,"أكد الخادم رفض الطلب.");window.AMANAdminNavigation?.refreshCurrentRequest?.();window.AMANAdminNavigation?.refreshRequests?.();}catch{setNotice(feedback,"لم يصل تأكيد موثوق. حدّث تفاصيل الطلب قبل إعادة المحاولة.",true);submit.disabled=false;}});
  }
  const cancel=el("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>closeDialog(dialog));body.append(cancel);dialog.showModal();
 }
 document.addEventListener("aman:admin-screenchange",e=>{
  currentScreen=e.detail?.screen||"";
- if(currentScreen==="numbers"){renderNumbersShell();loadNumbers();}
+ if(currentScreen==="numbers"){renderNumbersShell();window.AMANPullRefresh?.attach($("admin-section"),loadNumbers);loadNumbers();}
 });
 document.addEventListener("click",e=>{
  const target=e.target.closest("button");if(!target)return;

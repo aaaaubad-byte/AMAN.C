@@ -56,7 +56,7 @@ function renderMore(){const h=$("admin-generic-view");h.replaceChildren();const 
 /* إظهار/إخفاء كلمة المرور في شاشة الدخول: تعود دائمًا إلى «مخفية» عند فتح الشاشة وبعد الدخول */
 function setPasswordVisible(show){const i=$("admin-password"),b=$("admin-password-toggle");i.type=show?"text":"password";b.setAttribute("aria-pressed",show?"true":"false");b.setAttribute("aria-label",show?"إخفاء كلمة المرور":"إظهار كلمة المرور");}
 function showLogin(){adminSession=null;current="login";historyStack=[];activeRequestId=null;detailRecord=null;dashboard.hidden=true;section.hidden=true;login.hidden=false;nav.hidden=true;showAccountButton(false);setActive("");setPasswordVisible(false);}
-function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;showAccountButton(true);setActive("dashboard");loadDashboard();}
+function showDashboard(){current="dashboard";login.hidden=true;section.hidden=true;dashboard.hidden=false;nav.hidden=false;showAccountButton(true);setActive("dashboard");window.AMANPullRefresh?.attach(dashboard,loadDashboard);loadDashboard();}
 function navigate(name,{remember=true}={}) {
  if(name==="login"){showLogin();return true;}
  /* لا تنقل إلى أي شاشة إدارية دون جلسة مدير مؤكدة (يشمل أيقونة الحساب وروابط الأقسام) */
@@ -69,12 +69,12 @@ function navigate(name,{remember=true}={}) {
  $("admin-generic-view").hidden=name==="requests";$("requests-list-view").hidden=name!=="requests";$("request-detail-view").hidden=true;
  setActive(name);window.scrollTo({top:0,behavior:"smooth"});
  document.dispatchEvent(new CustomEvent("aman:admin-screenchange",{detail:{screen:name}}));
- if(name==="requests")loadRequests();
+ if(name==="requests"){window.AMANPullRefresh?.attach(section,loadRequests);loadRequests();}
  if(name==="more")renderMore();
  return true;
 }
-function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
-window.AMANAdminNavigation=Object.freeze({navigate,back,get current(){return current;}});
+function back(){if(!authed()){showLogin();return;}if(activeRequestId){activeRequestId=null;detailRecord=null;$("requests-list-view").hidden=false;$("request-detail-view").hidden=true;current="requests";window.AMANPullRefresh?.attach(section,loadRequests);loadRequests();return;}const p=historyStack.pop();if(p==="requests"||p==="more"){navigate(p,{remember:false});return;}showDashboard();}
+window.AMANAdminNavigation=Object.freeze({navigate,back,refreshRequests:()=>loadRequests(),refreshCurrentRequest:()=>activeRequestId?openRequest(activeRequestId):Promise.resolve(),get current(){return current;}});
 function stat(id,value){$(id).textContent=text(value,"—");}
 async function loadDashboard(){
  const s=service();if(!s||typeof s.getDashboardSummary!=="function"){["stat-pending-requests","stat-protected-numbers","stat-open-reports","stat-due-tasks","stat-customers","stat-revenue"].forEach(id=>stat(id,"—"));return;}
@@ -139,7 +139,7 @@ async function performDecision(action,id,payload,button,feedback){
  catch{if(feedback)message(feedback,"لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.","error");else window.alert("لم يصل تأكيد موثوق بالقرار. حدّث حالة الطلب قبل إعادة المحاولة.");button.disabled=false;button.textContent=action==="approve"?"تأكيد الاعتماد":"تأكيد الرفض";}
 }
 async function openRequest(id){
- activeRequestId=id;window.AMANAdminCurrentRequest=null;$("requests-list-view").hidden=true;$("request-detail-view").hidden=false;$("request-detail-content").replaceChildren();current="request-detail";window.scrollTo({top:0,behavior:"smooth"});
+ activeRequestId=id;window.AMANAdminCurrentRequest=null;$("requests-list-view").hidden=true;$("request-detail-view").hidden=false;$("request-detail-content").replaceChildren();current="request-detail";window.AMANPullRefresh?.attach(section,()=>activeRequestId?openRequest(activeRequestId):Promise.resolve());window.scrollTo({top:0,behavior:"smooth"});
  const host=$("request-detail-content"),s=service();const loadingBox=document.createElement("div");loadingBox.className="surface empty-state";loadingBox.textContent="جارٍ تحميل تفاصيل الطلب…";host.append(loadingBox);
  if(!s||typeof s.getRequestDetails!=="function"){loadingBox.textContent="تفاصيل الطلب غير متاحة حاليًا.";return;}
  try{const r=await s.getRequestDetails({request_id:id});if(r?.success!==true||!r.request)throw Error();detailRecord=r.request;window.AMANAdminCurrentRequest=detailRecord;host.replaceChildren();const q=detailRecord;
@@ -174,13 +174,13 @@ $("admin-login-form").addEventListener("submit",async e=>{
  if(ok){form.reset();setPasswordVisible(false);message(msg,"تم التحقق من صلاحية الإدارة.","success");showDashboard();}
 });
 $("admin-password-toggle").addEventListener("click",()=>setPasswordVisible($("admin-password").type==="password"));
-$("dashboard-refresh").addEventListener("click",loadDashboard);
+
 accountBtn.addEventListener("click",()=>{if(!authed()){showLogin();return;}navigate("account");});
 tabs.forEach(t=>t.addEventListener("click",()=>navigate(t.dataset.adminTab)));
 document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.section)));
 $("admin-back").addEventListener("click",back);$("request-detail-back").addEventListener("click",back);
-$("request-detail-refresh").addEventListener("click",()=>activeRequestId&&openRequest(activeRequestId));
-$("requests-refresh").addEventListener("click",loadRequests);
+
+
 $("requests-reset").addEventListener("click",()=>{$("request-search").value="";$("request-status").value="pending";$("request-type").value="all";$("request-company").value="all";loadRequests();});
 ["request-status","request-type","request-company"].forEach(id=>$(id).addEventListener("change",loadRequests));
 let searchTimer=null;$("request-search").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadRequests,350);});

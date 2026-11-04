@@ -108,6 +108,8 @@ function navigate(name, { scroll = true, remember = true } = {}) {
   if (name === "operations") refreshOperations(true);
   if (name === "notifications") refreshNotifications(true);
  }
+ const pullTargets={home:()=>refreshNumbers(),numbers:()=>refreshNumbers(),operations:()=>refreshOperations(),notifications:()=>refreshNotifications()};
+ if(pullTargets[name])window.AMANPullRefresh?.attach(screens[name],pullTargets[name]);
  document.dispatchEvent(new CustomEvent("aman:screenchange", { detail: { screen: name, previous: previousScreen } }));
  return true;
 }
@@ -310,6 +312,7 @@ $("operations-status-filter").addEventListener("change", renderOperations);
 
 function openOperationDetails(item) {
  if (!item) return false;
+ window.AMANPullRefresh?.attach(screens["operation-detail"],async()=>{await refreshOperations();const latest=lists.operations.items.find(x=>String(x.id)===String(item.id));if(latest)openOperationDetails(latest);});
  const rows = [["رقم الطلب", item.request_number || item.id], ["نوع العملية", operationLabels[item.type]], ["رقم الهاتف", item.phone, "ltr"], ["شركة الاتصالات", item.company], ["الباقة", item.package_name], ["المدة", item.duration_days ? item.duration_days + " يوم" : null], ["السعر", has(item.price_yer) ? Number(item.price_yer).toLocaleString("ar") + " ر.ي" : null], ["وسيلة الدفع", item.payment_method], ["مرجع الدفع", item.payment_reference, "ltr"], ["تاريخ الطلب", fmt(item.created_at)], ["حالة الطلب", requestStatusLabels[item.status]]];
  if (item.status === "rejected") rows.push(["سبب الرفض", item.rejection_reason], ["توضيح الرفض", item.rejection_note]);
  const content = $("operation-detail-content"); content.replaceChildren();
@@ -416,6 +419,7 @@ async function openNumberAlerts(number) {
  $("alerts-status").textContent = numberStatusLabels[number.status] || "";
  host.replaceChildren(); setMessage(msg, "جارٍ تحميل التنبيهات…", "info");
  navigate("number-alerts");
+ window.AMANPullRefresh?.attach(screens["number-alerts"],()=>openNumberAlerts(number));
  const result = await svc().listNumberAlerts({ phone: number.phone });
  if (token !== alertsToken || !session) return true;
  if (result.success !== true) { setMessage(msg, serviceProblem(result)); const retry = el("button", "btn btn-outline", "إعادة المحاولة"); retry.type = "button"; retry.addEventListener("click", () => openNumberAlerts(number)); host.append(retry); return true; }
@@ -539,7 +543,7 @@ async function markRead(id) {
  if (result.success === true) await refreshNotifications(true); else setMessage($("notifications-message"), serviceProblem(result));
 }
 $("notification-filter").addEventListener("change", renderNotifications);
-$("notifications-refresh").addEventListener("click", () => refreshNotifications());
+
 
 function renderAll() { renderHomeNumbers(); renderNumbers(); renderOperations(); renderNotifications(); }
 

@@ -15,9 +15,9 @@ function button(text,cls,fn){const b=el("button",cls||"btn btn-outline",text);b.
 /* الأيام المتبقية حتى تاريخ المصادرة (شاملة اليوم الحالي)؛ null إن تعذر الحساب. */
 const daysLeft=t=>{const end=Date.parse(t.confiscation_date||t.due_at);return Number.isNaN(end)?null:Math.ceil((end-Date.now())/DAY);};
 const leftLabel=t=>{const d=daysLeft(t);if(d===null)return "—";return d<=1?"آخر يوم للتنفيذ":"يتبقى "+d+" يوم للتنفيذ";};
-async function refreshAfter(text){const h=host();renderTasks(h);h.prepend(el("p","notice-success",text));await loadTasks();}
+async function refreshAfter(text){const h=host();renderTasks(h);window.AMANPullRefresh?.attach($("admin-section"),loadTasks);h.prepend(el("p","notice-success",text));await loadTasks();}
 async function taskDetail(t){
- const h=host(),back=button("العودة إلى المهام","btn btn-outline",()=>{renderTasks(h);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
+ window.AMANPullRefresh?.attach($("admin-section"),()=>taskDetail(t));const h=host(),back=button("العودة إلى المهام","btn btn-outline",()=>{renderTasks(h);window.AMANPullRefresh?.attach($("admin-section"),loadTasks);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
  h.append(panel("تفاصيل المهمة",[["رقم الهاتف",t.phone],["الشركة",t.company_name],["موعد المهمة",fmtDay(t.due_at)],["تاريخ المصادرة",t.status==="executed"?"—":fmtDay(t.confiscation_date)],["نافذة الظهور",t.due_window_days===undefined?"—":t.due_window_days+" يوم قبل الموعد"],["الحالة",taskStatusLabel[t.status]||t.status],["تاريخ التنفيذ الفعلي",fmtDate(t.executed_at)],["معرّف الحماية",t.protection_id||"—"],["سياق الحماية",t.protection_context||"—"]]));
  if(t.status!=="executed"){
   const actions=el("section","surface"),title=el("h2","surface-title","الإجراءات المتاحة");actions.append(title);
@@ -47,7 +47,7 @@ function reschedule(t){
 function renderTasks(h){
  if(state.view==="followup"){renderFollowup(h);return;}
  h.replaceChildren();const filters=el("section","surface"),select=el("select","field");[["all","كل الحالات"],["planned","مخططة"],["due","مستحقة"],["executed","منفذة"]].forEach(([v,l])=>select.add(new Option(l,v)));select.value=state.taskFilter;
- const refresh=button("تحديث المهام","btn btn-outline",loadTasks);filters.append(el("label","field-label","حالة المهمة"),select,refresh);const list=el("div","");list.id="phase-task-list";h.append(filters,list);
+ filters.append(el("label","field-label","حالة المهمة"),select);const list=el("div","");list.id="phase-task-list";h.append(filters,list);
  select.addEventListener("change",()=>{state.taskFilter=select.value;renderTaskRows();});renderTaskRows();
 }
 function renderTaskRows(){const list=$("phase-task-list");if(!list)return;list.replaceChildren();const rows=state.tasks.filter(t=>state.taskFilter==="all"||t.status===state.taskFilter);if(!rows.length){msg(list,"لا توجد مهام سداد.");return;}
@@ -57,7 +57,7 @@ function renderTaskRows(){const list=$("phase-task-list");if(!list)return;list.r
 function renderFollowup(h){
  h.replaceChildren();const box=el("section","surface"),sel=el("select","field");
  [["due","ضمن نافذة الظهور (مستحقة)"],["planned","خارج النافذة (مخططة)"],["open","كل المهام غير المنفذة"]].forEach(([v,l])=>sel.add(new Option(l,v)));sel.value=state.followFilter;
- box.append(el("p","surface-desc","تظهر المهمة قبل موعدها وفق نافذة الشركة. يمكن تنفيذها خلال الفاصل الدوري، ويُحسب موعد المهمة التالية من تاريخ التنفيذ."),el("label","field-label","العرض"),sel,button("تحديث المتابعة","btn btn-outline",loadTasks));
+ box.append(el("p","surface-desc","تظهر المهمة قبل موعدها وفق نافذة الشركة. يمكن تنفيذها خلال الفاصل الدوري، ويُحسب موعد المهمة التالية من تاريخ التنفيذ."),el("label","field-label","العرض"),sel);
  const sum=el("div","");sum.id="phase-follow-summary";const list=el("div","");list.id="phase-follow-list";h.append(box,sum,list);
  sel.addEventListener("change",()=>{state.followFilter=sel.value;renderFollowRows();});renderFollowRows();
 }
@@ -75,8 +75,8 @@ function renderFollowRows(){
 async function loadTasks(){const s=svc();try{const r=await s.listTasks();if(r?.success!==true||!Array.isArray(r.tasks))throw Error();state.tasks=r.tasks;renderTaskRows();renderFollowRows();}catch{const h=$("phase-task-list")||$("phase-follow-list");if(h){h.replaceChildren();msg(h,"تعذر تحميل المهام. أعد المحاولة.","error");}}}
 function renderReports(h){
  h.replaceChildren();const controls=el("section","surface"),range=el("select","field");[["7","آخر 7 أيام"],["30","آخر 30 يومًا"],["90","آخر 90 يومًا"],["365","آخر سنة"],["all","كل الفترات"]].forEach(([v,l])=>range.add(new Option(l,v)));range.value=state.range;
- const refresh=button("تحديث التقرير","btn btn-outline",loadRevenue);controls.append(el("label","field-label","النطاق الزمني"),range,refresh);const summary=el("div",""),list=el("div","");summary.id="phase-revenue-summary";list.id="phase-revenue-list";h.append(controls,summary,list);range.addEventListener("change",()=>{state.range=range.value;loadRevenue();});
+ controls.append(el("label","field-label","النطاق الزمني"),range);const summary=el("div",""),list=el("div","");summary.id="phase-revenue-summary";list.id="phase-revenue-list";h.append(controls,summary,list);range.addEventListener("change",()=>{state.range=range.value;loadRevenue();});
 }
 async function loadRevenue(){const s=svc(),summary=$("phase-revenue-summary"),list=$("phase-revenue-list");if(!summary||!list)return;summary.replaceChildren();list.replaceChildren();msg(summary,"جارٍ تحميل الإيرادات…");try{const r=await s.getRevenueReport({days:state.range});if(r?.success!==true||!Array.isArray(r.operations))throw Error();summary.replaceChildren();summary.append(panel("ملخص الإيرادات المعتمدة",[["عدد العمليات",String(r.count)],["إجمالي الإيرادات",money(r.total_yer)],["الفترة",r.period_label||"—"]]));const groups=[["حسب نوع العملية",r.by_operation],["حسب الشركة",r.by_company],["حسب الباقة",r.by_package],["حسب وسيلة الدفع",r.by_payment]];groups.forEach(([title,items])=>{if(items?.length)summary.append(panel(title,items.map(x=>[x.name,x.count+" عملية • "+money(x.total_yer)])));});if(!r.operations.length){msg(list,"لا توجد عمليات معتمدة في هذه الفترة.");return;}list.append(panel("العمليات المعتمدة",r.operations.map(x=>[x.request_number||x.id,[x.operation_type_label||x.operation_type,x.company_name,x.package_name,x.payment_method_name,fmtDate(x.approved_at)].filter(Boolean).join(" • ")+" — "+money(x.price_yer)])));}catch{summary.replaceChildren();msg(summary,"تعذر تحميل تقرير الإيرادات. أعد المحاولة.","error");}}
-document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen,h=$("admin-generic-view");if(!h)return;if(screen==="tasks"||screen==="followup"){state.view=screen==="followup"?"followup":"all";renderTasks(h);loadTasks();}if(screen==="reports"){renderReports(h);loadRevenue();}});
+document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen,h=$("admin-generic-view");if(!h)return;if(screen==="tasks"||screen==="followup"){state.view=screen==="followup"?"followup":"all";renderTasks(h);window.AMANPullRefresh?.attach($("admin-section"),loadTasks);loadTasks();}if(screen==="reports"){renderReports(h);window.AMANPullRefresh?.attach($("admin-section"),loadRevenue);loadRevenue();}});
 })();
