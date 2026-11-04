@@ -6,7 +6,7 @@ let customers=[],tasks=[],selectedCustomer=null,filters={search:"",type:"all",st
 const node=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
 const panel=(title,rows)=>{const box=node("section","surface admin-detail-panel"),h=node("h2","surface-title",title);box.append(h);rows.forEach(([k,v])=>{const row=node("div","admin-detail-row"),a=node("span","",k),b=node("strong","",v??"—");row.append(a,b);box.append(row);});return box;};
 const notice=(host,msg,error=false)=>{const p=node("p",error?"notice-error":"notice-info",msg);host.append(p);};
-function shell(){const host=$("admin-generic-view");host.replaceChildren();return host;}
+function shell(){const host=$("admin-generic-view");host.replaceChildren();delete host.dataset.pullScreen;delete host.dataset.noPullRefresh;return host;}
 function customerList(host){
  const wrap=node("div","admin-customers-view"),filtersBox=node("div","surface"),grid=node("div","admin-filter-grid");
  const search=node("input","field");search.placeholder="اسم العميل أو البريد أو الهاتف";search.value=filters.search;
@@ -31,7 +31,7 @@ async function loadCustomers(){
  catch{host.textContent="تعذر تحميل العملاء. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.";}
 }
 async function openCustomer(id){
- selectedCustomer=id;const host=shell();const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
+ selectedCustomer=id;const host=shell();host.dataset.pullScreen="customers-detail";const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
  const loading=node("div","surface empty-state","جارٍ تحميل تفاصيل العميل…");host.append(loading);const s=service();
  if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة حاليًا.";return;}
  try{const r=await s.getCustomerDetails({customer_id:id});if(r?.success!==true||!r.customer)throw Error();const c=r.customer;host.replaceChildren(back);
@@ -53,6 +53,6 @@ function confirmStatusChange(c){
  const cancel=node("button","btn btn-outline btn-block","إلغاء");cancel.type="button";cancel.addEventListener("click",()=>{dialog.close();dialog.remove();});body.append(cancel);document.body.append(dialog);dialog.showModal();
 }
 function renderCustomerScreen(){const host=shell();customerList(host);}
-if (window.AMANPullToRefresh) window.AMANPullToRefresh.register("customers", loadCustomers);
+if (window.AMANPullToRefresh) { window.AMANPullToRefresh.register("customers", loadCustomers); window.AMANPullToRefresh.register("customers-detail", () => selectedCustomer ? openCustomer(selectedCustomer) : loadCustomers()); }
 document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen;if(screen==="customers"){renderCustomerScreen();loadCustomers();}});
 })();
