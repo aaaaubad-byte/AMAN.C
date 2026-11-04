@@ -25,7 +25,7 @@ const definitions={
  requests:{title:"الطلبات",description:"مراجعة طلبات الخدمة.",icon:"list",emptyTitle:"لا توجد طلبات",emptyDescription:"تظهر الطلبات الواردة هنا."},
  numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية.",icon:"phone",emptyTitle:"لا توجد أرقام",emptyDescription:"تظهر الأرقام بعد اعتماد الطلبات."},
  customers:{title:"العملاء",description:"حسابات العملاء وحالاتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"تظهر حسابات العملاء هنا."},
- tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
+ tasks:{title:"مهام السداد",description:"مواعيد السداد وتنفيذها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"تظهر المهام بعد اعتماد الطلبات."},
  complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات هنا."},
  reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"ستظهر الإيرادات هنا بعد وجود عمليات معتمدة."},
  settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
