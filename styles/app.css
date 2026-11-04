@@ -383,3 +383,6 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
  .screen-head .screen-subtitle{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.screen-head .tile-btn{transition:none}}
+
+/* The section header now handles request-detail back navigation; keep the legacy control wired but out of the visual layout. */
+.admin-app #request-detail-back{display:none}
