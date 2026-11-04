@@ -13,8 +13,7 @@ function customerList(host){
  const type=node("select","field");[["all","كل التصنيفات"],["user","مستخدمون"],["customer","عملاء"]].forEach(([v,t])=>type.add(new Option(t,v)));type.value=filters.type;
  const status=node("select","field");[["all","كل الحالات"],["active","فعّال"],["disabled","معطّل"]].forEach(([v,t])=>status.add(new Option(t,v)));status.value=filters.status;
  [["البحث",search],["تصنيف الحساب",type],["حالة الحساب",status]].forEach(([label,input])=>{const box=node("div",""),l=node("label","field-label",label);box.append(l,input);grid.append(box);});
- const msg=node("p","notice-info","");msg.id="customers-message";wrap.append(grid,msg);
- const list=node("div","");list.id="customers-list";wrap.append(list);host.append(wrap);
+ const list=node("div","");list.id="customers-list";wrap.append(grid,list);host.append(wrap);
  [search,type,status].forEach(input=>input.addEventListener(input===search?"input":"change",()=>{filters={search:search.value.trim(),type:type.value,status:status.value};renderCustomers();}));
 }
 function renderCustomers(){
@@ -24,11 +23,13 @@ function renderCustomers(){
  rows.forEach(c=>{const card=node("button","admin-request-card"),main=node("span","request-card-main"),name=node("strong","",c.full_name||c.email),meta=node("small","",[c.email,labels[c.customer_type]||"—"].filter(Boolean).join(" • ")),side=node("span","request-card-side"),badge=node("span","state "+(c.status==="active"?"state-active":"state-off"),labels[c.status]||"غير محدد");card.type="button";side.append(badge);main.append(name,meta);card.append(main,side);card.addEventListener("click",()=>openCustomer(c.id));host.append(card);});
 }
 async function loadCustomers(){
- const host=$("customers-message"),s=service();customers=[];renderCustomers();
- if(!s||typeof s.listCustomers!=="function"){host.textContent="تعذر الوصول إلى العملاء حاليًا.";return;}
- host.textContent="جارٍ تحميل العملاء…";
- try{const r=await s.listCustomers(filters);if(r?.success!==true||!Array.isArray(r.customers))throw Error();customers=r.customers;renderCustomers();host.textContent="تم تحديث قائمة العملاء.";}
- catch{host.textContent="تعذر تحميل العملاء. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.";}
+ const host=$("customers-list"),s=service();if(!host)return false;
+ if(!s||typeof s.listCustomers!=="function"){host.replaceChildren(node("p","notice-error","تعذر الوصول إلى العملاء حاليًا."));return false;}
+ host.setAttribute("aria-busy","true");
+ if(!customers.length)host.replaceChildren(node("div","empty-state","جارٍ تحميل العملاء…"));
+ try{const r=await s.listCustomers(filters);if(r?.success!==true||!Array.isArray(r.customers))throw Error();customers=r.customers;renderCustomers();return true;}
+ catch{if(customers.length){host.append(node("p","notice-error","تعذر تحديث القائمة. البيانات المعروضة قد تكون قديمة."));}else{host.replaceChildren(node("p","notice-error","تعذر تحميل العملاء. تحقق من الاتصال والصلاحيات ثم أعد المحاولة."));}return false;}
+ finally{host.removeAttribute("aria-busy");}
 }
 async function openCustomer(id){
  selectedCustomer=id;const host=shell();host.dataset.pullScreen="customers-detail";const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
