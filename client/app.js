@@ -155,7 +155,6 @@ document.querySelectorAll("[data-back-number]").forEach(node => node.addEventLis
 $("show-all-numbers").addEventListener("click", () => navigate("numbers"));
 $("account-button").addEventListener("click", () => { renderAccount(); navigate("account"); });
 $("notifications-button").addEventListener("click", () => navigate("notifications"));
-document.querySelector(".brand").addEventListener("click", event => { event.preventDefault(); navigate("home"); });
 
 function closeNumberSheet() { if (numberSheet) numberSheet.hidden = true; }
 $("close-sheet").addEventListener("click", closeNumberSheet);
