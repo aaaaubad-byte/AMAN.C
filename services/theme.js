@@ -20,7 +20,7 @@
     document.documentElement.dataset.theme = resolved;
     document.documentElement.dataset.themePreference = pref;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = resolved === "dark" ? "#10191f" : "#f1f5f6";
+    if (meta) meta.content = resolved === "dark" ? "#0b161c" : "#ffffff";
     document.querySelectorAll("[data-theme-setting]").forEach(control => {
       control.value = pref;
     });
@@ -52,4 +52,23 @@
     if (event.key === KEY) apply();
   });
   document.addEventListener("DOMContentLoaded", apply);
+})();
+
+/* AMAN.C visual layer v6 loader: stylesheet (after app.css) + icon/carousel behavior. */
+(() => {
+  "use strict";
+  const current = document.currentScript;
+  if (!current || !current.src || document.querySelector("link[data-aman-visual-v6]")) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = new URL("../styles/visual-v6.css", current.src).href;
+  link.setAttribute("data-aman-visual-v6", "");
+  const script = document.createElement("script");
+  script.src = new URL("./aman-ui-v6.js", current.src).href;
+  script.async = false;
+  /* Appended at the end of <head> so it follows app.css regardless of load order. */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.head.append(link);
+    document.head.append(script);
+  }, { once: true });
 })();
