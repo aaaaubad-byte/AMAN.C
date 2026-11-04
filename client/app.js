@@ -207,16 +207,16 @@ function numberCard(item, source) {
 }
 function renderHomeNumbers() {
  const host = $("my-numbers"); host.replaceChildren();
- const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام مرتبطة بحسابك", "ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.");
+ const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام مرتبطة بحسابك", "تظهر أرقامك بعد اعتماد الاشتراك.");
  if (box) host.append(box); else lists.numbers.items.slice(0, 3).forEach(n => host.append(numberCard(n, "home")));
 }
 function renderNumbers() {
  const host = $("numbers-list"); host.replaceChildren();
- const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام بعد", "تظهر هنا الأرقام بعد اعتماد طلب الاشتراك. البحث عن رقم لا يضيفه إلى قائمتك.");
+ const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام", "تظهر الأرقام بعد اعتماد الاشتراك. البحث لا يضيف الرقم إلى حسابك.");
  if (box) { host.append(box); updateCompanyFilter(); return; }
  const query = normalizePhone($("numbers-search").value), company = $("numbers-company-filter").value, status = $("numbers-status-filter").value;
  const filtered = lists.numbers.items.filter(i => (!query || normalizePhone(i.phone).includes(query)) && (!company || i.company_id === company) && (!status || i.status === status));
- if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "غيّر عبارة البحث أو خيارات التصفية.")); updateCompanyFilter(); return; }
+ if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "عدّل البحث أو التصفية.")); updateCompanyFilter(); return; }
  filtered.forEach(n => host.append(numberCard(n, "numbers")));
  updateCompanyFilter();
 }
@@ -247,11 +247,11 @@ function openNumberDetails(number, source = "numbers") {
  const extra = $("sheet-details-extra"); extra.replaceChildren();
  rows.filter(([, v]) => has(v) && v !== "—").forEach(([l, v]) => extra.append(detailBlock(l, v)));
  const notes = {
-  not_subscribed: "الرقم غير مشمول حاليًا بحماية أمان.",
-  protected: "الرقم مشمول بالحماية لدى حسابك.",
-  other_protected: "هذا الرقم محمي حاليًا لدى عميل آخر. لا يمكن الاشتراك فيه من هذا الحساب ولا يمكن عرض أي بيانات تخص ذلك العميل.",
-  inactive: "انتهت فترة الحماية السابقة؛ يتاح التنشيط ضمن مهلة التنشيط.",
-  confiscated: "انتهت مهلة التنشيط. لا يتاح إجراء التنشيط."
+  not_subscribed: "لا توجد حماية لهذا الرقم حاليًا.",
+  protected: "الرقم محمي في حسابك.",
+  other_protected: "هذا الرقم محمي لدى عميل آخر. لا يمكنك الاشتراك فيه أو الاطلاع على بياناته.",
+  inactive: "انتهت الحماية السابقة؛ يمكن التنشيط خلال المهلة.",
+  confiscated: "انتهت مهلة التنشيط؛ لا يمكن تنشيط الرقم."
  };
  const privacy = $("sheet-privacy-note"); privacy.hidden = false; privacy.textContent = notes[status] || ""; privacy.hidden = !notes[status];
  const actions = $("sheet-actions"); actions.replaceChildren();
@@ -289,11 +289,11 @@ $("search-form").addEventListener("submit", async event => {
 /* ---------- العمليات (C-04/C-05) ---------- */
 function renderOperations() {
  const host = $("operations-list"); host.replaceChildren();
- const box = listStateBox("operations", () => refreshOperations(), "لا توجد عمليات حتى الآن", "ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.");
+ const box = listStateBox("operations", () => refreshOperations(), "لا توجد عمليات", "تظهر طلباتك بعد إرسالها. تبدأ الحماية بعد اعتماد الاشتراك.");
  if (box) { host.append(box); return; }
  const query = normalizeDigits($("operations-search").value).trim(), status = $("operations-status-filter").value;
  const filtered = lists.operations.items.filter(i => (!query || normalizeDigits(i.phone).includes(query) || String(i.request_number || i.id || "").includes(query)) && (!status || i.status === status));
- if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو حالة الطلب المحددة.")); return; }
+ if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو الحالة.")); return; }
  filtered.forEach(item => {
   const b = el("button", "operation-card"); b.type = "button";
   const main = el("span", "operation-main"), phone = el("small", "", item.phone); phone.dir = "ltr";
@@ -353,8 +353,8 @@ function populateCatalog(catalog) {
  packages.forEach(p => ps.add(new Option(p.name + " — " + p.duration_days + " يوم — " + Number(p.price_yer).toLocaleString("ar") + " ر.ي", p.id)));
  ms.replaceChildren(new Option("اختر وسيلة الدفع", ""));
  catalog.payment_methods.forEach(p => ms.add(new Option(p.name, p.id)));
- $("package-summary").textContent = packages.length ? "اختر باقة معتمدة لهذه الشركة ونوع العملية." : "لا توجد باقات معتمدة متاحة حاليًا لهذه الشركة ونوع العملية.";
- $("payment-instructions").textContent = "تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
+ $("package-summary").textContent = packages.length ? "اختر الباقة المتاحة." : "لا توجد باقات متاحة حاليًا.";
+ $("payment-instructions").textContent = "تعليمات الدفع بعد اختيار الوسيلة.";
 }
 $("protection-package").addEventListener("change", event => {
  const p = protectionCatalog.packages.find(x => x.id === event.target.value);
@@ -393,7 +393,7 @@ $("confirm-protection").addEventListener("click", async () => {
  const confirmed = result.success === true && Boolean(result.request_id);
  const content = $("result-content"); content.replaceChildren();
  $("result-title").textContent = confirmed ? "تم إرسال الطلب" : "تعذر تأكيد إرسال الطلب";
- $("result-description").textContent = confirmed ? "استلمت أمان طلبك وهو قيد المراجعة. لا تبدأ الحماية إلا بعد اعتماد الإدارة." : "لم يتم تأكيد إنشاء الطلب. يمكنك مراجعة بياناتك وإعادة المحاولة بعد التحقق من قائمة العمليات.";
+ $("result-description").textContent = confirmed ? "طلبك قيد المراجعة. تبدأ الحماية بعد اعتماد الإدارة." : "لم يتأكد إرسال الطلب. راجع العمليات قبل إعادة المحاولة.";
  if (confirmed) {
   const box = el("div", "result-success"); box.append(el("strong", "", "طلبك قيد المراجعة"), el("div", "detail-label", "رقم الطلب"));
   const num = el("div", "detail-value", result.request_number || result.request_id); num.dir = "ltr"; box.append(num); content.append(box);
@@ -520,7 +520,7 @@ $("signout-confirm-yes").addEventListener("click", async () => {
 function renderNotifications() {
  const host = $("notifications-list"), filter = $("notification-filter").value;
  host.replaceChildren();
- const box = listStateBox("notifications", () => refreshNotifications(), "لا توجد إشعارات", "ستظهر هنا إشعارات حسابك عند وصولها.");
+ const box = listStateBox("notifications", () => refreshNotifications(), "لا توجد إشعارات", "تظهر إشعاراتك هنا.");
  $("notifications-dot").hidden = !lists.notifications.items.some(n => !n.read_at);
  if (box) { host.append(box); return; }
  const items = lists.notifications.items.filter(n => filter === "all" || (filter === "unread" && !n.read_at) || (filter === "read" && n.read_at));

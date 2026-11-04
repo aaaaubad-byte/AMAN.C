@@ -22,22 +22,22 @@ const ICONS={
  dots:svgWrap('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')
 };
 const definitions={
- requests:{title:"الطلبات",description:"مراجعة طلبات الاشتراك والتمديد والتنشيط واتخاذ القرار بشأنها.",icon:"list",emptyTitle:"لا توجد طلبات حتى الآن",emptyDescription:"ستظهر الطلبات الواردة هنا."},
- numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية وسجل العمليات المرتبطة بها.",icon:"phone",emptyTitle:"لا توجد أرقام مسجلة",emptyDescription:"ستظهر الأرقام وحالات الحماية هنا بعد تسجيل طلبات معتمدة."},
- customers:{title:"العملاء",description:"إدارة حسابات العملاء وحالات تفعيلها وصلاحياتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"ستظهر حسابات العملاء هنا."},
- tasks:{title:"مهام السداد",description:"متابعة مواعيد السداد الدورية وتنفيذها وجدولتها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"ستظهر مهام السداد هنا بعد اعتماد طلبات."},
- complaints:{title:"البلاغات",description:"متابعة البلاغات المقدمة ومراجعة بياناتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"ستظهر البلاغات هنا."},
- reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"ستظهر الإيرادات هنا بعد وجود عمليات معتمدة."},
- settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
- notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
- alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
- packages:{title:"باقات الحماية",description:"إدارة الباقات بحسب الشركة ونوع العملية والمدة والسعر.",icon:"box",emptyTitle:"لم تُضَف باقات بعد",emptyDescription:"أضف باقات الحماية المعتمدة لكل شركة وعملية."},
- payments:{title:"وسائل الدفع",description:"إدارة وسائل الدفع وتعليماتها واشتراط مرجع الدفع.",icon:"wallet",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
- content:{title:"المحتوى الثابت",description:"تحرير الشروط والأحكام والخصوصية والتواصل والمساعدة والدعم.",icon:"doc",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص الثابتة المعتمدة."},
- audit:{title:"سجل التدقيق",description:"مراجعة أحدث إجراءات الإدارة مع مرشحات الإجراء والكيان.",icon:"clock",emptyTitle:"لا توجد سجلات",emptyDescription:"ستظهر الأحداث الإدارية المسجلة هنا."},
- followup:{title:"نافذة الظهور والمتابعة",description:"المتابعة اليومية للمهام المستحقة ضمن نافذة الظهور قبل مواعيدها: تنفيذها أو إعادة جدولتها.",icon:"timer",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"ستظهر المهام المستحقة هنا ضمن نافذة الظهور."},
+ requests:{title:"الطلبات",description:"مراجعة طلبات الخدمة.",icon:"list",emptyTitle:"لا توجد طلبات",emptyDescription:"تظهر الطلبات الواردة هنا."},
+ numbers:{title:"الأرقام",description:"متابعة الأرقام وحالات الحماية.",icon:"phone",emptyTitle:"لا توجد أرقام",emptyDescription:"تظهر الأرقام بعد اعتماد الطلبات."},
+ customers:{title:"العملاء",description:"حسابات العملاء وحالاتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"تظهر حسابات العملاء هنا."},
+ tasks:{title:"مهام السداد",description:"مواعيد السداد وتنفيذها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"تظهر المهام بعد اعتماد الطلبات."},
+ complaints:{title:"البلاغات",description:"مراجعة البلاغات ومتابعتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"تظهر البلاغات هنا."},
+ reports:{title:"تقارير الإيرادات",description:"العمليات والإيرادات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة",emptyDescription:"تظهر الإيرادات بعد اعتماد العمليات."},
+ settings:{title:"الشركات والإعدادات",description:"بيانات الشركات والبادئات وإعدادات المهام والتنشيط.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف الشركات واضبط إعداداتها."},
+ notifications:{title:"الإشعارات",description:"عرض الإشعارات وإنشاؤها.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"تظهر الإشعارات هنا."},
+ alerts:{title:"تنبيهات الأرقام",description:"تنبيهات الأرقام المرتبطة بالعملاء.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"تظهر التنبيهات هنا."},
+ packages:{title:"باقات الحماية",description:"الباقات حسب الشركة والعملية والمدة والسعر.",icon:"box",emptyTitle:"لم تُضَف باقات بعد",emptyDescription:"أضف الباقات المعتمدة لكل شركة وعملية."},
+ payments:{title:"وسائل الدفع",description:"وسائل الدفع وتعليماتها ومرجع الدفع.",icon:"wallet",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
+ content:{title:"المحتوى الثابت",description:"الشروط والأحكام والخصوصية والمساعدة والتواصل.",icon:"doc",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص المعتمدة."},
+ audit:{title:"سجل التدقيق",description:"إجراءات الإدارة المسجلة.",icon:"clock",emptyTitle:"لا توجد سجلات",emptyDescription:"تظهر الإجراءات المسجلة هنا."},
+ followup:{title:"نافذة الظهور والمتابعة",description:"المهام المستحقة للتنفيذ أو الجدولة.",icon:"timer",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"تظهر المهام المستحقة هنا."},
  more:{title:"المزيد",description:"باقي أقسام الإدارة.",icon:"dots",emptyTitle:"",emptyDescription:""},
- account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
+ account:{title:"الحساب الإداري",description:"بيانات المدير والجلسة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير."}
 };
 let current="login",historyStack=[],activeRequestId=null,requestRows=[],detailRecord=null,adminSession=null,loading=false;
 /* حارس المصادقة في الواجهة: لا يُعرض أي قسم إداري إلا بعد تأكيد الخادم أن الحساب مدير.
@@ -95,7 +95,7 @@ function requestCard(r){
 }
 function renderRequests(){
  const host=$("requests-list");host.replaceChildren();
- if(!requestRows.length){const empty=document.createElement("div");empty.className="surface empty-state";const strong=document.createElement("strong");strong.textContent="لا توجد طلبات مطابقة";const p=document.createElement("p");p.textContent="جرّب تغيير المرشحات أو تحديث القائمة.";empty.append(strong,p);host.append(empty);return;}
+ if(!requestRows.length){const empty=document.createElement("div");empty.className="surface empty-state";const strong=document.createElement("strong");strong.textContent="لا توجد طلبات مطابقة";const p=document.createElement("p");p.textContent="عدّل التصفية أو حدّث القائمة.";empty.append(strong,p);host.append(empty);return;}
  requestRows.forEach(r=>host.append(requestCard(r)));
 }
 async function loadRequests(){
@@ -112,7 +112,7 @@ function openInlineActions(record,host){
  if(record.status!=="pending")return;
  const actions=document.createElement("section");actions.className="surface";
  const h=document.createElement("h2");h.className="surface-title";h.textContent="إجراءات الطلب";actions.append(h);
- const note=document.createElement("p");note.className="surface-desc";note.textContent="لا يُعتمد الطلب أو يُرفض إلا بعد تأكيد الخادم صلاحية المدير والحالة الحالية وبيانات الرقم ومرجع الدفع.";actions.append(note);
+ const note=document.createElement("p");note.className="surface-desc";note.textContent="يتحقق أمان من الصلاحية والبيانات ومرجع الدفع قبل اعتماد الطلب أو رفضه.";actions.append(note);
  const approve=document.createElement("button");approve.className="btn btn-block";approve.type="button";approve.textContent="مراجعة أثر الاعتماد";approve.addEventListener("click",()=>showApprovePreview(record,actions));actions.append(approve);
  const reject=document.createElement("button");reject.className="btn btn-outline btn-block";reject.type="button";reject.style.marginTop="9px";reject.textContent="رفض الطلب";reject.addEventListener("click",()=>showRejectForm(record,actions));actions.append(reject);host.append(actions);
 }
@@ -149,7 +149,7 @@ async function openRequest(id){
  host.append(panel("حالة الرقم والتحقق",[["حالة الرقم الحالية",q.number_status],["بداية الحماية الحالية",q.current_protection_starts_at],["نهاية الحماية الحالية",q.current_protection_ends_at],["آخر يوم للتنشيط",q.reactivation_deadline]]));
  const warnings=Array.isArray(q.warnings)?q.warnings:[];if(warnings.length){const p=document.createElement("section");p.className="surface";const h=document.createElement("h2");h.className="surface-title";h.textContent="تنبيهات المراجعة";p.append(h);warnings.forEach(w=>{const x=document.createElement("p");x.className="notice-error";x.textContent=String(w);p.append(x);});host.append(p);}
  openInlineActions(q,host);
- }catch{host.replaceChildren();const err=document.createElement("div");err.className="surface empty-state";err.textContent="تعذر تحميل تفاصيل الطلب. تحقق من الاتصال والصلاحيات ثم حاول مجددًا.";host.append(err);}
+ }catch{host.replaceChildren();const err=document.createElement("div");err.className="surface empty-state";err.textContent="تعذر تحميل تفاصيل الطلب. تحقق من الاتصال والصلاحيات.";host.append(err);}
 }
 async function refreshSession(){
  const s=service();if(!s||typeof s.getCurrentAdmin!=="function"){showLogin();return;}

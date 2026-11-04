@@ -44,7 +44,7 @@ async function openCustomer(id){
  const numbers=Array.isArray(c.numbers)?c.numbers:[];host.append(panel("الأرقام المرتبطة",numbers.map(n=>[n.phone,n.protection_status_label||labels[n.protection_status]||n.status||"—"])));
  const requests=Array.isArray(c.requests)?c.requests:[];host.append(panel("الطلبات",requests.map(x=>[x.request_number||x.id,[x.operation_type,x.status,x.created_at].filter(Boolean).join(" • ")])));
  const history=Array.isArray(c.status_history)?c.status_history:[];host.append(panel("سجل التعطيل والتفعيل",history.map(x=>[labels[x.status]||x.status,[x.reason,x.changed_at].filter(Boolean).join(" • ")])));
- }catch{loading.textContent="تعذر تحميل تفاصيل العميل. لم يتم عرض بيانات بديلة.";}
+ }catch{loading.textContent="تعذر تحميل تفاصيل العميل.";}
 }
 function confirmStatusChange(c){
  const s=service(),dialog=document.createElement("dialog");dialog.className="admin-decision-dialog";const box=node("div","surface"),title=node("h2","surface-title",c.status==="active"?"تأكيد تعطيل الحساب":"تأكيد إعادة تفعيل الحساب"),body=node("div","decision-body");box.append(title,body);dialog.append(box);document.body.append(dialog);
