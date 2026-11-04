@@ -21,10 +21,10 @@ function renderNumbersShell(){
  const status=el("select","field");status.id="number-status";
  [["all","كل الحالات"],["protected","محمي"],["inactive","غير نشط"],["expired_confiscated","منتهي / مصادَر"]].forEach(([v,t])=>status.add(new Option(t,v)));
  statusWrap.append(statusLabel,status);filters.append(searchWrap,statusWrap);
- const tools=el("div","field-row"),refresh=el("button","btn btn-outline","تحديث الأرقام");refresh.type="button";refresh.addEventListener("click",loadNumbers);
- const notice=el("p","","");notice.id="numbers-message";tools.append(refresh);
- const list=el("div","");list.id="numbers-list";wrap.append(filters,tools,notice,list);host.append(wrap);
+ const notice=el("p","","");notice.id="numbers-message";
+ const list=el("div","");list.id="numbers-list";wrap.append(filters,notice,list);host.append(wrap);
  search.addEventListener("input",()=>renderNumbers());status.addEventListener("change",()=>renderNumbers());
+ window.AMANPullRefresh?.attach(wrap,loadNumbers);
 }
 function renderNumbers(){
  const host=$("numbers-list");if(!host)return;host.replaceChildren();
