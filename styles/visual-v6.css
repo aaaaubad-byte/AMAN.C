@@ -221,3 +221,67 @@ html:not([data-theme="dark"]) .admin-app #dashboard-screen>.admin-stats.aman-car
 .admin-app #dashboard-screen>.admin-stats.aman-carousel-track~.aman-dots .aman-dot.is-active{
   width:9px!important;height:9px!important;background:var(--turquoise)!important;transform:scale(1.2);
 }
+
+
+/* ---------- 7) Visual depth (light theme only; dark theme untouched) ----------
+   Shadows, edge highlights and one limited glass surface. No new colors, sizes, spacing or layout:
+   shadow tints reuse the existing navy (#153b56) and turquoise (#078F87). */
+html:not([data-theme="dark"]){
+  --depth-card:0 1px 2px rgba(21,59,86,.06),0 4px 12px -3px rgba(21,59,86,.10);
+  --depth-field:inset 0 1px 2px rgba(21,59,86,.09);
+  --depth-icon:0 1px 2px rgba(21,59,86,.10),inset 0 1px 0 rgba(255,255,255,.75);
+  --shadow:var(--depth-card);
+}
+
+/* Layer 2: cards and containers lift off the screen base. */
+html:not([data-theme="dark"]) .surface,
+html:not([data-theme="dark"]) .soft-surface,
+html:not([data-theme="dark"]) .auth-card,
+html:not([data-theme="dark"]) .login-card,
+html:not([data-theme="dark"]) .phone-card,
+html:not([data-theme="dark"]) .quick-link,
+html:not([data-theme="dark"]) .detail-block,
+html:not([data-theme="dark"]) .operation-card,
+html:not([data-theme="dark"]) .admin-request-card,
+html:not([data-theme="dark"]) .admin-shortcut{
+  box-shadow:var(--depth-card);
+}
+
+/* Carousel cards: tight shadows so the track's overflow clipping never cuts them. */
+html:not([data-theme="dark"]) .aman-carousel-track>*{
+  box-shadow:0 2px 5px rgba(21,59,86,.10);
+}
+html:not([data-theme="dark"]) .aman-carousel-track>.is-active{
+  box-shadow:0 2px 6px rgba(21,59,86,.16),inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+/* Layer 3: fields sit slightly recessed (focus ring rule above still wins on :focus). */
+html:not([data-theme="dark"]) .field:not(:focus),
+html:not([data-theme="dark"]) .compact-filter-select:not(:focus),
+html:not([data-theme="dark"]) .compact-filter-icon{
+  box-shadow:var(--depth-field);
+}
+
+/* Subtle highlights on icons and featured elements. */
+html:not([data-theme="dark"]) .quick-icon,
+html:not([data-theme="dark"]) .detail-icon,
+html:not([data-theme="dark"]) .phone-icon,
+html:not([data-theme="dark"]) .sheet-hero-icon,
+html:not([data-theme="dark"]) .home-search-icon{
+  box-shadow:var(--depth-icon);
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+}
+html:not([data-theme="dark"]) .login-submit,
+html:not([data-theme="dark"]) .btn.btn-primary{
+  box-shadow:0 2px 6px rgba(7,143,135,.25),inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+/* Limited glassmorphism: bottom bar only (near-opaque, so text contrast is unchanged). */
+html:not([data-theme="dark"]) .bottom-nav{
+  background:rgba(244,248,250,.84)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.1);
+  backdrop-filter:blur(14px) saturate(1.1);
+  box-shadow:0 -4px 14px -6px rgba(21,59,86,.14);
+}
