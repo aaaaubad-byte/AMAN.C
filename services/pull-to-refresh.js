@@ -21,6 +21,11 @@
       const current = window.AMANAdminNavigation.current;
       if (current === "login") return "";
       if (current === "requests" && !document.getElementById("request-detail-view")?.hidden) return "requests-detail";
+      const generic = document.getElementById("admin-generic-view");
+      if (generic && !generic.hidden) {
+        if (generic.dataset.noPullRefresh === "true") return "";
+        if (generic.dataset.pullScreen) return generic.dataset.pullScreen;
+      }
       return current || "";
     }
     return window.AMANClientNavigation?.current || "";
