@@ -353,8 +353,8 @@ function populateCatalog(catalog) {
  packages.forEach(p => ps.add(new Option(p.name + " — " + p.duration_days + " يوم — " + Number(p.price_yer).toLocaleString("ar") + " ر.ي", p.id)));
  ms.replaceChildren(new Option("اختر وسيلة الدفع", ""));
  catalog.payment_methods.forEach(p => ms.add(new Option(p.name, p.id)));
- $("package-summary").textContent = packages.length ? "اختر باقة معتمدة لهذه الشركة ونوع العملية." : "لا توجد باقات معتمدة متاحة حاليًا لهذه الشركة ونوع العملية.";
- $("payment-instructions").textContent = "تعليمات الدفع المعتمدة ستظهر بعد اختيار الوسيلة.";
+ $("package-summary").textContent = packages.length ? "اختر الباقة المتاحة." : "لا توجد باقات متاحة حاليًا.";
+ $("payment-instructions").textContent = "تعليمات الدفع بعد اختيار الوسيلة.";
 }
 $("protection-package").addEventListener("change", event => {
  const p = protectionCatalog.packages.find(x => x.id === event.target.value);
@@ -393,7 +393,7 @@ $("confirm-protection").addEventListener("click", async () => {
  const confirmed = result.success === true && Boolean(result.request_id);
  const content = $("result-content"); content.replaceChildren();
  $("result-title").textContent = confirmed ? "تم إرسال الطلب" : "تعذر تأكيد إرسال الطلب";
- $("result-description").textContent = confirmed ? "استلمت أمان طلبك وهو قيد المراجعة. لا تبدأ الحماية إلا بعد اعتماد الإدارة." : "لم يتم تأكيد إنشاء الطلب. يمكنك مراجعة بياناتك وإعادة المحاولة بعد التحقق من قائمة العمليات.";
+ $("result-description").textContent = confirmed ? "طلبك قيد المراجعة. تبدأ الحماية بعد اعتماد الإدارة." : "لم يتأكد إرسال الطلب. راجع العمليات قبل إعادة المحاولة.";
  if (confirmed) {
   const box = el("div", "result-success"); box.append(el("strong", "", "طلبك قيد المراجعة"), el("div", "detail-label", "رقم الطلب"));
   const num = el("div", "detail-value", result.request_number || result.request_id); num.dir = "ltr"; box.append(num); content.append(box);
