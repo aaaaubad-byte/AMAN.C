@@ -65,7 +65,7 @@
   function onStart(event) {
     if (refreshing || !event.touches || event.touches.length !== 1) return;
     const target = event.target;
-    if (target.closest?.("input, textarea, select, button, a, [contenteditable=true], dialog, [data-no-pull-refresh]")) return;
+    if (target.closest?.("input, textarea, select, button, a, form, [contenteditable=true], dialog, [data-no-pull-refresh]")) return;
     if (!atTop(target)) return;
     startY = event.touches[0].clientY;
     startX = event.touches[0].clientX;
