@@ -34,7 +34,7 @@ async function loadCustomers(){
 async function openCustomer(id){
  selectedCustomer=id;const host=shell();host.dataset.pullScreen="customers-detail";const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
  const loading=node("div","surface empty-state","جارٍ تحميل تفاصيل العميل…");host.append(loading);const s=service();
- if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة حاليًا.";return;}
+ if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة حاليًا.";return false;}
  try{const r=await s.getCustomerDetails({customer_id:id});if(r?.success!==true||!r.customer)throw Error();const c=r.customer;host.replaceChildren(back);
  host.append(panel("بيانات الحساب",[["الاسم",c.full_name],["البريد الإلكتروني",c.email],["تصنيف الحساب",labels[c.customer_type]||c.customer_type],["حالة الحساب",labels[c.status]||c.status],["تاريخ الإنشاء",c.created_at],["سبب التعطيل",c.disabled_reason]]));
  const action=node("section","surface"),h=node("h2","surface-title","إدارة حالة الحساب"),desc=node("p","surface-desc",c.is_admin?"لا يمكن تغيير حالة حساب المدير.":c.status==="active"?"يمكن تعطيل حساب العميل بعد تأكيد الإجراء.":"يمكن إعادة تفعيل الحساب بعد تأكيد الإجراء.");
@@ -43,8 +43,8 @@ async function openCustomer(id){
  host.append(action);
  const numbers=Array.isArray(c.numbers)?c.numbers:[];host.append(panel("الأرقام المرتبطة",numbers.map(n=>[n.phone,n.protection_status_label||labels[n.protection_status]||n.status||"—"])));
  const requests=Array.isArray(c.requests)?c.requests:[];host.append(panel("الطلبات",requests.map(x=>[x.request_number||x.id,[x.operation_type,x.status,x.created_at].filter(Boolean).join(" • ")])));
- const history=Array.isArray(c.status_history)?c.status_history:[];host.append(panel("سجل التعطيل والتفعيل",history.map(x=>[labels[x.status]||x.status,[x.reason,x.changed_at].filter(Boolean).join(" • ")])));
- }catch{loading.textContent="تعذر تحميل تفاصيل العميل.";}
+ const history=Array.isArray(c.status_history)?c.status_history:[];host.append(panel("سجل التعطيل والتفعيل",history.map(x=>[labels[x.status]||x.status,[x.reason,x.changed_at].filter(Boolean).join(" • ")])));return true;
+ }catch{loading.textContent="تعذر تحميل تفاصيل العميل.";return false;}
 }
 function confirmStatusChange(c){
  const s=service(),dialog=document.createElement("dialog");dialog.className="admin-decision-dialog";const box=node("div","surface"),title=node("h2","surface-title",c.status==="active"?"تأكيد تعطيل الحساب":"تأكيد إعادة تفعيل الحساب"),body=node("div","decision-body");box.append(title,body);dialog.append(box);document.body.append(dialog);
