@@ -828,3 +828,83 @@ html[data-theme="dark"] .admin-app .surface:has(>.admin-filter-grid){
 }
 /* Remove redundant refresh controls from screen headers and list toolbars. */
 #dashboard-refresh,#requests-refresh,#request-detail-refresh,#notifications-refresh{display:none!important}
+
+
+/* AMAN.C — inline search and filter controls (user-approved refinement).
+   Search/filter controls are integrated into the screen surface, not presented
+   as a separate card. This layer changes presentation only. */
+:root{
+  --paper:#f7fafb;
+  --search-surface:#e4edf0;
+  --search-border:#c8d9de;
+}
+.list-tools,
+.admin-app .surface:has(>.admin-filter-grid){
+  padding:0!important;
+  margin:0 0 12px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.admin-app .surface:has(>.admin-filter-grid)>.field-row{margin-top:8px}
+.compact-search .field,
+.toolbar-search .field,
+.admin-filter-grid.compact-filter-row>.compact-search .field{
+  background:var(--search-surface)!important;
+  border:1px solid var(--search-border)!important;
+  border-radius:8px;
+  box-shadow:none;
+  color:var(--blue);
+}
+.compact-search .field:focus,
+.toolbar-search .field:focus,
+.admin-filter-grid.compact-filter-row>.compact-search .field:focus{
+  background:var(--search-surface)!important;
+  border-color:var(--turquoise)!important;
+  box-shadow:0 0 0 2px rgba(8,169,154,.11)!important;
+}
+.compact-filter-icon{
+  background:var(--search-surface)!important;
+  border:1px solid var(--search-border)!important;
+  border-radius:8px!important;
+  color:var(--blue)!important;
+  box-shadow:none!important;
+}
+.compact-filter-icon svg{stroke:var(--blue)}
+.compact-filter-icon svg path:nth-of-type(2),
+.compact-filter-icon svg circle:nth-of-type(2){stroke:var(--turquoise)}
+.compact-filter-icon:hover{border-color:var(--turquoise)!important}
+.compact-filter-icon[aria-expanded="true"]{
+  background:var(--search-surface)!important;
+  border-color:var(--turquoise)!important;
+  color:var(--turquoise-deep)!important;
+}
+.compact-filter select.field{
+  background:var(--search-surface)!important;
+  border:1px solid var(--search-border)!important;
+  color:var(--blue)!important;
+  box-shadow:none!important;
+}
+html[data-theme="dark"]{
+  --paper:#192b35;
+  --search-surface:#1a303a;
+  --search-border:#405965;
+}
+html[data-theme="dark"] .compact-search .field,
+html[data-theme="dark"] .toolbar-search .field,
+html[data-theme="dark"] .compact-filter select.field{
+  background:var(--search-surface)!important;
+  border-color:var(--search-border)!important;
+  color:var(--ink)!important;
+}
+html[data-theme="dark"] .compact-filter-icon{
+  background:var(--search-surface)!important;
+  border-color:var(--search-border)!important;
+  color:#d9eaf0!important;
+}
+html[data-theme="dark"] .compact-filter-icon svg{stroke:#d9eaf0}
+html[data-theme="dark"] .compact-filter-icon svg path:nth-of-type(2){stroke:var(--turquoise)}
+html[data-theme="dark"] .compact-filter-icon[aria-expanded="true"]{
+  border-color:var(--turquoise)!important;color:var(--turquoise)!important;
+}
