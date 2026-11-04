@@ -2,14 +2,14 @@
 "use strict";
 const $=id=>document.getElementById(id),svc=()=>window.AMANAdminServices||{};
 const DAY=86400000;
-const state={tasks:[],reports:[],revenue:[],taskFilter:"all",reportFilter:"all",range:"30",view:"all",followFilter:"due",pendingView:null};
+const state={tasks:[],reports:[],revenue:[],taskFilter:"all",reportFilter:"all",range:"30",view:"all",followFilter:"due",pendingView:null,activeTask:null};
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const fmtDate=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleString("ar",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Aden"});};
 const fmtDay=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleString("ar",{dateStyle:"medium",timeZone:"Asia/Aden"});};
 const money=v=>Number(v||0).toLocaleString("ar")+" ر.ي";
 const taskStatusLabel={planned:"مخططة",due:"مستحقة",executed:"منفذة"};
 const panel=(title,rows)=>{const p=el("section","surface admin-detail-panel"),h=el("h2","surface-title",title);p.append(h);rows.forEach(([a,b])=>{const r=el("div","admin-detail-row"),k=el("span","",a),v=el("strong","",b??"—");r.append(k,v);p.append(r);});return p;};
-function host(){const h=$("admin-generic-view");h.replaceChildren();return h;}
+function host(){const h=$("admin-generic-view");h.replaceChildren();delete h.dataset.pullScreen;delete h.dataset.noPullRefresh;return h;}
 function msg(h,t,kind="info"){const p=el("p","notice-"+kind,t);h.append(p);}
 function button(text,cls,fn){const b=el("button",cls||"btn btn-outline",text);b.type="button";b.addEventListener("click",fn);return b;}
 /* الأيام المتبقية حتى تاريخ المصادرة (شاملة اليوم الحالي)؛ null إن تعذر الحساب. */
@@ -17,7 +17,7 @@ const daysLeft=t=>{const end=Date.parse(t.confiscation_date||t.due_at);return Nu
 const leftLabel=t=>{const d=daysLeft(t);if(d===null)return "—";return d<=1?"آخر يوم للتنفيذ":"يتبقى "+d+" يوم للتنفيذ";};
 async function refreshAfter(text){const h=host();renderTasks(h);h.prepend(el("p","notice-success",text));await loadTasks();}
 async function taskDetail(t){
- const h=host(),back=button("العودة إلى المهام","btn btn-outline",()=>{renderTasks(h);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
+ const h=host();h.dataset.pullScreen="tasks-detail";state.activeTask=t;const back=button("العودة إلى المهام","btn btn-outline",()=>{state.activeTask=null;renderTasks(h);loadTasks();});h.append(back);const loading=el("div","surface empty-state","جارٍ تحميل تفاصيل المهمة…");h.append(loading);try{const detail=await svc().getTaskDetails({task_id:t.id});if(detail?.success!==true||!detail.task)throw Error();t=detail.task;state.activeTask=t;}catch{loading.textContent="تعذر تحميل تفاصيل المهمة.";return;}loading.remove();
  h.append(panel("تفاصيل المهمة",[["رقم الهاتف",t.phone],["الشركة",t.company_name],["موعد المهمة",fmtDay(t.due_at)],["تاريخ المصادرة",t.status==="executed"?"—":fmtDay(t.confiscation_date)],["نافذة الظهور",t.due_window_days===undefined?"—":t.due_window_days+" يوم قبل الموعد"],["الحالة",taskStatusLabel[t.status]||t.status],["تاريخ التنفيذ الفعلي",fmtDate(t.executed_at)],["معرّف الحماية",t.protection_id||"—"],["سياق الحماية",t.protection_context||"—"]]));
  if(t.status!=="executed"){
   const actions=el("section","surface"),title=el("h2","surface-title","الإجراءات المتاحة");actions.append(title);
@@ -78,6 +78,6 @@ function renderReports(h){
  controls.append(el("label","field-label","النطاق الزمني"),range);const summary=el("div",""),list=el("div","");summary.id="phase-revenue-summary";list.id="phase-revenue-list";h.append(controls,summary,list);range.addEventListener("change",()=>{state.range=range.value;loadRevenue();});
 }
 async function loadRevenue(){const s=svc(),summary=$("phase-revenue-summary"),list=$("phase-revenue-list");if(!summary||!list)return;summary.replaceChildren();list.replaceChildren();msg(summary,"جارٍ تحميل الإيرادات…");try{const r=await s.getRevenueReport({days:state.range});if(r?.success!==true||!Array.isArray(r.operations))throw Error();summary.replaceChildren();summary.append(panel("ملخص الإيرادات المعتمدة",[["عدد العمليات",String(r.count)],["إجمالي الإيرادات",money(r.total_yer)],["الفترة",r.period_label||"—"]]));const groups=[["حسب نوع العملية",r.by_operation],["حسب الشركة",r.by_company],["حسب الباقة",r.by_package],["حسب وسيلة الدفع",r.by_payment]];groups.forEach(([title,items])=>{if(items?.length)summary.append(panel(title,items.map(x=>[x.name,x.count+" عملية • "+money(x.total_yer)])));});if(!r.operations.length){msg(list,"لا توجد عمليات معتمدة في هذه الفترة.");return;}list.append(panel("العمليات المعتمدة",r.operations.map(x=>[x.request_number||x.id,[x.operation_type_label||x.operation_type,x.company_name,x.package_name,x.payment_method_name,fmtDate(x.approved_at)].filter(Boolean).join(" • ")+" — "+money(x.price_yer)])));}catch{summary.replaceChildren();msg(summary,"تعذر تحميل تقرير الإيرادات. أعد المحاولة.","error");}}
-if (window.AMANPullToRefresh) { window.AMANPullToRefresh.register("tasks", loadTasks); window.AMANPullToRefresh.register("followup", loadTasks); window.AMANPullToRefresh.register("reports", loadRevenue); }
+if (window.AMANPullToRefresh) { window.AMANPullToRefresh.register("tasks", loadTasks); window.AMANPullToRefresh.register("tasks-detail", () => state.activeTask ? taskDetail(state.activeTask) : loadTasks()); window.AMANPullToRefresh.register("followup", loadTasks); window.AMANPullToRefresh.register("reports", loadRevenue); }
 document.addEventListener("aman:admin-screenchange",e=>{const screen=e.detail?.screen,h=$("admin-generic-view");if(!h)return;if(screen==="tasks"||screen==="followup"){state.view=screen==="followup"?"followup":"all";renderTasks(h);loadTasks();}if(screen==="reports"){renderReports(h);loadRevenue();}});
 })();
