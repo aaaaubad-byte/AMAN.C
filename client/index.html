@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f1f5f6"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="./icons/icon.svg"><link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="أمان"><meta name="description" content="أمان لحماية أرقام الاتصالات من الفقدان بسبب الإهمال وعدم التجديد.">
-<title>أمان | العميل</title><style>.brand-logo{display:block;width:42px;height:42px;flex:0 0 42px;object-fit:contain;border-radius:12px}.auth-brand .brand-logo{width:72px;height:72px;flex:none;margin:0 auto 12px;border-radius:20px}</style><link rel="stylesheet" href="../styles/app.css"><script defer src="../services/runtime.js"></script><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.104.0/dist/umd/supabase.js" crossorigin="anonymous"></script><script defer src="../services/supabase-config.js"></script><script defer src="../services/supabase-adapter.js"></script><script defer src="./app.js"></script><script defer src="./ui-v5.js"></script><script defer src="./pwa.js"></script>
+<title>أمان | العميل</title><style>.brand picture,.auth-brand picture{display:block;flex:0 0 auto}.brand-logo{display:block;height:36px;width:auto}.auth-brand .brand-logo{height:64px;margin:0 auto 12px}</style><link rel="stylesheet" href="../styles/app.css"><script defer src="../services/runtime.js"></script><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.104.0/dist/umd/supabase.js" crossorigin="anonymous"></script><script defer src="../services/supabase-config.js"></script><script defer src="../services/supabase-adapter.js"></script><script defer src="./app.js"></script><script defer src="./ui-v5.js"></script><script defer src="./pwa.js"></script>
 </head>
 <body>
 <main class="app" id="client-app">
@@ -12,13 +12,13 @@
 <button class="icon-btn" id="account-button" type="button" aria-label="الحساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
 <button class="icon-btn" id="notifications-button" type="button" aria-label="الإشعارات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="unread-dot" id="notifications-dot" hidden aria-label="يوجد إشعارات غير مقروءة"></span></button>
 </div>
-<a class="brand" href="./" aria-label="أمان - الرئيسية"><img class="brand-logo" src="./icons/icon.svg" alt="" width="42" height="42"><span class="brand-copy"><strong>أمان</strong><small>AMAN</small></span></a>
+<a class="brand" href="./" aria-label="أمان - الرئيسية"><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/brand/logo-mark-light.svg"><img class="brand-logo" src="../assets/brand/logo-mark.svg" alt="" width="42" height="36"></picture><span class="brand-copy"><strong>أمان</strong><small>AMAN</small></span></a>
 </header>
 
 <section id="boot-screen" data-screen="boot"><div class="soft-surface empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><strong>جارٍ التحميل…</strong><p>نتحقق من جلسة حسابك.</p></div></section>
 
 <section id="login-screen" data-screen="login" hidden>
-<div class="auth-wrap"><div class="auth-brand"><img class="brand-logo" src="./icons/icon.svg" alt="" width="72" height="72"><h1>أمان</h1><p>AMAN</p></div>
+<div class="auth-wrap"><div class="auth-brand"><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/brand/logo-mark-light.svg"><img class="brand-logo" src="../assets/brand/logo-mark.svg" alt="" width="75" height="64"></picture><h1>أمان</h1><p>AMAN</p></div>
 <div class="auth-card"><h2 id="login-title">تسجيل الدخول</h2><p id="login-description">أدخل بريدك الإلكتروني وكلمة المرور للمتابعة إلى حسابك.</p>
 <form id="login-form"><label class="field-label" for="login-email">البريد الإلكتروني</label><input class="field" id="login-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
 <div class="field-wrap"><label class="field-label" for="login-password">كلمة المرور</label><input class="field" id="login-password" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" minlength="4" required></div>
@@ -27,7 +27,7 @@
 <p class="auth-foot" id="login-foot" aria-live="polite"></p></div></section>
 
 <section id="signup-screen" data-screen="signup" hidden>
-<div class="auth-wrap"><div class="auth-brand"><img class="brand-logo" src="./icons/icon.svg" alt="" width="72" height="72"><h1>أمان</h1><p>AMAN</p></div>
+<div class="auth-wrap"><div class="auth-brand"><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/brand/logo-mark-light.svg"><img class="brand-logo" src="../assets/brand/logo-mark.svg" alt="" width="75" height="64"></picture><h1>أمان</h1><p>AMAN</p></div>
 <div class="auth-card"><h2 id="signup-title">إنشاء حساب جديد</h2><p id="signup-description">أدخل بريدك الإلكتروني وكلمة مرور لإنشاء حسابك.</p>
 <form id="signup-form"><label class="field-label" for="signup-email">البريد الإلكتروني</label><input class="field" id="signup-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
 <div class="field-wrap"><label class="field-label" for="signup-password">كلمة المرور</label><input class="field" id="signup-password" type="password" autocomplete="new-password" placeholder="أدخل كلمة المرور" minlength="4" required></div>
