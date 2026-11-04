@@ -63,7 +63,8 @@ async function audit(){
   action.input.addEventListener("change",render);
   entity.input.addEventListener("change",render);
   search.input.addEventListener("input",render);
-  h.append(panel("بحث ومرشحات سجل التدقيق",[search.wrap,action.wrap,entity.wrap]),detail,rows);
+  const toolbar=el("div","admin-filter-grid");toolbar.append(search.wrap,action.wrap,entity.wrap);
+  h.append(panel("بحث ومرشحات سجل التدقيق",[toolbar]),detail,rows);
   render();
  }catch{msg(h,"تعذر تحميل سجل التدقيق.",true);}
 }
