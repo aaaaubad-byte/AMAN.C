@@ -63,10 +63,24 @@
     row.classList.add('compact-filter-row');
     row.dataset.compactFiltersReady = 'true';
   }
+  function scan(root) {
+    if (!root) return;
+    if (root.nodeType === 1 && root.matches('.customer-toolbar,.admin-filter-grid')) prepare(root);
+    if (typeof root.querySelectorAll === 'function') {
+      root.querySelectorAll('.customer-toolbar,.admin-filter-grid').forEach(prepare);
+    }
+  }
   function init() {
-    document.querySelectorAll('.customer-toolbar,.admin-filter-grid').forEach(prepare);
+    scan(document);
+    if (document.documentElement && !window.__amanCompactFiltersObserver) {
+      const observer = new MutationObserver(records => {
+        records.forEach(record => record.addedNodes.forEach(scan));
+      });
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+      window.__amanCompactFiltersObserver = observer;
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
-  document.addEventListener('aman:admin-screenchange', init);
+  document.addEventListener('aman:admin-screenchange', () => scan(document));
 })();
