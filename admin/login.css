@@ -130,3 +130,17 @@
   .login-card { padding: 20px 16px 18px; }
   .login-logo { width: 64px; height: 64px; }
 }
+
+
+/* AMAN.C identity alignment — turquoise primary action with deep-blue typography. */
+.login-brand h1{color:#153b56}
+.login-card{border-color:#dce6e9;box-shadow:0 1px 3px rgba(21,59,86,.035)}
+.login-card .field:focus{border-color:#08a99a;box-shadow:0 0 0 3px rgba(8,169,154,.13)}
+.password-toggle{color:#153b56}
+.password-toggle[aria-pressed="true"]{color:#08a99a}
+.remember-row input{accent-color:#08a99a}
+.login-submit{background:#08a99a;color:#fff}
+html[data-theme="dark"] .login-brand h1{color:#e8f2f5}
+html[data-theme="dark"] .login-card{background:#192b35;border-color:#354b56;box-shadow:none}
+html[data-theme="dark"] .login-card .field{background:#192b35;border-color:#354b56;color:#e8f2f5}
+html[data-theme="dark"] .login-submit{background:#13b8aa;color:#082c30}
