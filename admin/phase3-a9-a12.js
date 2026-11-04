@@ -32,7 +32,7 @@ async function loadCustomers(){
  catch{host.textContent="تعذر تحميل العملاء. تحقق من الاتصال والصلاحيات ثم أعد المحاولة.";}
 }
 async function openCustomer(id){
- selectedCustomer=id;window.AMANPullRefresh?.attach($("admin-section"),()=>openCustomer(id));const host=shell();const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();loadCustomers();});host.append(back);
+ selectedCustomer=id;window.AMANPullRefresh?.attach($("admin-section"),()=>openCustomer(id));const host=shell();const back=node("button","btn btn-outline","العودة إلى العملاء");back.type="button";back.addEventListener("click",()=>{selectedCustomer=null;renderCustomerScreen();window.AMANPullRefresh?.attach($("admin-section"),loadCustomers);loadCustomers();});host.append(back);
  const loading=node("div","surface empty-state","جارٍ تحميل تفاصيل العميل…");host.append(loading);const s=service();
  if(!s||typeof s.getCustomerDetails!=="function"){loading.textContent="تفاصيل العميل غير متاحة حاليًا.";return;}
  try{const r=await s.getCustomerDetails({customer_id:id});if(r?.success!==true||!r.customer)throw Error();const c=r.customer;host.replaceChildren(back);
