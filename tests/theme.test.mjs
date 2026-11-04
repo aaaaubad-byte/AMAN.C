@@ -43,7 +43,7 @@ test("السمة الافتراضية تتبع تفضيل النظام وتضب�
   assert.equal(dark.root.dataset.theme, "dark");
   assert.equal(dark.root.dataset.themePreference, "system");
   assert.equal(dark.source.media, "all");
-  assert.equal(dark.meta.content, "#0b161c");
+  assert.equal(dark.meta.content, "#182b35");
   const light = loadTheme(false);
   assert.equal(light.root.dataset.theme, "light");
   assert.equal(light.source.media, "not all");
