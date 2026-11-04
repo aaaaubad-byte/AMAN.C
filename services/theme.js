@@ -58,17 +58,15 @@
 (() => {
   "use strict";
   const current = document.currentScript;
-  if (!current || !current.src || document.querySelector("link[data-aman-visual-v6]")) return;
+  if (!current || !current.src || !document.head || document.querySelector("link[data-aman-visual-v6]")) return;
+  /* theme.js runs in <head> after the stylesheet links, so this link follows app.css (and admin login.css loads before DOM end). */
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = new URL("../styles/visual-v6.css", current.src).href;
   link.setAttribute("data-aman-visual-v6", "");
+  document.head.append(link);
   const script = document.createElement("script");
   script.src = new URL("./aman-ui-v6.js", current.src).href;
-  script.async = false;
-  /* Appended at the end of <head> so it follows app.css regardless of load order. */
-  document.addEventListener("DOMContentLoaded", () => {
-    document.head.append(link);
-    document.head.append(script);
-  }, { once: true });
+  script.defer = true;
+  document.head.append(script);
 })();
