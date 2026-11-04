@@ -35,7 +35,7 @@ const definitions={
  payments:{title:"وسائل الدفع",description:"وسائل الدفع وتعليماتها ومرجع الدفع.",icon:"wallet",emptyTitle:"لم تُضَف وسائل دفع بعد",emptyDescription:"أضف وسائل الدفع المعتمدة."},
  content:{title:"المحتوى الثابت",description:"الشروط والأحكام والخصوصية والمساعدة والتواصل.",icon:"doc",emptyTitle:"لا يوجد محتوى محفوظ",emptyDescription:"أضف النصوص المعتمدة."},
  audit:{title:"سجل التدقيق",description:"إجراءات الإدارة المسجلة.",icon:"clock",emptyTitle:"لا توجد سجلات",emptyDescription:"تظهر الإجراءات المسجلة هنا."},
- followup:{title:"نافذة الظهور والمتابعة",description:"المتابعة اليومية للمهام المستحقة ضمن نافذة الظهور قبل مواعيدها: تنفيذها أو إعادة جدولتها.",icon:"timer",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"ستظهر المهام المستحقة هنا ضمن نافذة الظهور."},
+ followup:{title:"نافذة الظهور والمتابعة",description:"المهام المستحقة للتنفيذ أو الجدولة.",icon:"timer",emptyTitle:"لا توجد مهام ضمن النافذة",emptyDescription:"تظهر المهام المستحقة هنا."},
  more:{title:"المزيد",description:"باقي أقسام الإدارة.",icon:"dots",emptyTitle:"",emptyDescription:""},
  account:{title:"الحساب الإداري",description:"عرض بيانات المدير وإدارة جلسة الإدارة.",icon:"user",emptyTitle:"بيانات الحساب غير متاحة",emptyDescription:"تعذر تحميل بيانات المدير الحالي."}
 };
