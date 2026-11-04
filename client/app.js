@@ -547,7 +547,7 @@ async function markRead(id) {
  if (result.success === true) await refreshNotifications(true); else setMessage($("notifications-message"), serviceProblem(result));
 }
 $("notification-filter").addEventListener("change", renderNotifications);
-$("notifications-refresh").addEventListener("click", () => refreshNotifications());
+
 
 function renderAll() { renderHomeNumbers(); renderNumbers(); renderOperations(); renderNotifications(); }
 
