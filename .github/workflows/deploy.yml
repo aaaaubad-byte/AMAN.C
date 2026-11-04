@@ -46,6 +46,7 @@ jobs:
           mkdir -p dist
           cp index.html dist/
           cp -R client admin styles services dist/
+          cp -R assets dist/
           touch dist/.nojekyll
       - name: Stamp production PWA build id
         run: node scripts/build-pwa.mjs dist "${GITHUB_SHA::12}"
