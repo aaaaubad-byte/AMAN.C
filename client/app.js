@@ -207,7 +207,7 @@ function numberCard(item, source) {
 }
 function renderHomeNumbers() {
  const host = $("my-numbers"); host.replaceChildren();
- const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام مرتبطة بحسابك", "ستظهر أرقامك هنا بعد اعتماد طلب الاشتراك من إدارة أمان.");
+ const box = listStateBox("numbers", () => refreshNumbers(), "لا توجد أرقام مرتبطة بحسابك", "تظهر أرقامك بعد اعتماد الاشتراك.");
  if (box) host.append(box); else lists.numbers.items.slice(0, 3).forEach(n => host.append(numberCard(n, "home")));
 }
 function renderNumbers() {
