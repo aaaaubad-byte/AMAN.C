@@ -156,13 +156,15 @@ function resetLists(message) {
 }
 /* silent: إن كانت القائمة محمّلة فلا نعرض «جارٍ التحميل» أثناء التحديث؛ الفشل يظهر دائمًا ولا تبقى بيانات قديمة. */
 async function loadList(name, call, silent = false) {
- const list = lists[name];
- if (!(silent && list.state === "ready")) { list.state = "loading"; list.message = ""; renderAll(); }
+ const list = lists[name], wasReady = list.state === "ready";
+ if (!(silent && wasReady)) { list.state = "loading"; list.message = ""; renderAll(); }
  const result = await call();
- if (!session) return;
+ if (!session) return false;
  if (result.success === true) { list.items = Array.isArray(result.items) ? result.items : []; list.state = "ready"; list.message = ""; }
+ else if (silent && wasReady) { list.state = "ready"; list.message = serviceProblem(result); }
  else { list.items = []; list.state = result.code === "auth_required" ? "signedout" : "error"; list.message = serviceProblem(result); }
  renderAll();
+ return result.success === true;
 }
 const refreshNumbers = silent => loadList("numbers", () => svc().listMyNumbers(), silent === true);
 const refreshOperations = silent => loadList("operations", () => svc().listMyOperations(), silent === true);
