@@ -3,12 +3,13 @@
    1) surface layers  2) input-field rule  3) filled two-tone icons  4) horizontal carousel */
 
 /* ---------- 1) Surface layers ----------
-   Light theme: screen base and cards share the same pure white (#fff).
-   Section surfaces remain subtly distinct; dark theme and input-field colors stay unchanged. */
+   The screen base and the cards share ONE color in each theme (--bg = --paper = --sheet).
+   Card edges are defined by borders; inner elements (--tile) and input fields stay distinct. */
 :root{
-  --bg:#ffffff;--sheet:#f0f0f0;
-  --panel:#f7f7f7;      /* section */
   --paper:#ffffff;      /* card */
+  --bg:var(--paper);    /* screen base = card */
+  --sheet:var(--paper);
+  --panel:var(--paper);
   --tile:#ffffff;       /* inner element */
   --panel-2:#ffffff;
   --line:#dedede;--border:1px solid #dedede;
@@ -19,9 +20,10 @@
   --app-pad:16px;
 }
 html[data-theme="dark"]{
-  --bg:#0b161c;--sheet:#0b161c;
-  --panel:#11202a;
-  --paper:#182b35;
+  --paper:#182b35;      /* card */
+  --bg:var(--paper);    /* screen base = card */
+  --sheet:var(--paper);
+  --panel:var(--paper);
   --tile:#20363f;
   --panel-2:#2a4552;
   --line:#33505d;--border:1px solid #33505d;
@@ -31,17 +33,12 @@ html[data-theme="dark"]{
   --num:#4fe0d1;--dot:#3f5967;
 }
 @media(min-width:650px){:root{--app-pad:28px}}
-html,body,.app{
-  background:#ffffff!important;
-  background-color:#ffffff!important;
+html,body,.app,.topbar,.bottom-nav,.screen-head,.sheet{
+  background:var(--bg)!important;
   background-image:none!important;
 }
-html[data-theme="dark"] body,html[data-theme="dark"] .app,
-html[data-theme="dark"] .topbar,html[data-theme="dark"] .bottom-nav,
-html[data-theme="dark"] .screen-head{background:var(--bg)}
-.sheet{background:var(--sheet)}
 
-/* ---------- 2) Input fields: intentionally untouched ---------- */
+/* ---------- 2) Input fields: always darker than the surface that holds them ---------- */
 .field,input.field,select.field,textarea.field,
 .compact-search .field,.toolbar-search .field,.compact-filter-select,
 .compact-filter-icon,.auth-field .field,.password-wrap .field,.admin-filter-grid .field{
@@ -61,7 +58,7 @@ html[data-theme="dark"] .screen-head{background:var(--bg)}
 select.field option{background:var(--paper);color:var(--ink)}
 .password-toggle{color:var(--muted)}
 
-/* ---------- 3) Filled two-tone icons (unchanged for this color experiment) ---------- */
+/* ---------- 3) Filled two-tone icons ---------- */
 svg.ami{fill:none!important;stroke:none!important;flex:0 0 auto;display:block}
 svg.ami *{stroke:none!important}
 svg.ami .a{fill:var(--ic-a)!important}
