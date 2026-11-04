@@ -405,7 +405,7 @@ test("حالة الفشل لكل شاشة: تعذّر الخدمة يعرض رس
     await breakService(t.page, method);
     await go(t.page, screen);
     await t.page.waitForTimeout(400);
-    const box = screen === "requests" ? "#requests-message" : "#admin-generic-view";
+    const box = screen === "requests" ? "#requests-list" : "#admin-generic-view";
     const text = await t.page.locator(box).innerText();
     assert.match(text, /تعذر|غير مربوط|لم يصل/, "لا رسالة خطأ في " + screen);
     assert.doesNotMatch(text, /جارٍ تحميل/, "تحميل معلّق في " + screen);
