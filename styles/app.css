@@ -789,3 +789,18 @@ html[data-theme="dark"] .screen-head .tile-btn svg path:nth-of-type(2),
 html[data-theme="dark"] .quick-icon svg path:nth-of-type(2),
 html[data-theme="dark"] .nav-item.active svg{stroke:var(--turquoise)}
 html[data-theme="dark"] .bottom-nav{background:var(--bg);border-color:var(--line)}
+
+
+/* Width and dark-surface refinements for the independent C layout. */
+@media(max-width:649px){
+  .admin-app .topbar,.admin-app .screen-head{margin-inline:-16px;padding-inline:16px}
+}
+@media(min-width:650px){
+  .app:not(.admin-app) .topbar,.app:not(.admin-app) .screen-head{
+    margin-inline:-28px;padding-inline:28px
+  }
+}
+html[data-theme="dark"] .list-tools,
+html[data-theme="dark"] .admin-app .surface:has(>.admin-filter-grid){
+  background:var(--panel);border-color:var(--line)
+}
