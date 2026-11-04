@@ -289,11 +289,11 @@ $("search-form").addEventListener("submit", async event => {
 /* ---------- العمليات (C-04/C-05) ---------- */
 function renderOperations() {
  const host = $("operations-list"); host.replaceChildren();
- const box = listStateBox("operations", () => refreshOperations(), "لا توجد عمليات حتى الآن", "ستظهر طلباتك هنا بعد إرسالها، ولن تبدأ الحماية إلا بعد اعتماد طلب الاشتراك.");
+ const box = listStateBox("operations", () => refreshOperations(), "لا توجد عمليات", "تظهر طلباتك بعد إرسالها. تبدأ الحماية بعد اعتماد الاشتراك.");
  if (box) { host.append(box); return; }
  const query = normalizeDigits($("operations-search").value).trim(), status = $("operations-status-filter").value;
  const filtered = lists.operations.items.filter(i => (!query || normalizeDigits(i.phone).includes(query) || String(i.request_number || i.id || "").includes(query)) && (!status || i.status === status));
- if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو حالة الطلب المحددة.")); return; }
+ if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو الحالة.")); return; }
  filtered.forEach(item => {
   const b = el("button", "operation-card"); b.type = "button";
   const main = el("span", "operation-main"), phone = el("small", "", item.phone); phone.dir = "ltr";
