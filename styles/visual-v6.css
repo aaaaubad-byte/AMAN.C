@@ -128,3 +128,28 @@ svg.ami .c{fill:var(--ic-c)!important}
 html[data-theme="dark"] .tab-strip{background:var(--panel-2);border:0}
 html[data-theme="dark"] .alert-note{border:0}
 html[data-theme="dark"] .btn.btn-soft{background:#203d43;color:#c5e9e5;border-color:transparent}
+
+
+/* ---------- 6) Turquoise home cards (light theme only) ----------
+   Apply the approved identity turquoise to the admin statistics cards and
+   the three intentionally empty client-home carousel slots. Dark theme is untouched. */
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card,
+html:not([data-theme="dark"]) .aman-home-cards .aman-carousel-track .aman-slot{
+  background:var(--turquoise);
+  border-color:var(--turquoise);
+  color:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card small,
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card strong{
+  color:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon{
+  background:rgba(255,255,255,.18);
+  color:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .a{
+  fill:#fff;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon .b{
+  fill:#d8f3f0;
+}
