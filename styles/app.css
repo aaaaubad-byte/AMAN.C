@@ -475,3 +475,110 @@ html[data-theme="dark"] .unread-dot{border-color:var(--paper)}
 html[data-theme="dark"] .admin-decision-dialog::backdrop,
 html[data-theme="dark"] .overlay{background:rgba(0,0,0,.62)}
 html[data-theme="dark"] :focus-visible{outline-color:#65d4b3}
+
+
+/* AMAN.C visual identity refinement — turquoise + deep blue, icon-first treatment.
+   Presentation only: keep all controls, hit areas, states and behavior intact. */
+:root{
+ --turquoise:#08a99a;
+ --turquoise-deep:#087f78;
+ --blue:#153b56;
+ --blue-soft:#e7f0f4;
+ --navy:#08a99a;
+ --navy-deep:#087f78;
+ --green:#08a99a;
+ --green-ink:#087f78;
+ --green-bg:#dff3ef;
+ --ink:#153b56;
+ --text:#18394e;
+ --muted:#718591;
+ --line:#dce6e9;
+ --border:1px solid #dce6e9;
+ --panel:#f0f5f6;
+ --panel-2:#e8f0f2;
+ --tile:#edf3f5;
+ --sheet:#f4f7f8;
+ --bg:#edf3f5;
+ --shadow:0 1px 3px rgba(21,59,86,.035);
+}
+html,body{background:var(--bg);color:var(--text)}
+.app{background:var(--sheet)}
+.surface,.auth-card,.login-card{background:#fff;border-color:var(--line);box-shadow:var(--shadow)}
+.soft-surface{background:#f0f5f6;border-color:#e4ecef}
+.phone-card,.quick-link,.detail-block,.operation-card,.admin-request-card,.stat-card,.admin-shortcut{background:#edf3f5}
+.btn{background:var(--turquoise);color:#fff}
+.btn:hover{filter:brightness(.97)}
+.btn-outline{background:#fff;border-color:#c5d7dc;color:var(--blue)}
+.btn-soft{background:#e2f0ef;color:var(--turquoise-deep)}
+.field{border-color:#cbdadd;background:#fff;color:var(--blue)}
+.field:focus{border-color:var(--turquoise);box-shadow:0 0 0 2px rgba(8,169,154,.13)}
+.quiet-link,.eyebrow,.notice-success,.nav-item.active{color:var(--turquoise-deep)}
+.state-active{background:var(--green-bg);color:#087f78}
+.alert-note,.notice-info{background:#e8f2f3;color:#31596a}
+.progress-fill{background:var(--turquoise)}
+.unread-dot{background:var(--turquoise)}
+/* Icon glyphs are the color surface: no decorative tile, circle or frame around them. */
+.icon-btn,.screen-head .tile-btn,.empty-icon,.phone-icon,.quick-icon,.detail-icon,.stat-icon,.sheet-hero-icon{
+ background:transparent!important;
+ color:var(--blue);
+ box-shadow:none;
+}
+.icon-btn{border:0}
+.screen-head .tile-btn{border:0}
+.empty-icon,.phone-icon,.quick-icon,.detail-icon,.stat-icon,.sheet-hero-icon{
+ border:0;border-radius:0;
+}
+.icon-btn svg,.screen-head .tile-btn svg,.empty-icon svg,.phone-icon svg,.quick-icon svg,
+.detail-icon svg,.stat-icon svg,.sheet-hero-icon svg,.nav-item svg{
+ color:var(--blue);stroke:var(--blue);
+}
+.icon-btn svg path:nth-of-type(2),.screen-head .tile-btn svg path:nth-of-type(2),
+.empty-icon svg path:nth-of-type(2),.phone-icon svg path:nth-of-type(2),
+.quick-icon svg path:nth-of-type(2),.detail-icon svg path:nth-of-type(2),
+.stat-icon svg path:nth-of-type(2),.sheet-hero-icon svg path:nth-of-type(2),
+.nav-item svg path:nth-of-type(2){
+ stroke:var(--turquoise); 
+}
+.icon-btn svg circle:nth-of-type(2),.phone-icon svg circle:nth-of-type(2),
+.quick-icon svg circle:nth-of-type(2),.detail-icon svg circle:nth-of-type(2),
+.stat-icon svg circle:nth-of-type(2){stroke:var(--turquoise)}
+.icon-btn:active,.screen-head .tile-btn:active{background:transparent!important;opacity:.72}
+.nav-item.active svg{stroke:var(--turquoise-deep)}
+.tab-strip{background:#e8f0f2}
+.tab-strip button[aria-selected="true"]{color:var(--blue);box-shadow:0 1px 2px rgba(21,59,86,.06)}
+.bottom-nav{background:rgba(255,255,255,.97);border-color:var(--line)}
+.brand-symbol{background:var(--blue);color:#fff}
+:focus-visible{outline-color:var(--turquoise)}
+html[data-theme="dark"]{
+ --bg:#101d25;--sheet:#14232c;--paper:#192b35;--panel:#20333d;--panel-2:#293e48;
+ --tile:#20343e;--navy:#13b8aa;--navy-deep:#70d9d0;--green:#13b8aa;
+ --green-ink:#70d9d0;--green-bg:#173f3d;--ink:#e8f2f5;--text:#dce9ee;
+ --muted:#9aadb7;--line:#354b56;--border:1px solid #354b56;--shadow:none;
+}
+html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--bg)}
+html[data-theme="dark"] .surface,html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .login-card,html[data-theme="dark"] .admin-decision-dialog>.surface{
+ background:var(--paper);border-color:var(--line);box-shadow:none
+}
+html[data-theme="dark"] .soft-surface{background:var(--panel);border-color:var(--line)}
+html[data-theme="dark"] .phone-card,html[data-theme="dark"] .quick-link,
+html[data-theme="dark"] .detail-block,html[data-theme="dark"] .operation-card,
+html[data-theme="dark"] .admin-request-card,html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .admin-shortcut{background:var(--tile)}
+html[data-theme="dark"] .icon-btn,html[data-theme="dark"] .screen-head .tile-btn,
+html[data-theme="dark"] .empty-icon,html[data-theme="dark"] .phone-icon,
+html[data-theme="dark"] .quick-icon,html[data-theme="dark"] .detail-icon,
+html[data-theme="dark"] .stat-icon,html[data-theme="dark"] .sheet-hero-icon{
+ background:transparent!important;color:#d9eaf0
+}
+html[data-theme="dark"] .icon-btn svg,html[data-theme="dark"] .screen-head .tile-btn svg,
+html[data-theme="dark"] .empty-icon svg,html[data-theme="dark"] .phone-icon svg,
+html[data-theme="dark"] .quick-icon svg,html[data-theme="dark"] .detail-icon svg,
+html[data-theme="dark"] .stat-icon svg,html[data-theme="dark"] .sheet-hero-icon svg{stroke:#d9eaf0}
+html[data-theme="dark"] .btn{background:#13b8aa;color:#082c30}
+html[data-theme="dark"] .btn-soft,html[data-theme="dark"] .alert-note,
+html[data-theme="dark"] .notice-info{background:#203d43;color:#c5e9e5}
+html[data-theme="dark"] .bottom-nav{background:rgba(25,43,53,.98);border-color:var(--line)}
+html[data-theme="dark"] .field{background:var(--paper);border-color:var(--line);color:var(--ink)}
+html[data-theme="dark"] .state-active{background:var(--green-bg);color:#8de3d9}
+html[data-theme="dark"] :focus-visible{outline-color:#70d9d0}
