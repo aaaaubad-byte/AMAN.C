@@ -115,3 +115,57 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
 .stat-card{min-height:112px;padding:14px}
 @media(min-width:650px){.surface,.soft-surface{padding:20px}.admin-shortcuts{gap:12px}}
 @media(max-width:350px){.app{padding-left:12px;padding-right:12px}.surface,.soft-surface{padding:13px}}
+
+
+/* Screen-specific refinement mapped to AMAN.C's existing markup only. */
+.page-head{padding:14px 2px 20px}
+.page-title{letter-spacing:-.25px}
+.page-desc{max-width:54ch}
+.surface{padding:17px}
+.surface-title{line-height:1.55}
+.surface-desc{line-height:1.8}
+.field-label{margin-bottom:7px}
+.field-row{gap:9px}
+.field{padding-inline:13px}
+.btn{padding-inline:17px;letter-spacing:0}
+.quick-link{padding:11px 12px;min-height:66px;gap:11px}
+.quick-icon,.phone-icon,.stat-icon{width:36px;height:36px;flex-basis:36px}
+.quick-text strong,.phone-info strong{line-height:1.5}
+.quick-text small,.phone-info small{line-height:1.65}
+.phone-card{padding:11px 12px;min-height:68px}
+.state{border-radius:20px;padding:5px 10px}
+.detail-block{padding:15px}
+.sheet{padding:10px 17px calc(20px + env(safe-area-inset-bottom))}
+.sheet-hero{padding:7px 0 18px}
+.overlay{backdrop-filter:blur(2px)}
+.admin-app .page-head{padding-bottom:16px}
+.admin-stats{gap:10px}
+.stat-card{display:flex;flex-direction:column;justify-content:flex-start;gap:4px}
+.stat-card strong{line-height:1.35}
+.admin-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.admin-shortcut{aspect-ratio:1/1;min-height:0;padding:11px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.admin-shortcut .quick-icon{margin:0;width:34px;height:34px;flex:0 0 34px}
+.admin-shortcut strong{font-size:12px;line-height:1.55}
+.admin-shortcut small{font-size:10px;line-height:1.5;max-width:100%}
+.admin-shortcut:active{transform:scale(.985);background:var(--panel)}
+.admin-filter-grid{gap:11px}
+.detail-toolbar{flex-wrap:wrap}
+.detail-toolbar>*{flex:1 1 140px}
+.login-card{border-radius:17px;padding:20px}
+.password-wrap .field{padding-inline-end:48px}
+@media(max-width:380px){
+ .admin-shortcuts{gap:7px}
+ .admin-shortcut{padding:8px 5px;gap:5px}
+ .admin-shortcut strong{font-size:10.5px}
+ .admin-shortcut small{font-size:9px}
+ .surface{padding:14px}
+}
+@media(min-width:650px){
+ .admin-shortcuts{gap:12px}
+ .admin-shortcut{padding:14px 10px}
+ .admin-shortcut strong{font-size:13px}
+ .admin-shortcut small{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .admin-shortcut,.btn,.field{transition:none}
+}
