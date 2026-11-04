@@ -43,11 +43,11 @@ test("السمة الافتراضية تتبع تفضيل النظام وتضب�
   assert.equal(dark.root.dataset.theme, "dark");
   assert.equal(dark.root.dataset.themePreference, "system");
   assert.equal(dark.source.media, "all");
-  assert.equal(dark.meta.content, "#10191f");
+  assert.equal(dark.meta.content, "#0b161c");
   const light = loadTheme(false);
   assert.equal(light.root.dataset.theme, "light");
   assert.equal(light.source.media, "not all");
-  assert.equal(light.meta.content, "#f1f5f6");
+  assert.equal(light.meta.content, "#ffffff");
 });
 
 test("الاختيار اليدوي يُحفظ ويتجاوز تفضيل النظام", () => {
