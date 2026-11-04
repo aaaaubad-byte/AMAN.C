@@ -3,15 +3,15 @@
    1) surface layers  2) input-field rule  3) filled two-tone icons  4) horizontal carousel */
 
 /* ---------- 1) Surface layers ----------
-   Light: pure white base; each deeper level (section -> card -> inner element) is a step darker.
-   Dark : darkest base; each deeper level is a step lighter.
-   Fields are always darker than the surface that holds them. */
+   Light experiment: reverse the surface hierarchy — the screen base is now darker,
+   while cards and inner surfaces become progressively lighter.
+   Dark theme and all input-field colors remain unchanged. */
 :root{
-  --bg:#ffffff;--sheet:#ffffff;
-  --panel:#f3f8fa;      /* section */
-  --paper:#eaf2f5;      /* card */
-  --tile:#e0ebef;       /* inner element */
-  --panel-2:#d8e5ea;
+  --bg:#e0ebef;--sheet:#e0ebef;
+  --panel:#eaf2f5;      /* section */
+  --paper:#f3f8fa;      /* card */
+  --tile:#ffffff;       /* inner element */
+  --panel-2:#ffffff;
   --line:#cbdce3;--border:1px solid #cbdce3;
   --field-bg:#d3e2e8;--field-border:#a9bdc7;
   --search-surface:var(--field-bg);--search-border:var(--field-border);
@@ -39,7 +39,7 @@ html[data-theme="dark"] .topbar,html[data-theme="dark"] .bottom-nav,
 html[data-theme="dark"] .screen-head{background:var(--bg)}
 .sheet{background:var(--sheet)}
 
-/* ---------- 2) Input fields ---------- */
+/* ---------- 2) Input fields: intentionally untouched ---------- */
 .field,input.field,select.field,textarea.field,
 .compact-search .field,.toolbar-search .field,.compact-filter-select,
 .compact-filter-icon,.auth-field .field,.password-wrap .field,.admin-filter-grid .field{
@@ -59,7 +59,7 @@ html[data-theme="dark"] .screen-head{background:var(--bg)}
 select.field option{background:var(--paper);color:var(--ink)}
 .password-toggle{color:var(--muted)}
 
-/* ---------- 3) Filled two-tone icons ---------- */
+/* ---------- 3) Filled two-tone icons (unchanged for this color experiment) ---------- */
 svg.ami{fill:none!important;stroke:none!important;flex:0 0 auto;display:block}
 svg.ami *{stroke:none!important}
 svg.ami .a{fill:var(--ic-a)!important}
