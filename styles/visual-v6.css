@@ -7,12 +7,12 @@
    while cards and inner surfaces become progressively lighter.
    Dark theme and all input-field colors remain unchanged. */
 :root{
-  --bg:#e0ebef;--sheet:#e0ebef;
-  --panel:#eaf2f5;      /* section */
-  --paper:#f3f8fa;      /* card */
+  --bg:#f0f0f0;--sheet:#f0f0f0;
+  --panel:#f7f7f7;      /* section */
+  --paper:#ffffff;      /* card */
   --tile:#ffffff;       /* inner element */
   --panel-2:#ffffff;
-  --line:#cbdce3;--border:1px solid #cbdce3;
+  --line:#dedede;--border:1px solid #dedede;
   --field-bg:#d3e2e8;--field-border:#a9bdc7;
   --search-surface:var(--field-bg);--search-border:var(--field-border);
   --ic-a:#153b56;--ic-b:#08a99a;--ic-c:#ffffff;
