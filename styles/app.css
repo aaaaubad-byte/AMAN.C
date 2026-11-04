@@ -1030,3 +1030,57 @@ html[data-theme="dark"] .compact-filter.is-expanded .compact-filter-icon{border-
   .compact-filter-row>.compact-filter,.compact-filter-icon,.compact-filter-caption,
   .compact-filter-close,.compact-filter-select{transition:none!important}
 }
+
+
+/* Final AMAN.C brand calibration — derived from the official logo gradient. */
+:root{
+ --turquoise:#087f78;
+ --turquoise-deep:#01616d;
+ --navy:#087f78;
+ --navy-deep:#01616d;
+ --green:#087f78;
+ --green-ink:#01616d;
+ --green-bg:#e5f0ef;
+ --bg:#f3f5f7;
+ --sheet:#f7f8fa;
+ --panel:#f0f3f5;
+ --panel-2:#e9eef2;
+ --tile:#eef2f5;
+ --line:#dce3e8;
+ --border:1px solid #dce3e8;
+ --muted:#778895;
+ --shadow:0 1px 3px rgba(21,59,86,.025);
+}
+html,body{background:var(--bg);color:var(--text)}
+.app{background:var(--sheet)}
+.soft-surface{background:var(--panel);border-color:#e5eaee}
+.phone-card,.quick-link,.detail-block,.operation-card,.admin-request-card,.stat-card,.admin-shortcut{background:var(--tile)}
+.btn{background:var(--turquoise)}
+.btn-soft{background:#e8f0f2;color:var(--turquoise-deep)}
+.field:focus{border-color:var(--turquoise);box-shadow:0 0 0 2px rgba(1,97,109,.11)}
+.quiet-link,.eyebrow,.notice-success,.nav-item.active{color:var(--turquoise-deep)}
+.state-active{background:var(--green-bg);color:var(--turquoise-deep)}
+.progress-fill,.unread-dot{background:var(--turquoise)}
+:focus-visible{outline-color:var(--turquoise)}
+/* The shared admin container is structural only on numbers/customers: no enclosing white card. */
+.admin-numbers-view,.admin-customers-view{display:grid;gap:12px}
+.admin-numbers-view>.admin-filter-grid,.admin-customers-view>.admin-filter-grid{
+ background:transparent;border:0;box-shadow:none;padding:0;margin:0;
+}
+.admin-customers-view>.admin-filter-grid{margin-bottom:0}
+html[data-theme="dark"]{
+ --turquoise:#4bb8ad;
+ --turquoise-deep:#70c9c0;
+ --navy:#258f88;
+ --navy-deep:#70c9c0;
+ --green:#258f88;
+ --green-ink:#70c9c0;
+ --green-bg:#193d3c;
+ --bg:#101d25;
+ --sheet:#14232c;
+ --panel:#20333d;
+ --panel-2:#293e48;
+ --tile:#20343e;
+ --line:#354b56;
+ --border:1px solid #354b56;
+}
