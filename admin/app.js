@@ -27,7 +27,7 @@ const definitions={
  customers:{title:"العملاء",description:"حسابات العملاء وحالاتها.",icon:"users",emptyTitle:"لا يوجد عملاء",emptyDescription:"تظهر حسابات العملاء هنا."},
  tasks:{title:"مهام السداد",description:"مواعيد السداد وتنفيذها.",icon:"clock",emptyTitle:"لا توجد مهام سداد",emptyDescription:"تظهر المهام بعد اعتماد الطلبات."},
  complaints:{title:"البلاغات",description:"مراجعة البلاغات ومتابعتها.",icon:"flag",emptyTitle:"لا توجد بلاغات",emptyDescription:"تظهر البلاغات هنا."},
- reports:{title:"تقارير الإيرادات",description:"تقارير العمليات والإيرادات والاشتراكات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة في هذه الفترة",emptyDescription:"ستظهر الإيرادات هنا بعد وجود عمليات معتمدة."},
+ reports:{title:"تقارير الإيرادات",description:"العمليات والإيرادات المعتمدة.",icon:"doc",emptyTitle:"لا توجد عمليات معتمدة",emptyDescription:"تظهر الإيرادات بعد اعتماد العمليات."},
  settings:{title:"الشركات والإعدادات",description:"إدارة بيانات الشركات والبادئات وإعدادات المهام والتنشيط المستقلة لكل شركة.",icon:"sliders",emptyTitle:"لم تُضَف شركات بعد",emptyDescription:"أضف شركات الاتصالات واضبط إعداداتها."},
  notifications:{title:"الإشعارات",description:"استعراض الإشعارات وإنشاء إشعار يدوي.",icon:"bell",emptyTitle:"لا توجد إشعارات",emptyDescription:"لا توجد إشعارات لعرضها."},
  alerts:{title:"تنبيهات الأرقام",description:"استعراض التنبيهات وإنشاء تنبيه لرقم مرتبط بعميل.",icon:"flag",emptyTitle:"لا توجد تنبيهات",emptyDescription:"لا توجد تنبيهات أرقام لعرضها."},
