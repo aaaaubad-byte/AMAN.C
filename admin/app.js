@@ -7,17 +7,17 @@ const service=()=>window.AMANAdminServices||null;
 /* جدول أيقونات SVG ثابتة داخلية (ليست من بيانات المستخدم) */
 const svgWrap=d=>'<svg class="aman-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
 const ICONS={
- list:svgWrap('<path d="M8 6h13""/><path d="d="M8 12h13""/><path d="d="M8 18h13""/><path d="d="M3 6h.01""/><path d="d="M3 12h.01""/><path d="d="M3 18h.01"/>'),
- phone:svgWrap('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6""/><path d="d="M9 10h2m3 0h1""/><path d="d="M9 14h2m3 0h1m-5 4h2"/>'),
- users:svgWrap('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0""/><path d="d="M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/>'),
+ list:svgWrap('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>'),
+ phone:svgWrap('<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M9 10h2m3 0h1M9 14h2m3 0h1m-5 4h2"/>'),
+ users:svgWrap('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 6"/>'),
  user:svgWrap('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
  clock:svgWrap('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
- timer:svgWrap('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2""/><path d="d="M9 2h6"/>'),
- flag:svgWrap('<path d="M4 22V4""/><path d="d="M4 4h14l-2 4 2 4H4"/>'),
- doc:svgWrap('<path d="M7 3h10l3 3v15H4V3z""/><path d="d="M8 10h8""/><path d="d="M8 14h8""/><path d="d="M8 18h5"/>'),
- sliders:svgWrap('<path d="M4 6h10""/><path d="d="M18 6h2""/><path d="d="M4 12h2""/><path d="d="M10 12h10""/><path d="d="M4 18h12""/><path d="d="M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
- bell:svgWrap('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9""/><path d="d="M10 21h4"/>'),
- box:svgWrap('<path d="M21 8 12 3 3 8v8l9 5 9-5z""/><path d="d="M3 8l9 5 9-5""/><path d="d="M12 13v8"/>'),
+ timer:svgWrap('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>'),
+ flag:svgWrap('<path d="M4 22V4"/><path d="M4 4h14l-2 4 2 4H4"/>'),
+ doc:svgWrap('<path d="M7 3h10l3 3v15H4V3z"/><path d="M8 10h8M8 14h8M8 18h5"/>'),
+ sliders:svgWrap('<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
+ bell:svgWrap('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>'),
+ box:svgWrap('<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>'),
  wallet:svgWrap('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'),
  dots:svgWrap('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>')
 };
