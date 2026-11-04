@@ -328,3 +328,58 @@ body{font-family:Alexandria,'DM Sans',sans-serif}
  .admin-filter-grid:has(>div:nth-child(3):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}
  .admin-filter-grid:has(>div:nth-child(4)){grid-template-columns:minmax(0,1.25fr) repeat(3,minmax(0,1fr))}
 }
+
+
+/* Unified internal screen headers — AMAN.Y geometry, AMAN.C identity. */
+.screen-head{
+ display:grid;
+ grid-template-columns:40px minmax(0,1fr) 40px;
+ align-items:center;
+ gap:8px;
+ min-height:40px;
+ margin:0 0 18px;
+ padding:0 2px;
+ direction:rtl;
+}
+.screen-head .tile-btn{
+ flex:none;
+ display:grid;
+ place-items:center;
+ width:40px;
+ height:40px;
+ min-width:40px;
+ padding:0;
+ border:0;
+ border-radius:var(--radius-control);
+ background:var(--panel-2);
+ color:var(--ink);
+}
+.screen-head .tile-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.screen-head .screen-head-title{min-width:0;text-align:center}
+.screen-head .page-title{
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ font-size:17px;
+ font-weight:700;
+ line-height:1.35;
+ letter-spacing:0;
+}
+.screen-head .screen-subtitle{
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ margin:0;
+ color:var(--muted);
+ font-size:12px;
+ line-height:1.3;
+}
+.screen-head .screen-head-spacer{display:block;width:40px;height:40px}
+.screen-head .screen-subtitle:empty{display:none}
+.screen-head .tile-btn:active{transform:scale(.96)}
+@media(max-width:350px){
+ .screen-head{gap:6px;margin-bottom:16px}
+ .screen-head .page-title{font-size:16px}
+ .screen-head .screen-subtitle{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.screen-head .tile-btn{transition:none}}
