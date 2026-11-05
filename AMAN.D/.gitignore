@@ -1,0 +1,10 @@
+# ملف تمهيدي لقواعد الملفات المحلية
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
