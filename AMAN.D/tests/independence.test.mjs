@@ -5,8 +5,6 @@ import { readProjectFile, projectPath, fileExists, stripComments, localHtmlRefer
 import { dirname, resolve } from "node:path";
 
 const pages=["index.html","client/index.html","admin/index.html"];
-// Explicit P-01 exception: image paths are intentionally staged but PNG binaries are deferred.
-const deferredPngRef = ref => /^(?:\\.\\.\\/assets\\/brand\\/logo-mark(?:-light)?\\.png|\\.\\/icons\\/(?:icon-192|icon-512|icon-maskable-512|apple-touch-icon)\\.png)$/.test(ref);
 const appScripts=[
   "client/app.js","admin/app.js","admin/requests.js","admin/numbers.js","admin/customers.js",
   "admin/tasks.js","admin/reports.js","admin/complaints.js","admin/messaging.js",
@@ -28,7 +26,7 @@ test("روابط HTML المحلية تبقى داخل AMAN.D وتشير إلى 
       const resolved=resolve(dirname(projectPath(page)),clean);
       const relativePath=resolve(projectPath("."),resolved);
       assert.equal(staysInsideRoot(relativePath),true,page+" → "+ref);
-      assert.equal(existsSync(relativePath) || deferredPngRef(ref),true,page+" → "+ref);
+      assert.equal(existsSync(relativePath),true,page+" → "+ref);
     }
   }
 });
