@@ -1076,4 +1076,3 @@ svg.aman-icon .icon-cut{fill:none;stroke:var(--panel);stroke-width:1.15;stroke-l
 @media(prefers-reduced-motion:reduce){.icon-btn,.tile-btn{transition:none}}
 .btn.has-icon:not(.btn-outline) svg.aman-icon .icon-cut{stroke:#d8f6f1!important}
 .btn.has-icon:not(.btn-outline) svg.aman-icon path:nth-of-type(2),.btn.has-icon:not(.btn-outline) svg.aman-icon circle:first-of-type{stroke:#c8eee8!important}
-
