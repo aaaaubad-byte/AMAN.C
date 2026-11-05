@@ -1,11 +1,11 @@
 # شجرة ملفات AMAN.D — النسخة المعتمدة D1
 
-الحالة: **معتمدة من صاحب المشروع (D1)** — مراجَعة بعد إغلاق نواقص المرحلة 1 (2026-11-05، انظر `10-CLOSURES-AND-APPROVAL-PACKAGE.md`). لا يُكتب أي ملف في `AMAN.D` قبل اعتمادها (قرار D1).
+الحالة: **معتمدة من صاحب المشروع (D1)** — مراجَعة بعد إغلاق نواقص المرحلة 1 (2026-11-05، انظر `10-CLOSURES-AND-APPROVAL-PACKAGE.md`). الشجرة معتمدة (D1)، ومهيأة لبدء التنفيذ. لم يبدأ إنشاء كود AMAN.D في تحديث التجهيز الحالي.
 
 
 
 ## اعتماد D1 — 2026-11-05
-اعتمد صاحب المشروع هذه الشجرة بعد مراجعة النسخة المنقحة. يُقرأ هذا الاعتماد مع AMAN.B/11-APPROVAL-AND-ADDITIONAL-AUDIT.md وAMAN.B/12-SOURCE-AND-SUPABASE-AUDIT.md. لا يعني الاعتماد بدء إنشاء الملفات أو كتابة الكود؛ ذلك يتطلب موافقة المرحلة التالية. تبقى قواعد R1–R17 ومحتويات الشجرة مرجع التنفيذ، مع مراعاة نتائج التدقيق الأحدث.
+اعتمد صاحب المشروع هذه الشجرة بعد مراجعة النسخة المنقحة. يُقرأ هذا الاعتماد مع AMAN.B/11-APPROVAL-AND-ADDITIONAL-AUDIT.md وAMAN.B/12-SOURCE-AND-SUPABASE-AUDIT.md. اعتماد الشجرة منفصل عن بدء التنفيذ. بعد إغلاق متطلبات التجهيز في تحديث 2026-11-05 أصبحت جاهزة للتنفيذ وفق سجل 13. تبقى قواعد R1–R17 ومحتويات الشجرة مرجع التنفيذ.
 
 ## التعديلات عن النسخة السابقة (للمراجعة)
 - **R1** الأيقونات: المستعمل فعليًا هو مجموعة `*-v3.png` (manifest وHTML وprecache)؛ تُنسخ بايتًا ببايت بأسماء بلا إصدار، ولكل تطبيق مجموعته (مختلفة بايتًا). لا SVG ولا v1/v2.
@@ -25,7 +25,7 @@
 - **R15** (C-31) `admin/requests.js`: ملاحظة الرفض `maxLength=300` (تطابق الخادم). `admin/catalog.js`: رقم الحساب `maxLength=100` (يطابق `admin_save_payment_method`).
 - **R16** `tests/independence.test.mjs`: قاعدة «لا `localStorage` في الواجهات» **تستثني `shared/supabase-adapter.js`** لأنه يخزّن جلسة Supabase فيه (تصحيح لصياغة سابقة).
 - **R17** لوحة تفاصيل الرقم في `client/` تُبنى كما في `main` (كتل + أزرار) **ما لم تقرر D2 خلاف ذلك**. `#operation-sheet` لا يُنقل قبل حسم C-35 (قراءة `ui-v5.js`). شاشة «خدمة أمان» تُنقل كما هي.
-- **ملاحظة D3:** أسماء ملفات `supabase/migrations/` أدناه (0001–0006) **شكل مبدئي**؛ شكلها النهائي يتبع قرار D3 (المقترح: ستة ملفات بنفس ترتيب وأسماء الترحيلات الحية).
+- **ملاحظة D3 — محسوم:** ملفات `supabase/migrations/` الستة تحمل أسماء الإصدارات الحية حرفيًا، وكل ملف ينسخ statements[1] من الترحيل المطابق دون تقسيم أو إعادة تنسيق أو تعديل. بصمات المصادر في 13-SUPABASE-DEEP-AUDIT-AND-READY.md.
 
 ## الشجرة
 
@@ -108,16 +108,16 @@ AMAN.D/
 | `styles/admin-login.css` | شاشة دخول الإدارة | `admin/login.css` | `base.css` |
 | `assets/brand/logo-mark(.png|-light.png)` | الشعار (نسخ ثنائي، R2) | `logo-mark-v2.png`, `logo-mark-light-v2.png` | HTML |
 
-### قاعدة البيانات `supabase/` (الشكل النهائي يتبع D3)
-| الملف | الوظيفة | المصادر | يعتمد على |
+### قاعدة البيانات supabase/ (D3 محسوم: نسخ حرفي للترحيلات الحية)
+| الملف في AMAN.D | الوظيفة | المصدر الأصلي الحي | يعتمد على |
 |---|---|---|---|
-| `migrations/0001_schema.sql` | الأنواع والجداول والقيود والفهارس والمشغّل | **كتالوج Supabase الحي (قراءة فقط)** + مقارنة بـ `20261101000100_initial_schema.sql` | — |
-| `0002_helpers.sql` | مخطط `aman` والدوال المساعدة (`adm()`, `cust()` …) | الكتالوج الحي | 0001 |
-| `0003_client_rpcs.sql` | 11 دالة `client_*` | الكتالوج + نصوص الدوال (C-17) | 0001–0002 |
-| `0004_admin_rpcs.sql` | 35 دالة `admin_*` | نفسه | 0001–0002 |
-| `0005_security.sql` | RLS والصلاحيات والإلغاءات (EXECUTE لـ `authenticated` فقط) | الكتالوج، `SUPABASE_INTEGRATION_PROGRESS` §3 | 0001–0004 |
-| `0006_reference_data.sql` | أسباب الرفض (3) ومفاتيح المحتوى (4) فقط، بلا بيانات تشغيلية (C-13) | القاعدة الحية | 0001 |
-| `tests/security_and_rules.sql` | اختبارات بمعاملة تُلغى؛ **لا تُشغَّل إلا بموافقة وعلى بيئة حسب Q3** (وإلغاء المعاملة لا يكفي وحده ضمانًا) | أمثلة `task-rules.test.mjs` (القيم فقط) | 0001–0006 |
+| migrations/20261103015328_initial_schema.sql | الأنواع والجداول والقيود والفهارس والمشغّل وRLS الأولي | initial_schema / statements[1] | — |
+| migrations/20261103015752_operational_schema_and_helpers.sql | أعمدة وجداول التشغيل ومخطط aman ودوال المساعدة والبذور | operational_schema_and_helpers / statements[1] | السابق |
+| migrations/20261103015845_client_rpcs.sql | دوال العميل الـ11 | client_rpcs / statements[1] | السابق |
+| migrations/20261103020103_admin_rpcs_part1.sql | الجزء الأول من دوال الإدارة | admin_rpcs_part1 / statements[1] | السابق |
+| migrations/20261103020323_admin_rpcs_part2.sql | الجزء الثاني من دوال الإدارة | admin_rpcs_part2 / statements[1] | السابق |
+| migrations/20261103020953_revoke_public_execution_rls_auto_enable.sql | سحب EXECUTE من PUBLIC وanon وauthenticated عن public.rls_auto_enable() | revoke_public_execution_rls_auto_enable / statements[1] | السابق |
+| tests/security_and_rules.sql | اختبارات قاعدة اختيارية؛ لا تُشغّل على الإنتاج ولا قبل Q3 | تُكتب بعد تصميم بيئة الاختبار | الترحيلات الستة |
 
 ### السكربتات والاختبارات والنشر
 | الملف | الوظيفة | المصادر | يعتمد على |
