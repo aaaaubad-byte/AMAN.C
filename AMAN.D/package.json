@@ -1,10 +1,15 @@
 {
   "name": "aman-d",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "AMAN independent client and administration application",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
+  },
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "test": "node --test tests/*.test.js tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs"
   }
 }
