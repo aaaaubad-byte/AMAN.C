@@ -76,12 +76,12 @@ for (const path of runtimeFiles.filter(path => !path.startsWith("assets/"))) {
   let executableSource = source;
   if (/\\.(?:js|mjs)$/i.test(path)) {
     executableSource = executableSource
-      .replace(/\\/\\*[\\s\\S]*?\\*\\//g, "")
-      .replace(/^\\s*\\/\\/.*$/gm, "");
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^\s*\/\/.*$/gm, "");
   } else if (/\\.css$/i.test(path)) {
-    executableSource = executableSource.replace(/\\/\\*[\\s\\S]*?\\*\\//g, "");
+    executableSource = executableSource.replace(/\/\*[\s\S]*?\*\//g, "");
   } else if (/\\.html$/i.test(path)) {
-    executableSource = executableSource.replace(/<!--([\\s\\S]*?)-->/g, "");
+    executableSource = executableSource.replace(/<!--([\s\S]*?)-->/g, "");
   }
   if (independentPattern.test(executableSource))
     failures.push("مرجع إلى المشروع القديم أو المحاكاة في كود التشغيل: " + path);
