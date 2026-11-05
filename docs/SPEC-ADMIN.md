@@ -1,1 +1,0 @@
-PLACEHOLDER — docs/SPEC-ADMIN.md
