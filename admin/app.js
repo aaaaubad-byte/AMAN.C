@@ -67,7 +67,7 @@ function navigate(name,{remember=true}={}) {
  if(remember&&current!==name)historyStack.push(current);
  current=name;login.hidden=true;dashboard.hidden=true;section.hidden=false;nav.hidden=false;showAccountButton(true);
  $("section-title").textContent=item.title;$("section-description").textContent=item.description;
- $("admin-generic-view").classList.toggle("surface",!["numbers","customers"].includes(name));$("admin-generic-view").hidden=name==="requests";$("requests-list-view").hidden=name!=="requests";$("request-detail-view").hidden=true;
+ $("admin-generic-view").hidden=name==="requests";$("requests-list-view").hidden=name!=="requests";$("request-detail-view").hidden=true;
  setActive(name);window.scrollTo({top:0,behavior:"smooth"});
  document.dispatchEvent(new CustomEvent("aman:admin-screenchange",{detail:{screen:name}}));
  if(name==="requests")loadRequests();
