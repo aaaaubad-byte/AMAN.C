@@ -83,7 +83,7 @@ async function loadDashboard(){
  catch{return false;}}
 function normalizeList(r){if(Array.isArray(r))return r;if(Array.isArray(r?.items))return r.items;if(Array.isArray(r?.requests))return r.requests;return [];}
 function requestCard(r){
- const card=document.createElement("button");card.type="button";card.className="admin-request-card";
+ const card=document.createElement("button");card.type="button";card.className="compact-item admin-request-card";
  const main=document.createElement("span");main.className="request-card-main";
  const title=document.createElement("strong");title.textContent=text(r.request_number||r.id,"طلب بدون رقم");
  const phone=document.createElement("span");phone.className="request-phone";phone.dir="ltr";phone.textContent=text(r.phone);
