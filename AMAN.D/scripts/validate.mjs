@@ -73,7 +73,18 @@ for (const path of jsFiles) {
 const independentPattern = /AMAN\.C|AMAN\.B|simulation-adapter|__AMAN_SIMULATION__|local-preview\.mjs/i;
 for (const path of runtimeFiles.filter(path => !path.startsWith("assets/"))) {
   const source = readFileSync(resolve(ROOT, path), "utf8");
-  if (independentPattern.test(source)) failures.push("مرجع إلى المشروع القديم أو المحاكاة في ملف تشغيل: " + path);
+  let executableSource = source;
+  if (/\\.(?:js|mjs)$/i.test(path)) {
+    executableSource = executableSource
+      .replace(/\\/\\*[\\s\\S]*?\\*\\//g, "")
+      .replace(/^\\s*\\/\\/.*$/gm, "");
+  } else if (/\\.css$/i.test(path)) {
+    executableSource = executableSource.replace(/\\/\\*[\\s\\S]*?\\*\\//g, "");
+  } else if (/\\.html$/i.test(path)) {
+    executableSource = executableSource.replace(/<!--([\\s\\S]*?)-->/g, "");
+  }
+  if (independentPattern.test(executableSource))
+    failures.push("مرجع إلى المشروع القديم أو المحاكاة في كود التشغيل: " + path);
   if (/service[_-]?role|sb_secret_[A-Za-z0-9_-]{12,}/i.test(source))
     failures.push("احتمال وجود مفتاح سري في ملف تشغيل: " + path);
 }
