@@ -52,7 +52,7 @@ function renderTasks(h){
  select.addEventListener("change",()=>{state.taskFilter=select.value;renderTaskRows();});renderTaskRows();
 }
 function renderTaskRows(){const list=$("phase-task-list");if(!list)return;list.replaceChildren();const rows=state.tasks.filter(t=>state.taskFilter==="all"||t.status===state.taskFilter);if(!rows.length){msg(list,"لا توجد مهام سداد.");return;}
- rows.forEach(t=>{const b=button("", "compact-item admin-request-card",()=>taskDetail(t)),main=el("span","request-card-main"),title=el("strong","",t.phone||"رقم غير محدد"),meta=el("small","",[t.company_name||"شركة غير محددة","الموعد: "+fmtDay(t.due_at),taskStatusLabel[t.status]||t.status].join(" • "));main.append(title,meta);b.append(main);list.append(b);});
+ rows.forEach(t=>{const b=button("", "admin-request-card",()=>taskDetail(t)),main=el("span","request-card-main"),title=el("strong","",t.phone||"رقم غير محدد"),meta=el("small","",[t.company_name||"شركة غير محددة","الموعد: "+fmtDay(t.due_at),taskStatusLabel[t.status]||t.status].join(" • "));main.append(title,meta);b.append(main);list.append(b);});
 }
 /* شاشة «نافذة الظهور والمتابعة»: المتابعة اليومية للمهام المستحقة ضمن نافذة ظهور كل شركة. */
 function renderFollowup(h){
@@ -69,7 +69,7 @@ function renderFollowRows(){
  sum.append(panel("ملخص المتابعة",[["مستحقة ضمن نافذة الظهور",String(due.length)],["مخططة خارج النافذة",String(planned.length)]]));
  const rows=state.followFilter==="due"?due:state.followFilter==="planned"?planned:open;
  if(!rows.length){msg(list,state.followFilter==="due"?"لا توجد مهام ضمن نافذة الظهور حاليًا.":"لا توجد مهام لعرضها.");return;}
- rows.forEach(t=>{const b=button("","compact-item admin-request-card",()=>taskDetail(t)),main=el("span","request-card-main"),title=el("strong","",t.phone||"رقم غير محدد"),
+ rows.forEach(t=>{const b=button("","admin-request-card",()=>taskDetail(t)),main=el("span","request-card-main"),title=el("strong","",t.phone||"رقم غير محدد"),
   meta=el("small","",[t.company_name||"شركة غير محددة","موعد المهمة: "+fmtDay(t.due_at),"المصادرة: "+fmtDay(t.confiscation_date||t.due_at),"نافذة الشركة: "+(t.due_window_days??0)+" يوم"].join(" • "));
   main.append(title,meta);const d=daysLeft(t),side=el("span","request-card-side"),badge=el("span","state "+(t.status==="due"?(d!==null&&d<=1?"state-expired":"state-wait"):"state-off"),t.status==="due"?leftLabel(t):"مخططة");side.append(badge);b.append(main,side);list.append(b);});
 }
