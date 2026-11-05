@@ -1,15 +1,20 @@
-/* AMAN — الطبقة البصرية: سلوك العرض فقط (لا بيانات ولا وظائف أعمال).
-   - يستبدل كل أيقونة SVG في التطبيق بالمجموعة الموحدة الممتلئة ثنائية اللون (أزرق داكن + فيروزي).
-   - يحوّل شبكة إحصائيات الإدارة إلى شريط بطاقات أفقي (العقد والمعرّفات والبيانات كما هي).
-   - يضيف إلى الصفحة الرئيسية للعميل شريطًا من ثلاث بطاقات فارغة (بلا محتوى أو أفعال).
-   الشعار صورة نقطية (<img>) ولا يُمسّ أبدًا. */
+/*
+ * AMAN — طبقة العرض: الأيقونات الموحدة وشرائط البطاقات (عرض فقط، بلا بيانات أو إجراءات).
+ *
+ * - يستبدل كل أيقونة SVG في التطبيق بالمجموعة الموحدة ثنائية اللون المصمتة (أزرق داكن + فيروزي).
+ * - يحوّل شبكة إحصاءات الإدارة إلى شريط أفقي قابل للتمرير (العقد والمعرّفات والبيانات لا تُمسّ).
+ * - يضيف شريط ثلاث بطاقات فارغة إلى الشاشة الرئيسية للعميل (بلا محتوى أو بيانات أو إجراءات).
+ * - شعار AMAN صورة نقطية (<img>) ولا يُمسّ أبدًا.
+ *
+ * يُحمَّل تلقائيًا من shared/theme.js بعد ربط styles/visual.css.
+ */
 (() => {
   "use strict";
-  if (window.__amanUiIcons) return;
-  window.__amanUiIcons = true;
+  if (window.__amanUiV6) return;
+  window.__amanUiV6 = true;
 
-  /* ---------- مجموعة الأيقونات: 24×24، الصنف a = أزرق داكن، b = فيروزي، c = لون التفاصيل ---------- */
-  const ICONS = {
+  /* ---------- مجموعة الأيقونات: 24×24؛ الفئة a = أزرق داكن، b = فيروزي، c = لون التفصيل ---------- */
+  const I = {
     user: '<path class="a" d="M3.5 21.2c0-4.6 3.8-7.4 8.5-7.4s8.5 2.8 8.5 7.4z"/><circle class="b" cx="12" cy="8" r="4.6"/>',
     bell: '<path class="a" d="M12 2.8c-3.6 0-6.3 2.7-6.3 6.4 0 4.3-1.5 5.6-2.6 6.6-.3.3-.1.9.4.9h16.9c.5 0 .7-.6.4-.9-1.1-1-2.6-2.3-2.6-6.6 0-3.7-2.7-6.4-6.2-6.4z"/><path class="b" d="M9.2 19h5.6a2.8 2.8 0 0 1-5.6 0z"/>',
     clock: '<circle class="a" cx="12" cy="12" r="9.6"/><circle class="b" cx="12" cy="12" r="6.8"/><path class="c" d="M11.2 7.6h1.6v4.1l2.8 1.7-.8 1.3-3.6-2.2z"/>',
@@ -31,8 +36,8 @@
     filter: '<rect class="a" x="3" y="5" width="18" height="2.6" rx="1.3"/><rect class="b" x="6.5" y="10.7" width="11" height="2.6" rx="1.3"/><rect class="a" x="9.5" y="16.4" width="5" height="2.6" rx="1.3"/>'
   };
 
-  /* بصمات الأيقونات الخطية الأصلية في الواجهات: جزء من محتوى <svg> ← اسم الأيقونة الموحدة. */
-  const SIGNATURES = [
+  /* بصمات الأيقونات الخطية القديمة، تُطابَق مع محتوى الـ SVG لتحديد الأيقونة البديلة. */
+  const SIGS = [
     ["M4 21a8 8 0 0 1 16 0", "user"],
     ["M18 8a6 6 0 0 0-12 0", "bell"],
     ["M12 7v5l3 2", "clock"],
@@ -55,21 +60,21 @@
   ];
 
   function swapIcon(svg) {
-    /* أيقونة زر إظهار كلمة المرور تبقى كما هي، وما استُبدل سابقًا لا يُعاد استبداله. */
     if (!svg || svg.closest(".password-toggle") || svg.querySelector("g[data-ami]")) return;
     const html = svg.innerHTML;
-    const hit = SIGNATURES.find(([sig]) => html.includes(sig));
+    const hit = SIGS.find(([sig]) => html.includes(sig));
     if (!hit) return;
     ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"].forEach(a => svg.removeAttribute(a));
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("aria-hidden", "true");
     svg.classList.add("ami");
-    svg.innerHTML = '<g data-ami="' + hit[1] + '">' + ICONS[hit[1]] + "</g>";
+    svg.innerHTML = '<g data-ami="' + hit[1] + '">' + I[hit[1]] + "</g>";
   }
 
   function scanIcons(node) {
     if (!node || node.nodeType !== 1) return;
-    if (node.tagName.toLowerCase() === "svg") {
+    const tag = node.tagName.toLowerCase();
+    if (tag === "svg") {
       swapIcon(node);
     } else {
       const parent = node.closest && node.closest("svg");
@@ -78,23 +83,20 @@
     if (node.querySelectorAll) node.querySelectorAll("svg").forEach(swapIcon);
   }
 
-  /* ---------- شريط البطاقات (Carousel) ---------- */
+  /* ---------- شريط البطاقات ---------- */
   function initCarousel(track, label) {
-    if (!track || track.dataset.carousel === "1") return;
-    track.dataset.carousel = "1";
+    if (!track || track.dataset.amanCarousel === "1") return;
+    track.dataset.amanCarousel = "1";
     track.classList.add("aman-carousel-track");
     track.setAttribute("role", "group");
     track.setAttribute("aria-roledescription", "carousel");
     track.setAttribute("aria-label", label || "البطاقات");
-
     const dots = document.createElement("div");
     dots.className = "aman-dots";
     track.insertAdjacentElement("afterend", dots);
-
     let active = -1;
     let raf = 0;
     const cards = () => Array.from(track.children).filter(el => !el.hidden);
-
     const goTo = i => {
       const card = cards()[i];
       if (!card) return;
@@ -102,7 +104,6 @@
       const c = card.getBoundingClientRect();
       track.scrollBy({ left: (c.left + c.width / 2) - (t.left + t.width / 2), behavior: "smooth" });
     };
-
     const renderDots = () => {
       const n = cards().length;
       if (dots.children.length === n) return;
@@ -116,8 +117,6 @@
         dots.append(b);
       }
     };
-
-    /* البطاقة الأقرب إلى منتصف الشريط هي النشطة. */
     const update = () => {
       if (!track.clientWidth) return;
       renderDots();
@@ -138,7 +137,6 @@
         b.setAttribute("aria-current", i === best ? "true" : "false");
       });
     };
-
     track.addEventListener("scroll", () => {
       if (raf) return;
       raf = requestAnimationFrame(() => { raf = 0; update(); });
@@ -149,7 +147,7 @@
     requestAnimationFrame(update);
   }
 
-  /* الرئيسية للعميل: ثلاث بطاقات فارغة بالضبط (تصميم فقط، بلا بيانات أو روابط أو أفعال). */
+  /* الرئيسية للعميل: ثلاث خانات تصميم فارغة تمامًا، بلا بيانات أو روابط أو إجراءات. */
   function injectClientSlots() {
     const home = document.getElementById("home-screen");
     if (!home || home.querySelector(".aman-home-cards")) return;
@@ -164,8 +162,7 @@
     }
     section.append(track);
     const head = home.querySelector(".page-head");
-    if (head) head.after(section);
-    else home.prepend(section);
+    if (head) head.after(section); else home.prepend(section);
     initCarousel(track, "بطاقات الرئيسية");
   }
 
