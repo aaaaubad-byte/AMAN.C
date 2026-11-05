@@ -1,9 +1,19 @@
-/* AMAN — تفضيل سمة العرض: «حسب الجهاز» افتراضيًا، وفاتح/داكن اختياران صريحان. */
+/*
+ * AMAN — تفضيل سمة العرض وحقن الطبقة البصرية.
+ *
+ * الجزء الأول: «حسب الجهاز» هو الافتراضي، والفاتح/الداكن اختيار صريح يتجاوزه ويُحفظ في localStorage.
+ *   - يضبط data-theme وdata-theme-preference على عنصر الجذر.
+ *   - يضبط لون المتصفح (meta theme-color) وقيمة عناصر [data-theme-setting] ومصدر الشعار الداكن.
+ *   - يتابع تغيّر تفضيل النظام (عند اختيار «حسب الجهاز» فقط) وتغيّر المخزن من تبويب آخر.
+ * الجزء الثاني: يربط styles/visual.css وshared/ui-icons.js بعد اكتمال <head>، ليأتي ترتيب الطبقة
+ *   البصرية بعد styles/base.css مهما كان موضع تحميل هذا الملف (يُحمَّل في <head> قبل تحليل base.css).
+ *
+ * لا اعتماد على ملفات أخرى وقت التشغيل سوى المسارين النسبيين أعلاه.
+ */
 (() => {
   "use strict";
   const KEY = "aman-display-theme-v1";
   const VALID = new Set(["system", "light", "dark"]);
-  const THEME_COLOR = { dark: "#182b35", light: "#f4f8fa" };
   const media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
   function preference() {
@@ -15,14 +25,13 @@
     }
   }
 
-  /* يطبّق السمة المحسومة على الجذر ولون شريط المتصفح وعناصر الإعداد وشعار الوضع الداكن. */
   function apply() {
     const pref = preference();
     const resolved = pref === "system" ? (media && media.matches ? "dark" : "light") : pref;
     document.documentElement.dataset.theme = resolved;
     document.documentElement.dataset.themePreference = pref;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = THEME_COLOR[resolved];
+    if (meta) meta.content = resolved === "dark" ? "#182b35" : "#f4f8fa";
     document.querySelectorAll("[data-theme-setting]").forEach(control => {
       control.value = pref;
     });
@@ -40,7 +49,7 @@
     try {
       localStorage.setItem(KEY, control.value);
     } catch {
-      /* تبقى السمة المختارة فعّالة في هذه الصفحة حتى لو تعذّر التخزين. */
+      /* يبقى الاختيار فعّالًا في هذه الصفحة حتى لو تعذّر التخزين. */
     }
     apply();
   });
@@ -56,13 +65,11 @@
   document.addEventListener("DOMContentLoaded", apply);
 })();
 
-/* محمّل الطبقة البصرية: ورقة الأنماط visual.css وسلوك الأيقونات والشرائح (ui-icons.js).
-   يعمل theme.js داخل <head> قبل تحليل base.css، فتُلحَق الطبقة عند اكتمال الرأس
-   (لحظة إنشاء <body> وقبل أول رسم لمحتواه) لضمان أنها تلي base.css في ترتيب التتالي. */
+/* ---------- حقن الطبقة البصرية: ورقة الأنماط + سلوك الأيقونات والبطاقات ---------- */
 (() => {
   "use strict";
   const current = document.currentScript;
-  if (!current || !current.src || document.querySelector("link[data-visual-layer]")) return;
+  if (!current || !current.src || document.querySelector("link[data-aman-visual-v6]")) return;
   const cssUrl = new URL("../styles/visual.css", current.src).href;
   const jsUrl = new URL("./ui-icons.js", current.src).href;
   let done = false;
@@ -73,7 +80,7 @@
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = cssUrl;
-    link.setAttribute("data-visual-layer", "");
+    link.setAttribute("data-aman-visual-v6", "");
     document.head.append(link);
     const script = document.createElement("script");
     script.src = jsUrl;
