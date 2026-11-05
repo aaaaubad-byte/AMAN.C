@@ -20,7 +20,7 @@ function renderCustomers(){
  const host=$("customers-list");if(!host)return;host.replaceChildren();
  const q=filters.search.toLowerCase(),rows=customers.filter(c=>(filters.type==="all"||c.customer_type===filters.type)&&(filters.status==="all"||c.status===filters.status)&&[c.full_name,c.email,c.phone].some(v=>String(v||"").toLowerCase().includes(q)));
  if(!rows.length){host.append(node("div","surface empty-state","لا يوجد عملاء مطابقون للبحث والتصفية."));return;}
- rows.forEach(c=>{const card=node("button","admin-request-card"),main=node("span","request-card-main"),name=node("strong","",c.full_name||c.email),meta=node("small","",[c.email,labels[c.customer_type]||"—"].filter(Boolean).join(" • ")),side=node("span","request-card-side"),badge=node("span","state "+(c.status==="active"?"state-active":"state-off"),labels[c.status]||"غير محدد");card.type="button";side.append(badge);main.append(name,meta);card.append(main,side);card.addEventListener("click",()=>openCustomer(c.id));host.append(card);});
+ rows.forEach(c=>{const card=node("button","compact-item admin-request-card"),main=node("span","request-card-main"),name=node("strong","",c.full_name||c.email),meta=node("small","",[c.email,labels[c.customer_type]||"—"].filter(Boolean).join(" • ")),side=node("span","request-card-side"),badge=node("span","state "+(c.status==="active"?"state-active":"state-off"),labels[c.status]||"غير محدد");card.type="button";side.append(badge);main.append(name,meta);card.append(main,side);card.addEventListener("click",()=>openCustomer(c.id));host.append(card);});
 }
 async function loadCustomers(){
  const host=$("customers-list"),s=service();if(!host)return false;
