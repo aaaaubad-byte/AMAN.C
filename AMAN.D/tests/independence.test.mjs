@@ -53,9 +53,8 @@ test("تحميل طبقة الخدمات المشتركة يسبق الواجه�
 
 test("طبقة الاتصال وحدها تملك مفاتيح تخزين جلسات Supabase",()=>{
   const adapter=readProjectFile("shared/supabase-adapter.js");
-  assert.match(adapter,/aman_c_client_auth/);
-  assert.match(adapter,/aman_c_admin_auth/);
-  assert.match(adapter,/aman_c_admin_remember/);
+  assert.match(adapter,/storageKey\s*=\s*scope\s*=>\s*"aman_c_"\s*\+\s*scope\s*\+\s*"_auth"/);
+  assert.match(adapter,/ADMIN_REMEMBER_KEY\s*=\s*"aman_c_admin_remember"/);
   assert.doesNotMatch(readProjectFile("client/app.js"),/localStorage|sessionStorage/);
   assert.doesNotMatch(readProjectFile("admin/app.js"),/localStorage|sessionStorage/);
 });
