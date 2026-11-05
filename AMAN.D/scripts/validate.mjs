@@ -89,6 +89,11 @@ for (const app of ["client", "admin"]) {
   if (!exists(htmlPath) || !exists(swPath) || !exists(manifestPath)) continue;
   const html = readFileSync(resolve(ROOT, htmlPath), "utf8");
   const sw = readFileSync(resolve(ROOT, swPath), "utf8");
+  for (const match of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
+    const ref = match[1];
+    if (/^(https?:|data:|#|mailto:|tel:|javascript:)/i.test(ref)) continue;
+    if (!sw.includes(ref)) failures.push("PWA: مورد محلي غير موجود في قائمة precache لـ " + app + ": " + ref);
+  }
   if (!html.includes('rel="manifest" href="./manifest.webmanifest"'))
     failures.push("PWA: ربط manifest مفقود في " + htmlPath);
   if (!html.includes('src="./pwa.js"'))
