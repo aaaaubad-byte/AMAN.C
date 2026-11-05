@@ -1,0 +1,40 @@
+name: AMAN.D validation
+
+on:
+  push:
+    branches: [rebuild/aman-d]
+    paths:
+      - "AMAN.D/**"
+      - ".github/workflows/aman-d-validation.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "AMAN.D/**"
+      - ".github/workflows/aman-d-validation.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aman-d-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-test-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: AMAN.D
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate AMAN.D structure and references
+        run: npm run validate
+      - name: Run AMAN.D automated tests
+        run: npm test
+      - name: Build independent AMAN.D distribution
+        run: npm run build
