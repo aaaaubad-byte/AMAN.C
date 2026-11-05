@@ -1,5 +1,7 @@
 # تحليل الاعتماديات (AMAN.C @ 0c37d34)
 
+> **تحديث 2026-11-05 (تحقق مؤكد، التفاصيل في `07` §4):** (1) المحاكاة: يستعملها `local-preview.mjs` واختبارات `task-rules/contract/browser*/isolation` فقط؛ `runtime.js` لا يستورد الملف ويرفض تسجيل أي محوّل `simulation:true` خارج localhost؛ الإنتاج يعمل بلا محاكاة. (2) `deploy.yml` ينسخ `index.html client admin styles services assets` فقط. (3) الأصول المستعملة: `logo-mark-v2.png`, `logo-mark-light-v2.png`, و`*-v3.png` (أيقونات، مختلفة بايتًا بين العميل والإدارة)؛ لا مرجع لأي SVG. (4) الواجهات لا تصل إلى `localStorage` (فقط `supabase-adapter.js` و`theme.js`). (5) `window.AMANClientData` المذكور في وثائق PHASE_2 **غير موجود** في main. (6) طرف fcd يضيف اختبارات متصفح إلى CI وينشر نسخة محاكاة (متجاوَز بقرار main اللاحق).
+
 ## ترتيب التحميل (صفحة العميل)
 `theme.js` (في head؛ يحقن `visual-v6.css` + `aman-ui-v6.js`) ← `app.css` ← مكتبة supabase-js من CDN ← `supabase-config.js` ← `runtime.js` ← `supabase-adapter.js` ← `compact-filters.js` ← `pull-to-refresh.js` ← `app.js` ← `ui-v5.js` ← `pwa.js`.
 
