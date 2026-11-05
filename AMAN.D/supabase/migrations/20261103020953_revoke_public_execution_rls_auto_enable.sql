@@ -1,4 +1,1 @@
--- ملف تمهيدي فقط؛ ليس ترحيلًا صالحًا للتطبيق.
--- المصدر المعتمد: Supabase live migration statements[1].
--- SHA-256 المتوقع للمحتوى الأصلي: 2ba591b2767c43a32731c8b74b5ffaa07c47a41d096eee6fb3672aad9278c49d
--- يستبدل بالنص الأصلي حرفيًا بعد استخراجه والتحقق من البصمة.
+REVOKE EXECUTE ON FUNCTION public.rls_auto_enable() FROM PUBLIC, anon, authenticated;
