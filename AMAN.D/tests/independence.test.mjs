@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { readProjectFile, projectPath, fileExists, stripComments, localHtmlReferences, staysInsideRoot } from "./helpers.mjs";
 import { dirname, resolve } from "node:path";
 
@@ -25,7 +26,7 @@ test("روابط HTML المحلية تبقى داخل AMAN.D وتشير إلى 
       const resolved=resolve(dirname(projectPath(page)),clean);
       const relativePath=resolve(projectPath("."),resolved);
       assert.equal(staysInsideRoot(relativePath),true,page+" → "+ref);
-      assert.equal(fileExists(relativePath.replace(projectPath(""),"")),true,page+" → "+ref);
+      assert.equal(existsSync(relativePath),true,page+" → "+ref);
     }
   }
 });
