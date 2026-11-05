@@ -67,7 +67,7 @@ function navigate(name,{remember=true}={}) {
  if(remember&&current!==name)historyStack.push(current);
  current=name;login.hidden=true;dashboard.hidden=true;section.hidden=false;nav.hidden=false;showAccountButton(true);
  $("section-title").textContent=item.title;$("section-description").textContent=item.description;
- $("admin-generic-view").hidden=name==="requests";$("requests-list-view").hidden=name!=="requests";$("request-detail-view").hidden=true;
+ $("admin-generic-view").classList.toggle("surface",!["numbers","customers"].includes(name));$("admin-generic-view").hidden=name==="requests";$("requests-list-view").hidden=name!=="requests";$("request-detail-view").hidden=true;
  setActive(name);window.scrollTo({top:0,behavior:"smooth"});
  document.dispatchEvent(new CustomEvent("aman:admin-screenchange",{detail:{screen:name}}));
  if(name==="requests")loadRequests();
@@ -83,7 +83,7 @@ async function loadDashboard(){
  catch{return false;}}
 function normalizeList(r){if(Array.isArray(r))return r;if(Array.isArray(r?.items))return r.items;if(Array.isArray(r?.requests))return r.requests;return [];}
 function requestCard(r){
- const card=document.createElement("button");card.type="button";card.className="compact-item admin-request-card";
+ const card=document.createElement("button");card.type="button";card.className="admin-request-card";
  const main=document.createElement("span");main.className="request-card-main";
  const title=document.createElement("strong");title.textContent=text(r.request_number||r.id,"طلب بدون رقم");
  const phone=document.createElement("span");phone.className="request-phone";phone.dir="ltr";phone.textContent=text(r.phone);
