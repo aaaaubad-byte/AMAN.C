@@ -74,13 +74,13 @@ const independentPattern = /AMAN\.C|AMAN\.B|simulation-adapter|__AMAN_SIMULATION
 for (const path of runtimeFiles.filter(path => !path.startsWith("assets/"))) {
   const source = readFileSync(resolve(ROOT, path), "utf8");
   let executableSource = source;
-  if (/\\.(?:js|mjs)$/i.test(path)) {
+  if (/\.(?:js|mjs)$/i.test(path)) {
     executableSource = executableSource
       .replace(/\/\*[\s\S]*?\*\//g, "")
       .replace(/^\s*\/\/.*$/gm, "");
-  } else if (/\\.css$/i.test(path)) {
+  } else if (/\.css$/i.test(path)) {
     executableSource = executableSource.replace(/\/\*[\s\S]*?\*\//g, "");
-  } else if (/\\.html$/i.test(path)) {
+  } else if (/\.html$/i.test(path)) {
     executableSource = executableSource.replace(/<!--([\s\S]*?)-->/g, "");
   }
   if (independentPattern.test(executableSource))
