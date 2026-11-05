@@ -13,10 +13,13 @@ const failures = [];
 const required = [
   "index.html",
   "client/index.html", "client/app.js", "client/pwa.js", "client/sw.js", "client/manifest.webmanifest",
+  "client/icons/icon-192.png", "client/icons/icon-512.png", "client/icons/icon-maskable-512.png", "client/icons/apple-touch-icon.png",
   "admin/index.html", "admin/app.js", "admin/requests.js", "admin/numbers.js", "admin/customers.js",
   "admin/tasks.js", "admin/reports.js", "admin/complaints.js", "admin/messaging.js",
   "admin/companies.js", "admin/catalog.js", "admin/content-audit.js", "admin/account.js",
   "admin/pwa.js", "admin/sw.js", "admin/manifest.webmanifest",
+  "admin/icons/icon-192.png", "admin/icons/icon-512.png", "admin/icons/icon-maskable-512.png", "admin/icons/apple-touch-icon.png",
+  "assets/brand/logo-mark.png", "assets/brand/logo-mark-light.png",
   "shared/config.js", "shared/runtime.js", "shared/supabase-adapter.js", "shared/theme.js",
   "shared/ui-icons.js", "shared/compact-filters.js", "shared/pull-to-refresh.js",
   "styles/base.css", "styles/visual.css", "styles/admin-login.css",
