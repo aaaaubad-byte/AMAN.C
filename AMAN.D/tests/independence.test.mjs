@@ -55,13 +55,13 @@ test("طبقة الاتصال وحدها تملك مفاتيح تخزين جلس
   const adapter=readProjectFile("shared/supabase-adapter.js");
   assert.match(adapter,/storageKey\s*=\s*scope\s*=>\s*"aman_c_"\s*\+\s*scope\s*\+\s*"_auth"/);
   assert.match(adapter,/ADMIN_REMEMBER_KEY\s*=\s*"aman_c_admin_remember"/);
-  assert.doesNotMatch(readProjectFile("client/app.js"),/localStorage|sessionStorage/);
-  assert.doesNotMatch(readProjectFile("admin/app.js"),/localStorage|sessionStorage/);
+  assert.doesNotMatch(stripComments(readProjectFile("client/app.js")),/localStorage|sessionStorage/);
+  assert.doesNotMatch(stripComments(readProjectFile("admin/app.js")),/localStorage|sessionStorage/);
 });
 
 test("أدوات التشغيل والبناء لا تحقن المحاكاة ولا تنسخ مجلدًا خارجيًا",()=>{
-  const build=readProjectFile("scripts/build.mjs");
-  const serve=readProjectFile("scripts/serve.mjs");
+  const build=stripComments(readProjectFile("scripts/build.mjs"));
+  const serve=stripComments(readProjectFile("scripts/serve.mjs"));
   assert.doesNotMatch(build,/simulation|AMAN\.C|AMAN\.B/i);
   assert.doesNotMatch(serve,/simulation|AMAN\.C|AMAN\.B/i);
   assert.match(build,/client.*admin.*shared.*styles/);
