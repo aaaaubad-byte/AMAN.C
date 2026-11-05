@@ -1,0 +1,9 @@
+{
+  "name": "أمان",
+  "short_name": "أمان",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "description": "حماية أرقام الاتصالات من الفقدان بسبب الخمول"
+}
