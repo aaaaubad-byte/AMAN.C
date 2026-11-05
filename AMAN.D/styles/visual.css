@@ -1,1 +1,208 @@
-/* ملف تمهيدي: visual.css — تُكتب الهوية البصرية وفق المرجع المعتمد. */
+/* ==========================================================================
+   AMAN — styles/visual.css
+   الطبقة البصرية. تُحقن بعد styles/base.css بواسطة shared/theme.js (عرض فقط).
+   1) خلفيات الشاشة  2) حقول الإدخال  3) الأيقونات الثنائية المصمتة (svg.ami)
+   4) شريط البطاقات الأفقي ومؤشراته  5) قواعد المكونات المستهلكة للرموز
+   6) بطاقات فيروزية (الثيم الفاتح فقط)  7) تحسين الرئيسية ولوحة الإدارة  8) العمق البصري
+
+   الرموز (الألوان والطبقات) معرَّفة مركزيًا في styles/base.css؛ هذا الملف يستهلكها فقط.
+   كل عنصر له قاعدة واحدة نهائية. بقيت علامة !important حيث تكون جزءًا من النتيجة
+   الفعلية (تغلّب على قواعد الأنماط الأخرى)، ولم تُضَف حيث لا يلزم.
+   ========================================================================== */
+
+/* ---------- 1) خلفيات الشاشة ---------- */
+html,body,.app,.topbar,.screen-head,.sheet,.bottom-nav{
+  background:var(--bg)!important;
+  background-image:none!important;
+}
+
+/* ---------- 2) حقول الإدخال: أغمق دائمًا من السطح الحامل لها ---------- */
+.field,input.field,select.field,textarea.field,
+.compact-search .field,.toolbar-search .field,.compact-filter-select,
+.compact-filter-icon,.auth-field .field,.password-wrap .field,.admin-filter-grid .field{
+  background:var(--field-bg)!important;
+  border:1px solid var(--field-border)!important;
+  color:var(--ink)!important;
+  caret-color:var(--turquoise);
+  box-shadow:none;
+}
+.field::placeholder{color:var(--muted)!important;opacity:1}
+.field:focus,.compact-filter-select:focus,.compact-search .field:focus{
+  border-color:var(--turquoise)!important;
+  box-shadow:0 0 0 2px rgba(7,143,135,.22)!important;
+  outline:none;
+}
+.field:disabled{opacity:.6}
+select.field option{background:var(--paper);color:var(--ink)}
+.password-toggle{color:var(--muted)}
+.password-toggle[aria-pressed="true"]{color:var(--turquoise)}
+
+/* ---------- 3) الأيقونات الثنائية المصمتة: a = أزرق/فاتح، b = فيروزي، c = تفصيل ---------- */
+svg.ami{fill:none!important;stroke:none!important;flex:0 0 auto;display:block}
+svg.ami *{stroke:none!important}
+svg.ami .a{fill:var(--ic-a)!important}
+svg.ami .b{fill:var(--ic-b)!important}
+svg.ami .c{fill:var(--ic-c)!important}
+.icon-btn svg.ami,.quick-icon svg.ami,.phone-icon svg.ami,.detail-icon svg.ami,
+.sheet-hero-icon svg.ami,.empty-icon svg.ami{width:26px;height:26px}
+.stat-icon svg.ami,.admin-shortcut .quick-icon svg.ami{width:30px;height:30px}
+.screen-head .tile-btn svg.ami{width:24px;height:24px}
+.nav-item svg.ami{width:23px;height:23px}
+.compact-filter-icon svg.ami{width:20px;height:20px}
+.sheet-close svg.ami{width:22px;height:22px}
+
+/* ---------- 4) شريط البطاقات الأفقي (إحصاءات الإدارة + خانات رئيسية العميل) ---------- */
+.aman-carousel-track,.admin-stats.aman-carousel-track{
+  display:flex!important;grid-template-columns:none!important;gap:12px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  margin-inline:calc(-1 * var(--app-pad));
+  padding:6px max(11%,calc((100% - 420px) / 2)) 8px;
+}
+.aman-carousel-track::-webkit-scrollbar{display:none}
+.aman-carousel-track>*{
+  flex:0 0 min(78%,420px);scroll-snap-align:center;scroll-snap-stop:always;
+  border-radius:22px;background:var(--tile);border:1px solid var(--line);
+  transform:scale(.93);opacity:.8;transition:transform .25s ease,opacity .25s ease;
+}
+.aman-carousel-track>.is-active{transform:scale(1);opacity:1}
+.admin-stats.aman-carousel-track .stat-card{
+  min-height:132px;padding:15px;gap:5px;justify-content:space-between;
+  display:flex;flex-direction:column;align-items:flex-start;
+}
+.admin-stats.aman-carousel-track .stat-card small{font-size:11.5px;color:var(--muted)}
+.admin-stats.aman-carousel-track .stat-card strong{font-size:34px;line-height:1.2;color:var(--num);margin-top:0}
+.aman-slot{min-height:132px}
+
+/* المؤشرات: دوائر 9×9 (النشط فيروزي ومكبَّر). */
+.aman-dots{display:flex;justify-content:center;align-items:center;gap:9px;margin:0 0 14px}
+.aman-dot{
+  width:9px;height:9px;min-width:9px;padding:0;border:0;border-radius:50%;
+  background:var(--dot);background-clip:border-box;cursor:pointer;
+  transition:background-color .2s ease;
+}
+.aman-dot.is-active{background:var(--turquoise);transform:scale(1.2)}
+.aman-home-cards{margin:-9px 0 0}
+@media(prefers-reduced-motion:reduce){
+  .aman-carousel-track>*,.aman-dot{transition:none}
+}
+
+/* ---------- 5) قواعد المكونات المستهلكة للرموز ---------- */
+.surface,.soft-surface,.auth-card,.login-card,.phone-card,.quick-link,.detail-block,.operation-card,
+.admin-request-card,.stat-card,.admin-shortcut{background:var(--paper)}
+.btn.btn-outline{background:var(--paper);color:var(--ink);border-color:var(--field-border)}
+.btn.btn-soft{background:var(--paper);color:var(--turquoise);border-color:var(--line)}
+.tab-strip{background:var(--field-bg);border:1px solid var(--field-border)}
+.tab-strip button[aria-selected="true"]{background:var(--paper);color:var(--ink)}
+.alert-note,.notice-info{background:var(--paper);border:1px solid var(--line)}
+.notice-info{border:0}
+.login-submit{background:var(--turquoise)}
+.remember-row input{accent-color:var(--turquoise)}
+.login-card .field:focus{border-color:var(--turquoise)}
+html[data-theme="dark"] .tab-strip{background:var(--panel-2);border:0}
+html[data-theme="dark"] .alert-note{border:0}
+html[data-theme="dark"] .btn.btn-soft{background:#203d43;color:#c5e9e5;border-color:transparent}
+
+/* ---------- 6) بطاقات فيروزية (الثيم الفاتح فقط؛ الداكن دون تغيير) ---------- */
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card{
+  background:var(--turquoise)!important;
+  background-color:var(--turquoise)!important;
+  border-color:var(--turquoise)!important;
+  color:#fff!important;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card small,
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card strong{color:#fff!important}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card .stat-icon{
+  background:rgba(255,255,255,.18)!important;
+  color:#fff!important;
+}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card .stat-icon .a{fill:#fff!important}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-card .stat-icon .b{fill:#d8f3f0!important}
+html:not([data-theme="dark"]) .aman-home-cards .aman-carousel-track .aman-slot{
+  background:var(--turquoise);
+  border-color:var(--turquoise);
+  color:#fff;
+}
+/* مؤشرات لوحة الإدارة: دوائر حقيقية بالأولوية الصريحة (تغلّب على أنماط الأزرار الافتراضية). */
+.admin-app #dashboard-screen>.admin-stats.aman-carousel-track~.aman-dots .aman-dot{
+  width:9px!important;height:9px!important;min-width:9px!important;min-height:9px!important;
+  padding:0!important;border:0!important;border-radius:50%!important;
+  background:var(--dot)!important;background-clip:border-box!important;
+}
+.admin-app #dashboard-screen>.admin-stats.aman-carousel-track~.aman-dots .aman-dot.is-active{
+  width:9px!important;height:9px!important;background:var(--turquoise)!important;transform:scale(1.2);
+}
+
+/* ---------- 7) تحسين الرئيسية (العميل) ولوحة الإدارة ---------- */
+#client-app .topbar-actions{width:100%;justify-content:flex-start;gap:8px}
+#client-app .topbar-greeting{order:2;margin-inline-start:auto;font-size:14px;font-weight:800;color:var(--ink)}
+#client-app .topbar-actions .icon-btn{order:1}
+#home-screen>.section-head{margin-top:16px;margin-bottom:9px}
+#home-screen>.section-head h2{display:flex;align-items:center}
+#home-screen>.surface.home-search{padding:13px 15px 14px;margin-bottom:9px}
+.home-search-hero{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 12px;text-align:center}
+.home-search-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--field-bg);color:var(--turquoise)}
+.home-search-icon svg{width:29px;height:29px}
+.home-search-hero h2{font-size:14px;font-weight:800;margin:0;color:var(--ink)}
+#search-form{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+#search-form .field{width:100%;margin:0}
+#search-form .home-search-submit{width:100%;min-height:42px;padding:7px}
+#search-form .home-search-submit svg{width:21px;height:21px}
+.section-heading-icon,.admin-section-icon{
+  display:inline-grid;place-items:center;width:23px;height:23px;margin-inline-end:7px;
+  color:var(--turquoise);vertical-align:middle;
+}
+.section-heading-icon svg,.admin-section-icon svg{width:21px;height:21px}
+@media(max-width:380px){#client-app .topbar-greeting{font-size:12.5px}.home-search-icon{width:44px;height:44px}}
+
+.admin-app>.topbar,.admin-app>.admin-topbar{justify-content:flex-start}
+.admin-app>.admin-topbar{gap:11px}
+.admin-topbar-greeting{font-size:14px;font-weight:800;color:var(--ink);line-height:1}
+.admin-app #dashboard-screen>.admin-stats{margin-top:-6px;margin-bottom:2px}
+.admin-app #dashboard-screen>.section-head{margin-top:12px;margin-bottom:9px}
+.admin-app #dashboard-screen>.surface{margin-top:12px!important}
+.admin-app #dashboard-screen .section-head h2{display:flex;align-items:center}
+.admin-app .aman-dots{gap:9px;margin:1px 0 8px}
+
+/* ---------- 8) العمق البصري (الثيم الفاتح فقط؛ رموز --depth-* معرّفة في base.css) ---------- */
+html:not([data-theme="dark"]) .surface,
+html:not([data-theme="dark"]) .soft-surface,
+html:not([data-theme="dark"]) .auth-card,
+html:not([data-theme="dark"]) .login-card,
+html:not([data-theme="dark"]) .phone-card,
+html:not([data-theme="dark"]) .quick-link,
+html:not([data-theme="dark"]) .detail-block,
+html:not([data-theme="dark"]) .operation-card,
+html:not([data-theme="dark"]) .admin-request-card,
+html:not([data-theme="dark"]) .admin-shortcut{
+  box-shadow:var(--depth-card);
+}
+/* ظلال ضيقة حتى لا يقصّها اقتطاع تمرير الشريط. */
+html:not([data-theme="dark"]) .aman-carousel-track>*{box-shadow:0 2px 5px rgba(21,59,86,.10)}
+html:not([data-theme="dark"]) .aman-carousel-track>.is-active{
+  box-shadow:0 2px 6px rgba(21,59,86,.16),inset 0 1px 0 rgba(255,255,255,.28);
+}
+/* الحقول غائرة قليلًا (حلقة التركيز أعلاه تغلب عند :focus). */
+html:not([data-theme="dark"]) .field:not(:focus),
+html:not([data-theme="dark"]) .compact-filter-select:not(:focus),
+html:not([data-theme="dark"]) .compact-filter-icon{box-shadow:var(--depth-field)}
+html:not([data-theme="dark"]) .quick-icon,
+html:not([data-theme="dark"]) .detail-icon,
+html:not([data-theme="dark"]) .phone-icon,
+html:not([data-theme="dark"]) .sheet-hero-icon,
+html:not([data-theme="dark"]) .home-search-icon{box-shadow:var(--depth-icon)}
+html:not([data-theme="dark"]) .admin-stats.aman-carousel-track .stat-icon{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+}
+html:not([data-theme="dark"]) .login-submit,
+html:not([data-theme="dark"]) .btn.btn-primary{
+  box-shadow:0 2px 6px rgba(7,143,135,.25),inset 0 1px 0 rgba(255,255,255,.22);
+}
+/* زجاج محدود: الشريط السفلي فقط (شبه معتم فلا يتغير تباين النص). */
+html:not([data-theme="dark"]) .bottom-nav{
+  background:rgba(244,248,250,.84)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.1);
+  backdrop-filter:blur(14px) saturate(1.1);
+  box-shadow:0 -4px 14px -6px rgba(21,59,86,.14);
+}
