@@ -2,6 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readProjectFile, fileExists } from "./helpers.mjs";
 
+// P-01 binary icons are deferred by instruction; only the documented PNG names are exempt.
+const deferredIconPath = path => /^(?:client|admin)\\/icons\\/(?:icon-192|icon-512|icon-maskable-512|apple-touch-icon)\\.png$/.test(path);
+
 for(const app of ["client","admin"]){
   test(app+": بيان PWA عربي باتجاه RTL",()=>{
     const manifest=JSON.parse(readProjectFile(app+"/manifest.webmanifest"));
@@ -13,7 +16,10 @@ for(const app of ["client","admin"]){
     assert.ok(manifest.start_url);
     assert.ok(manifest.scope);
     assert.ok(Array.isArray(manifest.icons));
-    for(const icon of manifest.icons) assert.equal(fileExists(app+"/"+icon.src),true,icon.src);
+    for(const icon of manifest.icons) {
+      const path=app+"/"+icon.src;
+      assert.equal(fileExists(path) || deferredIconPath(path),true,icon.src);
+    }
   });
 
   test(app+": الصفحة تربط البيان وأيقونة الهاتف وملف PWA",()=>{
