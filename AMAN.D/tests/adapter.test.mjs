@@ -147,7 +147,7 @@ test("لا أسرار ولا service_role في ملفات الاتصال أو ا
 test("ترتيب تحميل الصفحات: runtime ثم المكتبة ثم الإعدادات ثم المحوّل ثم الواجهة", () => {
   for (const f of ["../client/index.html", "../admin/index.html"]) {
     const h = read(f);
-    const order = ["../shared/runtime.js", "supabase-js@2.104.0", "../shared/config.js", "../shared/supabase-adapter.js", "app.js"].map(x => h.indexOf(x));
+    const order = ["../shared/runtime.js", "supabase-js@2.104.0", "../shared/config.js", "../shared/supabase-adapter.js", 'src="./app.js"'].map(x => h.indexOf(x));
     assert.ok(order.every(i => i > 0), f);
     assert.deepEqual(order, [...order].sort((a, b) => a - b), f);
   }
