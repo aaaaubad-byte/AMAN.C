@@ -1,2 +1,59 @@
-# ملف تمهيدي لإعدادات Pages.
-# تُحدد الإعدادات الفعلية بعد حسم بيئة النشر والتحقق منها.
+# قالب نشر اختياري لـ AMAN.D.
+# هذا الملف محفوظ تحت deploy/ ولا يعمل تلقائيًا.
+# لا يُنقل إلى .github/workflows إلا بعد اكتمال الاختبارات وموافقة المالك.
+
+name: AMAN.D — GitHub Pages (manual template)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: aman-d-pages
+  cancel-in-progress: true
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: جلب المستودع
+        uses: actions/checkout@v4
+
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: التحقق البنيوي
+        run: node scripts/validate.mjs
+
+      - name: الاختبارات
+        run: npm test
+
+      - name: بناء ملفات النشر
+        run: npm run build
+        env:
+          BUILD_ID: ${{ github.sha }}
+
+      - name: تجهيز GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: رفع ناتج البناء فقط
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: validate-build
+    steps:
+      - name: نشر الحزمة بعد التفعيل والموافقة
+        id: deployment
+        uses: actions/deploy-pages@v4
