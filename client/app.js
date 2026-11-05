@@ -556,7 +556,7 @@ function renderNotifications() {
  const items = lists.notifications.items.filter(n => filter === "all" || (filter === "unread" && !n.read_at) || (filter === "read" && n.read_at));
  if (!items.length) { host.append(emptyBox("bell", "لا توجد إشعارات في هذا التصنيف")); return; }
  items.forEach(item => {
-  const card = el("article", "notification-card"), head = el("div", "notification-head");
+  const card = el("article", "surface notification-card"), head = el("div", "notification-head");
   head.append(el("strong", "", item.title || "إشعار من أمان"), el("span", "state " + (item.read_at ? "state-off" : "state-wait"), item.read_at ? "مقروء" : "جديد"));
   card.append(head, el("p", "", item.body || ""), el("small", "", fmt(item.created_at)));
   if (!item.read_at) { const b = el("button", "quiet-link", "تحديد كمقروء"); b.type = "button"; b.addEventListener("click", () => markRead(item.id)); card.append(b); }
