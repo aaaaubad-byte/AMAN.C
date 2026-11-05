@@ -29,7 +29,7 @@ function renderNumbers(){
  const rows=numberRows.filter(n=>(status==="all"||n.protection_status===status)&&[n.phone,n.number,n.company_name].some(v=>String(v||"").toLowerCase().includes(term)));
  if(!rows.length){host.append(panel("قائمة الأرقام",[["النتيجة","لا توجد أرقام مطابقة"]]));return;}
  rows.forEach(n=>{
-  const card=el("button","admin-request-card"),main=el("span","request-card-main"),phone=el("strong","",n.phone||n.number);
+  const card=el("button","compact-item admin-request-card"),main=el("span","request-card-main"),phone=el("strong","",n.phone||n.number);
   phone.dir="ltr";const meta=el("small","",[n.company_name,safe(n.protection_status_label||labels[n.protection_status]),n.customer_count===undefined?null:"العملاء المرتبطون: "+n.customer_count].filter(Boolean).join(" • "));
   const side=el("span","request-card-side"),badge=el("span","state state-off",n.protection_status_label||labels[n.protection_status]||"حالة غير محددة");
   side.append(badge);main.append(phone,meta);card.append(main,side);card.type="button";card.addEventListener("click",()=>openNumber(n.id));host.append(card);
