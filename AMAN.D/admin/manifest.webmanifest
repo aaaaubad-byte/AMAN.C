@@ -1,0 +1,8 @@
+{
+  "name": "أمان | الإدارة",
+  "short_name": "أمان إدارة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "standalone"
+}
