@@ -227,7 +227,7 @@ function listStateBox(name, retry, emptyTitle, emptyText) {
 
 /* ---------- الأرقام ---------- */
 function numberCard(item, source) {
- const b = el("button", "compact-item phone-card"); b.type = "button";
+ const b = el("button", "phone-card"); b.type = "button";
  const info = el("span", "phone-info"), phone = el("strong", "", item.phone); phone.dir = "ltr";
  const meta = [item.company, item.remaining_label || (item.ends_at ? "ينتهي " + fmt(item.ends_at) : "")].filter(Boolean).join(" · ");
  info.append(phone, el("small", "", meta));
@@ -325,7 +325,7 @@ function renderOperations() {
  const filtered = lists.operations.items.filter(i => (!query || normalizeDigits(i.phone).includes(query) || String(i.request_number || i.id || "").includes(query)) && (!status || i.status === status));
  if (!filtered.length) { host.append(emptyBox("search", "لا توجد نتائج مطابقة", "لا توجد عملية تطابق البحث أو الحالة.")); return; }
  filtered.forEach(item => {
-  const b = el("button", "compact-item operation-card"); b.type = "button";
+  const b = el("button", "operation-card"); b.type = "button";
   const main = el("span", "operation-main"), phone = el("small", "", item.phone); phone.dir = "ltr";
   main.append(el("strong", "", operationLabels[item.type] || "عملية حماية"), phone, el("small", "", fmt(item.created_at)));
   const side = el("span", "operation-side");
@@ -452,7 +452,7 @@ async function openNumberAlerts(number) {
  msg.textContent = ""; msg.className = "";
  const items = result.items || [];
  if (!items.length) { host.append(emptyBox("bell", "لا توجد تنبيهات لهذا الرقم")); return true; }
- items.forEach(a => { const card = el("article", "compact-item notification-card"), head = el("div", "notification-head"); head.append(el("strong", "", a.title), el("span", "state " + (a.read_at ? "state-off" : "state-wait"), a.read_at ? "مقروء" : "جديد")); card.append(head, el("p", "", a.body), el("small", "", fmt(a.created_at))); host.append(card); });
+ items.forEach(a => { const card = el("article", "surface notification-card"), head = el("div", "notification-head"); head.append(el("strong", "", a.title), el("span", "state " + (a.read_at ? "state-off" : "state-wait"), a.read_at ? "مقروء" : "جديد")); card.append(head, el("p", "", a.body), el("small", "", fmt(a.created_at))); host.append(card); });
  return true;
 }
 
