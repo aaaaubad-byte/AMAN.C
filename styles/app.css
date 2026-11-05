@@ -1085,7 +1085,7 @@ svg.aman-icon .icon-cut{fill:none;stroke:var(--panel);stroke-width:1.15;stroke-l
   --compact-item-gap:10px;
   --compact-item-min-height:66px;
 }
-.phone-card,.operation-card,.admin-request-card,.notification-card,.quick-link{
+.compact-item,.phone-card,.operation-card,.admin-request-card,.notification-card,.quick-link{
   box-sizing:border-box;
   min-height:var(--compact-item-min-height);
   padding:var(--compact-item-padding);
