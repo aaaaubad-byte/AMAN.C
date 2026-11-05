@@ -26,9 +26,6 @@ const required = [
   "scripts/validate.mjs", "scripts/build.mjs", "scripts/serve.mjs"
 ];
 const exists = path => existsSync(resolve(ROOT, path));
-// P-01 is explicitly deferred: expected PNG references remain in manifests/HTML,
-// but the binary files are intentionally absent until assets are copied.
-const deferredPng = path => /^(?:assets\\/brand\\/logo-mark(?:-light)?\\.png|(?:client|admin)\\/icons\\/(?:icon-192|icon-512|icon-maskable-512|apple-touch-icon)\\.png)$/.test(path);
 for (const path of required) if (!exists(path)) failures.push("ملف مطلوب مفقود: " + path);
 
 function walk(dir) {
