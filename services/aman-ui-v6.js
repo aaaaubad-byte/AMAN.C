@@ -136,23 +136,25 @@ function initCarousel(track, label) {
   requestAnimationFrame(update);
 }
 
-/* Client home: exactly three empty design slots. No data, links or actions. */
+/* Client home: three display-only cards. Reuse the exact admin statistics-card structure and carousel sizing. */
 function injectClientSlots() {
   const home = document.getElementById("home-screen");
   if (!home || home.querySelector(".aman-home-cards")) return;
   const section = document.createElement("section");
   section.className = "aman-home-cards";
-  section.setAttribute("aria-label", "بطاقات الرئيسية");
+  section.setAttribute("aria-label", "بطاقات العرض");
   const track = document.createElement("div");
+  track.className = "admin-stats";
   for (let i = 0; i < 3; i++) {
-    const slot = document.createElement("div");
-    slot.className = "aman-slot";
+    const slot = document.createElement("article");
+    slot.className = "stat-card aman-slot";
+    slot.setAttribute("aria-hidden", "true");
     track.append(slot);
   }
   section.append(track);
-  const head = home.querySelector(".page-head");
-  if (head) head.after(section); else home.prepend(section);
-  initCarousel(track, "بطاقات الرئيسية");
+  const search = home.querySelector(".home-search");
+  if (search) search.after(section); else home.prepend(section);
+  initCarousel(track, "بطاقات العرض");
 }
 
 function scanCarousels(root) {
